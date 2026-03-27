@@ -1010,8 +1010,51 @@ function completeCaseStudy(){
   activeSession.submitted=true;activeSession.submittedAt=ts(activeSession);
   activeSession.snapshot={ethMode,ethFields:ethMode==='static'?{ip:document.getElementById('ethIP')?.value.trim()||'—',mask:document.getElementById('ethMask')?.value.trim()||'—',gw:document.getElementById('ethGW')?.value.trim()||'—',dns:document.getElementById('ethDNS')?.value.trim()||'—',altdns:document.getElementById('ethAltDNS')?.value.trim()||'—'}:null,fwIP:document.getElementById('fwIPInput')?.value.trim()||'—',fwRules:[...fwRules],cfIP:document.getElementById('cfIPInput')?.value.trim()||'—',cfRules:[...cfRules],advState:{...advState},fixedCount:activeSession.fixedCount,vpuLooked:vpuLinked};
   addLog('SUBMITTED','lb-correct','Case study submitted.');
-  document.getElementById('completeWrap').style.display='none';document.getElementById('completeConfirm').style.display='block';
-  refreshAdmin();
+  persistCurrentSession();
+
+  // ── Reset candidate view back to landing ──
+  setTimeout(() => {
+    // Reset all state
+    S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;
+    resetAdvState();activeSession=null;
+    pendingCandidateAttachments=[];
+
+    // Reset UI panels
+    document.getElementById('ethIPCard').style.display='block';document.getElementById('ethBuilder').style.display='none';document.getElementById('ethDeviceIP').value='';
+    document.getElementById('fwIPCard').style.display='block';document.getElementById('fwBuilder').style.display='none';document.getElementById('fwIPInput').value='';
+    document.getElementById('cfIPCard').style.display='block';document.getElementById('cfBuilder').style.display='none';document.getElementById('cfIPInput').value='';
+    document.getElementById('vpuLookupWrap').style.display='block';document.getElementById('vpuDash').style.display='none';document.getElementById('vpuLookupInput').value='';
+    document.getElementById('completeWrap').style.display='block';document.getElementById('completeConfirm').style.display='none';
+
+    // Hide nav items and candidate badge
+    document.getElementById('nav-firewall').style.display='none';
+    document.getElementById('nav-email').style.display='none';
+    document.getElementById('sidebar-cand').style.display='none';
+    document.getElementById('cand-name-display').textContent='—';
+
+    // Reset case study view to landing
+    document.getElementById('cs-details').classList.remove('show');
+    document.getElementById('cs-landing').style.display='block';
+    document.getElementById('candidateName').value='';
+    document.getElementById('nameErr').textContent='';
+    document.getElementById('cs-cand-label').textContent='';
+
+    // Lock RemoteShield tabs
+    lockRemoteShieldTabs();
+
+    // Reset email panel
+    document.getElementById('ep-empty').style.display='block';
+    document.getElementById('ep-active').style.display='none';
+    document.getElementById('ep-reply').value='';
+    document.getElementById('ep-attach-bar').innerHTML='';
+    document.getElementById('emailBadge').style.display='none';
+
+    // Navigate back to Case Study
+    showPage('case', document.getElementById('nav-case'));
+    document.getElementById('nav-case').classList.add('active');
+
+    renderAdvanced();refresh();
+  }, 3000); // 3 second delay so they see the confirmation message before reset
 }
 
 function renderSubmission(sess){
