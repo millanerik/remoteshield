@@ -756,20 +756,23 @@ function doComplete(){
     // Reset everything and return to splash
     S={...DS};ethMode='dhcp';fwIPLocked=false;fwRules=[];cfIPLocked=false;cfRules=[];vpuLinked=false;
     resetAdvState();activeSess=null;pendingCandAtt=[];
-    document.getElementById('fwIPCard').style.display='block';document.getElementById('fwBuilder').style.display='none';document.getElementById('fwIPInp').value='';
-    document.getElementById('cfIPCard').style.display='block';document.getElementById('cfBuilder').style.display='none';document.getElementById('cfIPInp').value='';
-    document.getElementById('vpuLookupWrap').style.display='block';document.getElementById('vpuDash').style.display='none';document.getElementById('vpuInp').value='';
-    document.getElementById('completeWrap').style.display='block';document.getElementById('completeDone').style.display='none';
-    document.getElementById('sbCand').style.display='none';document.getElementById('sbName').textContent='—';document.getElementById('csCandLabel').textContent='';
+    document.getElementById('completeWrap').style.display='block';
+    document.getElementById('completeDone').style.display='none';
+    document.getElementById('sbCand').style.display='none';
+    document.getElementById('sbName').textContent='—';
     document.getElementById('sbAdmin').style.display='none';
-    lockItabs();renderAdv();refresh();
+    document.getElementById('csCandLabel').textContent='';
     document.getElementById('emailThread').innerHTML='';
-    document.getElementById('emailReply').value='';document.getElementById('emailAttachBar').innerHTML='';
-    document.getElementById('emailBadge' in window?'emailBadge':'ebadge').style.display='none';
+    document.getElementById('emailReply').value='';
+    document.getElementById('emailAttachBar').innerHTML='';
+    document.getElementById('ebadge').style.display='none';
+    try{localStorage.removeItem('rs_active_name');}catch(e){}
+    resetFwState();renderAdv();refresh();
     nav('case',document.getElementById('nav-case'));
-    // Return to splash
-    document.getElementById('spName').value='';document.getElementById('spPw').value='';
-    document.getElementById('spPwWrap').style.display='none';document.getElementById('spErr').textContent='';
+    document.getElementById('spName').value='';
+    document.getElementById('spPw').value='';
+    document.getElementById('spPwWrap').style.display='none';
+    document.getElementById('spErr').textContent='';
     showSplash(true);
   },3000);
 }
