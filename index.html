@@ -836,21 +836,41 @@ function submitAdminLogin(){
 }
 
 function launchCandidate(name){
-  S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;resetAdvState();
-  document.getElementById('ethIPCard').style.display='block';document.getElementById('ethBuilder').style.display='none';document.getElementById('ethDeviceIP').value='';
-  document.getElementById('fwIPCard').style.display='block';document.getElementById('fwBuilder').style.display='none';document.getElementById('fwIPInput').value='';
-  document.getElementById('cfIPCard').style.display='block';document.getElementById('cfBuilder').style.display='none';document.getElementById('cfIPInput').value='';
-  document.getElementById('vpuLookupWrap').style.display='block';document.getElementById('vpuDash').style.display='none';document.getElementById('vpuLookupInput').value='';
-  lockRemoteShieldTabs();
-  document.getElementById('completeWrap').style.display='block';document.getElementById('completeConfirm').style.display='none';
-  newSession(name);
-  addLog('START','lb-start','Candidate <strong>'+name+'</strong> started the exercise.');
-  document.getElementById('cand-name-display').textContent=name;
-  document.getElementById('sidebar-cand').style.display='block';
-  document.getElementById('sadmin').style.display='none';
-  document.getElementById('cs-cand-label').textContent='Candidate: '+name;
+  // Hide overlay first — before anything else can throw
   document.getElementById('landingOverlay').style.display='none';
-  renderAdvanced();refresh();updateEmailBadge();
+  document.getElementById('sadmin').style.display='none';
+
+  try {
+    S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;
+    resetAdvState();
+
+    document.getElementById('ethIPCard').style.display='block';
+    document.getElementById('ethBuilder').style.display='none';
+    document.getElementById('ethDeviceIP').value='';
+    document.getElementById('fwIPCard').style.display='block';
+    document.getElementById('fwBuilder').style.display='none';
+    document.getElementById('fwIPInput').value='';
+    document.getElementById('cfIPCard').style.display='block';
+    document.getElementById('cfBuilder').style.display='none';
+    document.getElementById('cfIPInput').value='';
+    document.getElementById('vpuLookupWrap').style.display='block';
+    document.getElementById('vpuDash').style.display='none';
+    document.getElementById('vpuLookupInput').value='';
+    document.getElementById('completeWrap').style.display='block';
+    document.getElementById('completeConfirm').style.display='none';
+
+    lockRemoteShieldTabs();
+    newSession(name);
+    addLog('START','lb-start','Candidate <strong>'+name+'</strong> started the exercise.');
+    document.getElementById('cand-name-display').textContent=name;
+    document.getElementById('sidebar-cand').style.display='block';
+    document.getElementById('cs-cand-label').textContent='Candidate: '+name;
+    renderAdvanced();
+    refresh();
+    updateEmailBadge();
+  } catch(e) {
+    console.error('launchCandidate error:', e);
+  }
 }
 
 // ══ VPU LOOKUP ══
