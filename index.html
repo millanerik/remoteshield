@@ -870,6 +870,8 @@ function launchCandidate(name){
     renderAdvanced();
     refresh();
     updateEmailBadge();
+    // Pre-render email thread so it's ready when user clicks Email tab
+    showEmailPanel();
   } catch(e) {
     console.error('launchCandidate error:', e);
   }
