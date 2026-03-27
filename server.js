@@ -37,12 +37,24 @@ async function getAllSessions() {
 
 async function upsertSession(session) {
   try {
-    const res = await sbFetch('sessions', {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/sessions`, {
       method: 'POST',
-      headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-      body: JSON.stringify({ name: session.name, data: session, updated_at: new Date().toISOString() })
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({
+        name: session.name,
+        data: session,
+        updated_at: new Date().toISOString()
+      })
     });
-    if (!res.ok) console.error('upsertSession error:', res.status, await res.text());
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error('upsertSession error:', res.status, txt);
+    }
   } catch (e) { console.error('upsertSession exception:', e); }
 }
 
