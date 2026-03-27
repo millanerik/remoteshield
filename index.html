@@ -680,7 +680,7 @@ function mkSession(name){
 }
 
 // ══ SPLASH ══
-function onStart(){
+async function onStart(){
   const name=document.getElementById('spName').value.trim();
   const err=document.getElementById('spErr');
   if(!name){err.textContent='Please enter your name.';return;}
@@ -708,13 +708,9 @@ function onAdminPw(){
   renderSessions();refreshAdmin();startPoll();
 }
 
-function launchCandidate(name){
+async function launchCandidate(name){
   showSplash(false);
   mkSession(name);
-
-  // Persist immediately so admin sees the session right away
-  persist();
-
   document.getElementById('sbName').textContent=name;
   document.getElementById('sbCand').style.display='block';
   document.getElementById('sbAdmin').style.display='none';
@@ -722,11 +718,19 @@ function launchCandidate(name){
   resetFwState();
   renderAdv();refresh();
   renderEmailThread();
-
-  // Log start after persist so it shows in the activity log
+  // Add start log entry directly (avoid calling log() before persist)
   activeSess.totalActions++;
   activeSess.log.push({t:ts(activeSess),badge:'START',cls:'lb-start',msg:'Candidate <strong>'+name+'</strong> started the exercise.'});
-  persist();
+  // Save name to localStorage for refresh restore
+  try{localStorage.setItem('rs_active_name',name);}catch(e){}
+  // Persist to Supabase and log result
+  try{
+    const san=JSON.parse(JSON.stringify(activeSess));
+    if(san.emails)san.emails=san.emails.map(m=>({...m,attachments:(m.attachments||[]).map(a=>({name:a.name,type:a.type,id:a.id,size:a.size}))}));
+    const res=await fetch('/api/sessions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(san)});
+    if(res.ok){console.log('Session saved to Supabase for:',name);}
+    else{console.error('Failed to save session:',res.status,await res.text());}
+  }catch(e){console.error('Session save error:',e);}
   refreshAdmin();
 }
 
