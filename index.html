@@ -6,317 +6,358 @@
 <title>RemoteShield — PlayOn High School</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;display:flex;}
+body{font-family:'Segoe UI',sans-serif;background:#0c0c0c;color:#e2e8f0;min-height:100vh;display:flex;}
+
+/* ── CSS Variables ── */
+:root{
+  --red:       #ef4444;
+  --red-hover: #dc2626;
+  --red-dark:  #450a0a;
+  --red-dim:   #7f1d1d;
+  --red-soft:  #fca5a5;
+  --bg-base:   #0c0c0c;
+  --bg-card:   #161616;
+  --bg-raised: #1e1e1e;
+  --bg-inset:  #0a0a0a;
+  --border:    #2a2a2a;
+  --border-md: #333333;
+  --text-1:    #f1f5f9;
+  --text-2:    #94a3b8;
+  --text-3:    #475569;
+  --green:     #22c55e;
+  --green-bg:  #14532d;
+  --green-dim: #166534;
+  --blue:      #3b82f6;
+  --blue-bg:   #1e3a5f;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
 .layout{display:flex;width:100%;min-height:100vh;}
 
-/* Sidebar */
-.sidebar{width:210px;background:#1a1a1a;border-right:1px solid #2a2a2a;display:flex;flex-direction:column;flex-shrink:0;}
-.sidebar-logo{padding:20px 16px 4px;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
-.sidebar-brand{padding:4px 16px 16px;font-size:15px;font-weight:700;color:#f97316;border-bottom:1px solid #2a2a2a;margin-bottom:8px;line-height:1.4;}
-.snav{padding:8px;flex:1;}
-.sitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:#888;transition:all .15s;user-select:none;margin-bottom:2px;}
-.sitem:hover{background:#2a2a2a;color:#e2e8f0;}
-.sitem.active{background:#f97316;color:#fff;font-weight:600;}
-.sitem .icon{font-size:15px;width:18px;text-align:center;}
-.sadmin{padding:8px;border-top:1px solid #2a2a2a;}
-.cand-badge{margin:0 10px 10px;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;}
-.cand-badge .lbl{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;}
-.cand-badge .name{font-size:13px;color:#f97316;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sidebar-footer{padding:10px 16px;text-align:center;border-top:1px solid #2a2a2a;}
-.sidebar-footer span{font-size:10px;color:#333;}
-.ebadge{background:#ef4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;margin-left:auto;display:none;}
+/* ── Sidebar ── */
+.sidebar{width:220px;background:#111;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-top{padding:20px 18px 14px;border-bottom:1px solid var(--border);}
+.sidebar-eyebrow{font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:5px;}
+.sidebar-brand{font-size:15px;font-weight:700;color:var(--red);line-height:1.3;}
+.sidebar-sub{font-size:11px;font-weight:400;color:var(--text-3);margin-top:2px;}
+.snav{padding:10px 10px;flex:1;}
+.sitem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-md);cursor:pointer;font-size:13px;color:var(--text-3);transition:all .15s;user-select:none;margin-bottom:1px;}
+.sitem:hover{background:var(--bg-raised);color:var(--text-1);}
+.sitem.active{background:var(--red);color:#fff;font-weight:600;}
+.sitem .icon{font-size:14px;width:16px;text-align:center;flex-shrink:0;}
+.sadmin{padding:10px;border-top:1px solid var(--border);}
+.cand-badge{margin:0 10px 10px;background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 12px;}
+.cand-badge .lbl{font-size:9px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-weight:600;}
+.cand-badge .name{font-size:13px;color:var(--red);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-footer{padding:10px 16px;text-align:center;border-top:1px solid var(--border);}
+.sidebar-footer span{font-size:10px;color:#2a2a2a;}
+.ebadge{background:var(--red);color:white;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-left:auto;display:none;}
 
-/* Content */
-.content{flex:1;overflow-y:auto;padding:28px;}
+/* ── Content ── */
+.content{flex:1;overflow-y:auto;padding:28px 32px;}
 .page{display:none;}.page.active{display:block;}
 
-/* Inner tabs */
-.itabs{display:flex;gap:2px;border-bottom:1px solid #334155;margin-bottom:20px;flex-wrap:wrap;}
-.itab{padding:10px 16px;font-size:12px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;user-select:none;}
-.itab:hover{color:#e2e8f0;}
-.itab.active{color:#f97316;border-bottom-color:#f97316;}
-.itab-locked{opacity:.35;cursor:not-allowed !important;}
-.itab-locked:hover{color:#64748b !important;}
-.itab-content{display:none;}.itab-content.active{display:block;}
+/* ── Page Header ── */
+.page-hdr{margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.page-hdr .eyebrow{font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:4px;}
+.page-hdr h1{font-size:22px;font-weight:700;color:var(--text-1);}
+.page-hdr p{font-size:12px;color:var(--text-3);margin-top:3px;}
 
-/* Cards */
-.card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;margin-bottom:16px;}
-.ctitle{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;font-weight:600;}
+/* ── Cards ── */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;}
+.card-inset{background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;}
+.ctitle{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;font-weight:600;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;}
 
-/* FW Header */
-.fw-hdr{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:12px 20px;margin-bottom:20px;}
-.fw-logo{font-size:15px;font-weight:700;color:#f97316;}
-.fw-logo span{color:#64748b;font-weight:400;font-size:11px;margin-left:8px;}
+/* ── Inner tabs ── */
+.itabs{display:flex;gap:1px;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;}
+.itab{padding:10px 18px;font-size:12px;color:var(--text-3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;user-select:none;font-weight:500;}
+.itab:hover{color:var(--text-1);}
+.itab.active{color:var(--red);border-bottom-color:var(--red);}
+.itab-locked{opacity:.3;cursor:not-allowed !important;}
+.itab-locked:hover{color:var(--text-3) !important;}
+.itab-content{display:none;}.itab-content.active{display:block;}
 
-/* Banners */
-.sbanner{background:#14532d;border:1px solid #22c55e;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:none;gap:12px;align-items:center;}
+/* ── FW Header ── */
+.fw-hdr{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;}
+.fw-logo{font-size:15px;font-weight:700;color:var(--red);}
+.fw-logo span{color:var(--text-3);font-weight:400;font-size:11px;margin-left:10px;}
+.fw-build{font-size:10px;color:var(--text-3);background:var(--bg-inset);border:1px solid var(--border);padding:3px 10px;border-radius:20px;}
+
+/* ── Banners ── */
+.sbanner{background:var(--green-bg);border:1px solid var(--green);border-radius:var(--radius-lg);padding:14px 20px;margin-bottom:20px;display:none;gap:14px;align-items:center;}
 .sbanner.show{display:flex;}
+.abanner{background:#0f0a00;border:1px solid #854d0e;border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start;}
+.abanner h4{color:#fbbf24;font-size:13px;margin-bottom:3px;font-weight:600;}
+.abanner p{color:#92400e;font-size:12px;line-height:1.6;}
 
-/* Checklist */
-.clitem{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #334155;font-size:13px;}
+/* ── Checklist ── */
+.clitem{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
 .clitem:last-child{border-bottom:none;}
 
-/* Table */
+/* ── Inputs & Controls ── */
+.field-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;display:block;margin-bottom:6px;}
+.inp{background:var(--bg-inset);border:1px solid var(--border-md);border-radius:var(--radius-md);padding:10px 14px;color:var(--text-1);font-size:13px;outline:none;transition:border .2s;width:100%;font-family:inherit;}
+.inp:focus{border-color:var(--red);}
+.inp.mono{font-family:'Courier New',monospace;}
+.inp.invalid{border-color:var(--red);}
+.sel{background:var(--bg-inset);border:1px solid var(--border-md);border-radius:var(--radius-md);padding:10px 12px;color:var(--text-1);font-size:13px;outline:none;width:100%;cursor:pointer;}
+.sel:focus{border-color:var(--red);}
+
+/* ── Buttons ── */
+.btn-primary{background:var(--red);color:white;border:none;padding:10px 22px;border-radius:var(--radius-md);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-primary:hover{background:var(--red-hover);}
+.btn-secondary{background:var(--bg-raised);color:var(--text-2);border:1px solid var(--border-md);padding:8px 16px;border-radius:var(--radius-md);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.btn-secondary:hover{background:#2a2a2a;color:var(--text-1);}
+.btn-allow{background:var(--green-dim);color:#4ade80;border:none;padding:8px 14px;border-radius:var(--radius-md);font-size:12px;font-weight:700;cursor:pointer;}
+.btn-allow:hover{background:#15803d;}
+.btn-deny{background:var(--red-dim);color:var(--red-soft);border:none;padding:8px 14px;border-radius:var(--radius-md);font-size:12px;font-weight:700;cursor:pointer;}
+.btn-deny:hover{background:#991b1b;}
+.btn-del{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:15px;padding:2px 6px;border-radius:4px;transition:color .15s;}
+.btn-del:hover{color:var(--red);}
+.btn-ghost{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:11px;transition:color .15s;}
+.btn-ghost:hover{color:var(--text-1);}
+
+/* ── Progress ── */
+.pbwrap{background:var(--bg-inset);border-radius:10px;height:6px;margin-top:10px;overflow:hidden;}
+.pb{height:6px;border-radius:10px;background:var(--red);transition:width .4s,background .4s;}
+.pb.done{background:var(--green);}
+
+/* ── Tables ── */
 table{width:100%;border-collapse:collapse;font-size:13px;}
-th{text-align:left;padding:10px 14px;color:#64748b;font-weight:600;border-bottom:1px solid #334155;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
-td{padding:11px 14px;border-bottom:1px solid #1e293b;vertical-align:middle;}
+th{text-align:left;padding:9px 14px;color:var(--text-3);font-weight:600;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.06em;background:var(--bg-inset);}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text-2);}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(255,255,255,.02);}
 
-/* Buttons */
-.eth-apply{background:#f97316;color:white;border:none;padding:11px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
-.eth-apply:hover{background:#ea7009;}
-.fw-action-btn{padding:9px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;white-space:nowrap;}
-.allow-btn{background:#166534;color:#4ade80;}.allow-btn:hover{background:#15803d;}
-.deny-btn{background:#7f1d1d;color:#fca5a5;}.deny-btn:hover{background:#991b1b;}
-.fw-del{background:none;border:none;color:#475569;cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;}
-.fw-del:hover{color:#ef4444;}
+/* ── Badge pills ── */
+.pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;display:inline-block;}
+.pill-green{background:var(--green-dim);color:#4ade80;}
+.pill-red{background:var(--red-dim);color:var(--red-soft);}
+.pill-blue{background:#1e3a5f;color:#93c5fd;}
+.pill-purple{background:#3b2a6b;color:#c4b5fd;}
+.pill-amber{background:#1c1400;color:#fbbf24;}
 
-/* Inputs */
-.eth-input{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-family:'Courier New',monospace;font-size:13px;outline:none;transition:border .2s;width:100%;}
-.eth-input:focus{border-color:#f97316;}
-.eth-input.invalid{border-color:#ef4444;}
-.fw-select{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:13px;outline:none;width:100%;cursor:pointer;}
-.fw-select:focus{border-color:#f97316;}
-
-/* Progress */
-.pbwrap{background:#0f172a;border-radius:10px;height:8px;margin-top:10px;}
-.pb{height:8px;border-radius:10px;background:#f97316;transition:width .4s,background .4s;}
-.pb.done{background:#22c55e;}
-.icnt{font-size:26px;font-weight:700;}
-.icnt.bad{color:#f97316;}.icnt.good{color:#22c55e;}
-
-/* Domain/CF rows */
-.drow{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #334155;gap:12px;}
-.drow:last-child{border-bottom:none;}
-.dtag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap;}
-.dtag.ok{background:#166534;color:#4ade80;}.dtag.warn{background:#7f1d1d;color:#fca5a5;}
-.cf-entry{display:grid;grid-template-columns:1fr 180px 80px 36px;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid #334155;font-size:13px;}
-.cf-entry:last-child{border-bottom:none;}
-.cf-entry:hover{background:rgba(255,255,255,.02);}
-.cf-th{display:grid;grid-template-columns:1fr 180px 80px 36px;gap:12px;padding:10px 18px;border-bottom:1px solid #334155;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-.cf-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-align:center;white-space:nowrap;}
-.cf-badge.allow{background:#166534;color:#4ade80;}
-.cf-badge.block{background:#7f1d1d;color:#fca5a5;}
-.fw-rule-entry{display:grid;grid-template-columns:80px 80px 90px 1fr 80px 36px;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid #334155;font-size:13px;}
-.fw-rule-entry:last-child{border-bottom:none;}
-.fw-rule-entry:hover{background:rgba(255,255,255,.02);}
-.fw-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-align:center;}
-.fw-badge.allow{background:#166534;color:#4ade80;}
-.fw-badge.deny{background:#7f1d1d;color:#fca5a5;}
-.fw-th{display:grid;grid-template-columns:80px 80px 90px 1fr 80px 36px;gap:10px;padding:10px 18px;border-bottom:1px solid #334155;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
-
-/* Ethernet */
-.eth-mode-bar{display:flex;gap:0;margin-bottom:24px;border:1px solid #334155;border-radius:8px;overflow:hidden;}
-.eth-mode-btn{flex:1;padding:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#0f172a;color:#64748b;transition:all .2s;text-align:center;}
-.eth-mode-btn.active{background:#f97316;color:white;}
-.eth-field-group{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
-.eth-field{display:flex;flex-direction:column;gap:6px;}
-.eth-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.07em;font-weight:600;}
-.eth-status{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:12px;display:none;}
-.eth-status.ok{background:#14532d;border:1px solid #22c55e;color:#4ade80;display:block;}
-.eth-status.err{background:#450a0a;border:1px solid #ef4444;color:#fca5a5;display:block;}
-.dhcp-info{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:12px;color:#64748b;line-height:1.7;}
-
-/* Advanced */
-.adv-group{background:#1e293b;border:1px solid #334155;border-radius:10px;margin-bottom:16px;overflow:hidden;}
-.adv-group-hdr{background:#0f172a;padding:11px 20px;border-bottom:1px solid #334155;display:flex;align-items:center;gap:10px;}
-.adv-group-hdr span{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
-.adv-row{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #334155;gap:20px;}
-.adv-row:last-child{border-bottom:none;}
-.adv-row-info{flex:1;}
-.adv-row-info h4{font-size:13px;color:#e2e8f0;margin-bottom:4px;font-weight:600;}
-.adv-row-info p{font-size:12px;color:#64748b;line-height:1.5;}
-.adv-row-ctrl{display:flex;flex-direction:column;align-items:center;flex-shrink:0;margin-left:16px;gap:5px;}
-.adv-lbl{font-size:10px;font-weight:700;text-align:center;min-width:54px;}
-.tswitch{position:relative;width:46px;height:24px;cursor:pointer;flex-shrink:0;}
+/* ── Toggle switch ── */
+.tswitch{position:relative;width:44px;height:22px;cursor:pointer;flex-shrink:0;}
 .tswitch input{opacity:0;width:0;height:0;position:absolute;}
-.slider{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:26px;background:#22c55e;transition:.3s;}
-.slider:before{position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;}
-input:checked+.slider{background:#ef4444;}
+.slider{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:22px;background:var(--green);transition:.25s;}
+.slider:before{position:absolute;content:'';height:16px;width:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.25s;}
+input:checked+.slider{background:var(--red);}
 input:checked+.slider:before{transform:translateX(22px);}
 
-/* VPU Dashboard */
-.vpu-lookup{max-width:460px;margin:40px auto 0;text-align:center;}
-.vpu-lookup h3{font-size:17px;font-weight:700;color:#f1f5f9;margin-bottom:6px;}
-.vpu-lookup p{font-size:12px;color:#64748b;margin-bottom:20px;}
-.lookup-row{display:flex;gap:8px;}
-.lookup-input{flex:1;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:11px 14px;color:#e2e8f0;font-size:13px;font-family:'Courier New',monospace;outline:none;transition:border .2s;}
-.lookup-input:focus{border-color:#f97316;}
-.lookup-input.err{border-color:#ef4444;}
-.lookup-btn{background:#f97316;color:white;border:none;padding:11px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
-.lookup-btn:hover{background:#ea7009;}
-.lookup-err{font-size:12px;color:#ef4444;margin-top:8px;min-height:16px;}
-.vpu-status-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:#0f172a;border:1px solid #334155;border-radius:10px;margin-bottom:16px;}
-.ds-section{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:12px;}
-.gen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;}
-.gen-item{display:flex;flex-direction:column;padding:6px 0;border-bottom:1px solid #1e293b;}
-.gen-item:last-child{border-bottom:none;}
-.gen-k{font-size:11px;color:#475569;margin-bottom:2px;}
-.gen-v{font-size:12px;color:#e2e8f0;font-family:'Courier New',monospace;}
-.gen-v.ok{color:#22c55e;font-family:inherit;}.gen-v.warn{color:#f97316;font-family:inherit;}
-.storage-wrap{background:#0f172a;border-radius:6px;height:18px;overflow:hidden;margin-bottom:7px;}
-.storage-fill{height:100%;background:#f97316;border-radius:6px;}
-.storage-meta{display:flex;justify-content:space-between;font-size:11px;color:#64748b;}
-.dp-table{width:100%;border-collapse:collapse;font-size:12px;}
-.dp-table th{text-align:left;padding:8px 14px;color:#475569;font-size:11px;font-weight:600;background:#0f172a;border-bottom:1px solid #334155;text-transform:uppercase;}
-.dp-table td{padding:9px 14px;border-bottom:1px solid #1e293b;color:#94a3b8;font-family:'Courier New',monospace;font-size:12px;}
-.dp-table tr:last-child td{border-bottom:none;}
-.poe-ok{color:#22c55e;font-family:inherit;}
-.poe-err{color:#ef4444;font-family:inherit;}
-.gauges-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
-.gauge-item{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.gauge-lbl{font-size:11px;color:#64748b;text-align:center;}
+/* ── Ethernet ── */
+.mode-bar{display:flex;border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:20px;}
+.mode-btn{flex:1;padding:10px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:var(--bg-inset);color:var(--text-3);transition:all .2s;text-align:center;}
+.mode-btn.active{background:var(--red);color:white;}
+.eth-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.eth-field{display:flex;flex-direction:column;}
+.eth-status{margin-top:12px;padding:11px 14px;border-radius:var(--radius-md);font-size:12px;display:none;}
+.eth-status.ok{background:var(--green-bg);border:1px solid var(--green);color:#4ade80;display:block;}
+.eth-status.err{background:var(--red-dark);border:1px solid var(--red);color:var(--red-soft);display:block;}
 
-/* Case Study */
-.cs-landing{max-width:620px;margin:0 auto;padding-top:20px;}
-.cs-landing-hero{background:linear-gradient(135deg,#1e293b,#0f172a);border:1px solid #334155;border-radius:14px;padding:32px;margin-bottom:24px;text-align:center;}
-.cs-landing-hero .badge{display:inline-block;background:#f97316;color:white;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:4px 14px;border-radius:20px;margin-bottom:14px;}
-.cs-landing-hero h1{font-size:22px;font-weight:700;color:#f1f5f9;margin-bottom:12px;}
-.cs-landing-hero p{font-size:13px;color:#94a3b8;line-height:1.9;}
-.cs-start-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:28px;margin-bottom:16px;}
-.cs-start-card h3{font-size:14px;color:#e2e8f0;margin-bottom:6px;}
-.cs-start-card p{font-size:12px;color:#64748b;margin-bottom:18px;line-height:1.6;}
-.name-input{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px 16px;color:#e2e8f0;font-size:14px;outline:none;transition:border .2s;margin-bottom:12px;}
-.name-input:focus{border-color:#f97316;}
-.name-input.err{border-color:#ef4444;animation:shake .3s;}
-.start-btn{width:100%;background:#f97316;color:white;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
-.start-btn:hover{background:#ea7009;}
+/* ── FW / CF Rule tables ── */
+.rule-hdr{display:flex;align-items:center;justify-content:space-between;background:var(--bg-inset);padding:10px 16px;border-bottom:1px solid var(--border);}
+.rule-hdr span{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
+.rule-count{background:var(--bg-raised);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--text-3);}
+.fw-row{display:grid;grid-template-columns:80px 80px 90px 1fr 80px 36px;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}
+.fw-row:last-child{border-bottom:none;}
+.fw-row:hover{background:rgba(255,255,255,.02);}
+.fw-th{display:grid;grid-template-columns:80px 80px 90px 1fr 80px 36px;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
+.cf-row{display:grid;grid-template-columns:1fr 180px 80px 36px;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}
+.cf-row:last-child{border-bottom:none;}
+.cf-row:hover{background:rgba(255,255,255,.02);}
+.cf-th{display:grid;grid-template-columns:1fr 180px 80px 36px;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
+.cf-empty{padding:20px 16px;font-size:13px;color:var(--text-3);font-style:italic;}
+
+/* ── IP confirm bar ── */
+.ip-bar{display:flex;align-items:center;gap:8px;background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--radius-md);padding:6px 14px;font-size:12px;}
+.ip-bar .lbl{color:var(--text-3);}
+.ip-bar .val{font-family:'Courier New',monospace;color:var(--red);font-weight:700;}
+
+/* ── Advanced Settings ── */
+.adv-group{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:14px;overflow:hidden;}
+.adv-group-hdr{background:var(--bg-inset);padding:10px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.adv-group-hdr span{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
+.adv-row{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);gap:20px;}
+.adv-row:last-child{border-bottom:none;}
+.adv-info h4{font-size:13px;color:var(--text-1);margin-bottom:4px;font-weight:600;}
+.adv-info p{font-size:12px;color:var(--text-3);line-height:1.6;}
+.adv-ctrl{display:flex;flex-direction:column;align-items:center;flex-shrink:0;margin-left:16px;gap:5px;}
+.adv-lbl{font-size:10px;font-weight:700;text-align:center;min-width:54px;}
+
+/* ── VPU Dashboard ── */
+.vpu-lookup-wrap{max-width:480px;margin:60px auto 0;text-align:center;}
+.vpu-lookup-wrap h3{font-size:18px;font-weight:700;color:var(--text-1);margin-bottom:6px;}
+.vpu-lookup-wrap p{font-size:13px;color:var(--text-3);margin-bottom:24px;}
+.lookup-row{display:flex;gap:8px;}
+.lookup-err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px;}
+.vpu-status-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:18px;}
+.ds-section{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:12px;}
+.gen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;}
+.gen-item{display:flex;flex-direction:column;padding:6px 0;border-bottom:1px solid var(--border);}
+.gen-item:last-child{border-bottom:none;}
+.gen-k{font-size:10px;color:var(--text-3);margin-bottom:2px;font-weight:500;}
+.gen-v{font-size:12px;color:var(--text-1);font-family:'Courier New',monospace;}
+.gen-v.ok{color:var(--green);font-family:inherit;}
+.gen-v.warn{color:#fbbf24;font-family:inherit;}
+.storage-bar{background:var(--bg-inset);border-radius:6px;height:16px;overflow:hidden;margin-bottom:6px;}
+.storage-fill{height:100%;background:var(--red);border-radius:6px;}
+.storage-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);}
+.dp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.dp-table th{text-align:left;padding:8px 14px;color:var(--text-3);font-size:10px;font-weight:600;background:var(--bg-inset);border-bottom:1px solid var(--border);text-transform:uppercase;}
+.dp-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text-2);font-family:'Courier New',monospace;font-size:12px;}
+.dp-table tr:last-child td{border-bottom:none;}
+.poe-ok{color:var(--green);font-family:inherit;}
+.poe-err{color:var(--red);font-family:inherit;}
+.gauges-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.gauge-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.gauge-lbl{font-size:11px;color:var(--text-3);text-align:center;}
+
+/* ── Case Study ── */
+.cs-landing{max-width:580px;margin:0 auto;padding-top:20px;}
+.hero{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px 32px;margin-bottom:20px;text-align:center;}
+.hero .badge{display:inline-block;background:var(--red);color:white;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;padding:4px 14px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:22px;font-weight:700;color:var(--text-1);margin-bottom:12px;line-height:1.3;}
+.hero p{font-size:13px;color:var(--text-2);line-height:1.9;}
+.start-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;}
+.start-card h3{font-size:14px;color:var(--text-1);margin-bottom:6px;font-weight:600;}
+.start-card p{font-size:12px;color:var(--text-3);margin-bottom:18px;line-height:1.6;}
+.name-inp{width:100%;background:var(--bg-inset);border:1px solid var(--border-md);border-radius:var(--radius-md);padding:12px 16px;color:var(--text-1);font-size:14px;outline:none;transition:border .2s;margin-bottom:12px;font-family:inherit;}
+.name-inp:focus{border-color:var(--red);}
+.name-inp.err{border-color:var(--red);animation:shake .3s;}
+.name-err{font-size:12px;color:var(--red);margin-bottom:10px;min-height:16px;}
+.start-btn{width:100%;background:var(--red);color:white;border:none;padding:14px;border-radius:var(--radius-md);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;}
+.start-btn:hover{background:var(--red-hover);}
 .cs-details{display:none;}.cs-details.show{display:block;}
-.cs-page-hdr{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #334155;}
-.cs-page-hdr .sub{font-size:10px;color:#f97316;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:4px;}
-.email-card{background:#1e293b;border:1px solid #334155;border-radius:10px;margin-bottom:16px;overflow:hidden;}
-.email-header{background:#0f172a;padding:14px 20px;border-bottom:1px solid #334155;}
-.email-meta{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12px;}
-.email-meta .k{color:#475569;font-weight:600;}
-.email-meta .v{color:#94a3b8;}
-.email-subject{font-size:14px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
-.email-body-cs{padding:20px;font-size:13px;color:#94a3b8;line-height:1.9;}
-.email-body-cs p{margin-bottom:10px;}.email-body-cs p:last-child{margin-bottom:0;}
-.email-sig{margin-top:16px;padding-top:14px;border-top:1px solid #334155;font-size:12px;color:#475569;}
-.case-section{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;margin-bottom:14px;}
-.case-section h3{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:12px;}
-.case-section p{font-size:13px;color:#94a3b8;line-height:1.7;margin-bottom:8px;}
+
+/* Case Study email preview */
+.email-preview{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;}
+.email-preview-hdr{background:var(--bg-inset);padding:14px 20px;border-bottom:1px solid var(--border);}
+.email-preview-subj{font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:8px;}
+.email-meta-grid{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:11px;}
+.emk{color:var(--text-3);font-weight:600;}
+.emv{color:var(--text-2);}
+.email-preview-body{padding:20px;font-size:13px;color:var(--text-2);line-height:1.9;}
+.email-preview-body p{margin-bottom:10px;}.email-preview-body p:last-child{margin-bottom:0;}
+.email-sig{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3);}
+.case-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:12px;}
+.case-section h3{font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:12px;}
+.case-section p{font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:8px;}
 .case-section p:last-child{margin-bottom:0;}
 .case-ul{list-style:none;padding:0;}
-.case-ul li{font-size:13px;color:#94a3b8;padding:6px 0;border-bottom:1px solid #334155;display:flex;gap:10px;line-height:1.5;}
+.case-ul li{font-size:13px;color:var(--text-2);padding:7px 0;border-bottom:1px solid var(--border);display:flex;gap:10px;line-height:1.5;}
 .case-ul li:last-child{border-bottom:none;}
-.case-ul li::before{content:'→';color:#f97316;flex-shrink:0;}
+.case-ul li::before{content:'→';color:var(--red);flex-shrink:0;}
 
-/* Email Page */
-.ep-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid #334155;margin-bottom:20px;}
-.ep-header h2{font-size:16px;font-weight:700;color:#f1f5f9;}
-.ep-header p{font-size:11px;color:#475569;}
-.ep-empty{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:60px 20px;text-align:center;color:#475569;font-size:13px;}
-.ep-thread-wrap{background:#1e293b;border:1px solid #334155;border-radius:10px 10px 0 0;overflow:hidden;}
-.ep-meta{background:#0f172a;padding:12px 18px;border-bottom:1px solid #334155;}
+/* ── Email Page ── */
+.ep-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.ep-hdr h2{font-size:16px;font-weight:700;color:var(--text-1);}
+.ep-hdr p{font-size:11px;color:var(--text-3);margin-top:3px;}
+.ep-empty{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:60px 20px;text-align:center;color:var(--text-3);font-size:13px;}
+.ep-thread-outer{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+.ep-thread-meta{background:var(--bg-inset);padding:12px 18px;border-bottom:1px solid var(--border);}
 .ep-meta-row{display:flex;gap:8px;font-size:12px;margin-bottom:2px;}
 .ep-meta-row:last-child{margin-bottom:0;}
-.ep-mk{color:#475569;min-width:36px;}
-.ep-mv{color:#94a3b8;}
-.ep-mv.hi{color:#f97316;font-weight:600;}
-.ep-messages{padding:16px;min-height:200px;max-height:380px;overflow-y:auto;background:#0a0f1a;}
+.ep-mk{color:var(--text-3);min-width:36px;font-weight:600;}
+.ep-mv{color:var(--text-2);}
+.ep-mv.hi{color:var(--red);font-weight:600;}
+.ep-messages{padding:16px;min-height:220px;max-height:400px;overflow-y:auto;background:var(--bg-inset);}
 .ep-bubble{margin-bottom:14px;}
 .ep-bubble.in{margin-right:15%;}
 .ep-bubble.out{margin-left:15%;}
-.ep-bm{font-size:11px;color:#475569;margin-bottom:4px;}
+.ep-bm{font-size:11px;color:var(--text-3);margin-bottom:4px;}
 .ep-bubble.out .ep-bm{text-align:right;}
 .ep-bb{padding:12px 16px;border-radius:10px;font-size:13px;line-height:1.7;display:inline-block;max-width:100%;}
-.ep-bubble.in .ep-bb{background:#1e293b;border:1px solid #334155;color:#94a3b8;border-radius:2px 10px 10px 10px;}
-.ep-bubble.out .ep-bb{background:#1e3a5f;border:1px solid #1d4ed8;color:#bfdbfe;border-radius:10px 2px 10px 10px;float:right;}
+.ep-bubble.in .ep-bb{background:var(--bg-card);border:1px solid var(--border);color:var(--text-2);border-radius:2px 10px 10px 10px;}
+.ep-bubble.out .ep-bb{background:var(--blue-bg);border:1px solid #2563eb;color:#bfdbfe;border-radius:10px 2px 10px 10px;float:right;}
 .ep-bubble.out::after{content:'';display:table;clear:both;}
-.ep-compose{background:#1e293b;border:1px solid #334155;border-top:none;border-radius:0 0 10px 10px;padding:14px;}
-.ep-compose textarea{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:13px;line-height:1.6;resize:none;outline:none;font-family:'Segoe UI',sans-serif;}
-.ep-compose textarea:focus{border-color:#f97316;}
+.ep-compose{background:var(--bg-card);border-top:1px solid var(--border);padding:16px;}
+.ep-compose textarea{width:100%;background:var(--bg-inset);border:1px solid var(--border-md);border-radius:var(--radius-md);padding:10px 14px;color:var(--text-1);font-size:13px;line-height:1.6;resize:none;outline:none;font-family:inherit;}
+.ep-compose textarea:focus{border-color:var(--red);}
 .ep-compose-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
-.ep-compose-foot span{font-size:11px;color:#475569;}
-.ep-send{background:#f97316;color:white;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
-.ep-send:hover{background:#ea7009;}
+.ep-char{font-size:11px;color:var(--text-3);}
 
-/* Attachments */
+/* ── Attachments ── */
 .attach-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;}
-.attach-chip{display:flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:4px 10px;font-size:11px;color:#94a3b8;}
-.attach-chip button{background:none;border:none;color:#475569;cursor:pointer;font-size:13px;line-height:1;padding:0 2px;}
-.attach-chip button:hover{color:#ef4444;}
-.attach-btn{background:#1e293b;border:1px solid #334155;color:#94a3b8;border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;}
-.attach-btn:hover{background:#334155;}
+.attach-chip{display:flex;align-items:center;gap:6px;background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px;font-size:11px;color:var(--text-2);}
+.attach-chip button{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:13px;line-height:1;padding:0 2px;}
+.attach-chip button:hover{color:var(--red);}
+.attach-btn{background:var(--bg-raised);border:1px solid var(--border-md);color:var(--text-2);border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;}
+.attach-btn:hover{background:#2a2a2a;}
 .msg-attachments{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;}
-.msg-attach-img{max-width:200px;max-height:160px;border-radius:6px;border:1px solid #334155;cursor:pointer;display:block;}
-.msg-attach-file{display:inline-flex;align-items:center;gap:6px;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:6px 12px;font-size:12px;color:#93c5fd;text-decoration:none;}
-.msg-attach-file:hover{border-color:#3b82f6;}
-.lightbox{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:zoom-out;}
-.lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;border:1px solid #334155;}
+.msg-attach-img{max-width:200px;max-height:160px;border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;display:block;}
+.msg-attach-file{display:inline-flex;align-items:center;gap:6px;background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;color:#93c5fd;text-decoration:none;}
+.msg-attach-file:hover{border-color:var(--blue);}
+.lightbox{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:zoom-out;}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:var(--radius-md);border:1px solid var(--border);}
 
-/* Admin */
+/* ── Admin ── */
 .admin-lock{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;}
-.admin-lock h2{font-size:22px;color:#e2e8f0;margin-bottom:8px;}
-.admin-lock p{font-size:13px;color:#64748b;margin-bottom:24px;}
+.admin-lock h2{font-size:22px;color:var(--text-1);margin-bottom:8px;}
+.admin-lock p{font-size:13px;color:var(--text-3);margin-bottom:28px;}
 .pinwrap{display:flex;gap:10px;justify-content:center;}
-.pin-input{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px 16px;color:#e2e8f0;font-size:16px;font-weight:700;letter-spacing:.2em;width:160px;text-align:center;outline:none;}
-.pin-input:focus{border-color:#f97316;}
-.pin-btn{background:#f97316;color:white;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
-.pin-btn:hover{background:#ea7009;}
-.pin-err{color:#ef4444;font-size:12px;margin-top:10px;min-height:16px;}
+.pin-inp{background:var(--bg-raised);border:1px solid var(--border-md);border-radius:var(--radius-md);padding:11px 16px;color:var(--text-1);font-size:18px;font-weight:700;letter-spacing:.3em;width:180px;text-align:center;outline:none;font-family:inherit;}
+.pin-inp:focus{border-color:var(--red);}
+.pin-err{color:var(--red);font-size:12px;margin-top:10px;min-height:16px;}
 .admin-content{display:none;}.admin-content.show{display:block;}
-.admin-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.admin-hdr h2{font-size:18px;color:#e2e8f0;}
-.logout-btn{background:#334155;color:#94a3b8;border:none;padding:7px 14px;border-radius:7px;font-size:12px;cursor:pointer;}
-.logout-btn:hover{background:#475569;}
-.disclaimer{background:#1a1100;border:1px solid #f97316;border-radius:10px;padding:11px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:12px;color:#fb923c;}
-.sess-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #334155;background:#1e293b;color:#94a3b8;margin-right:6px;margin-bottom:6px;}
-.sess-btn:hover{background:#334155;color:#e2e8f0;}
-.sess-btn.active{background:#f97316;color:white;border-color:#f97316;}
-.no-sess{font-size:13px;color:#475569;font-style:italic;padding:4px 0;}
-.score-card{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
-.sc-item{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:16px;text-align:center;}
-.sc-val{font-size:26px;font-weight:700;}
-.sc-lbl{font-size:11px;color:#64748b;margin-top:4px;}
-.log-section{background:#1e293b;border:1px solid #334155;border-radius:10px;margin-bottom:16px;overflow:hidden;}
-.log-section-hdr{background:#0f172a;padding:11px 18px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:600;border-bottom:1px solid #334155;}
-.log-entry{display:flex;align-items:flex-start;gap:14px;padding:11px 18px;border-bottom:1px solid #334155;font-size:13px;}
+.admin-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.admin-hdr h2{font-size:18px;color:var(--text-1);font-weight:700;}
+.disclaimer{background:#0f0800;border:1px solid #854d0e;border-radius:var(--radius-md);padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:12px;color:#fbbf24;}
+.sess-btn{padding:7px 14px;border-radius:var(--radius-md);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);color:var(--text-3);margin-right:6px;margin-bottom:6px;transition:all .15s;}
+.sess-btn:hover{background:var(--bg-raised);color:var(--text-1);}
+.sess-btn.active{background:var(--red);color:white;border-color:var(--red);}
+.no-sess{font-size:13px;color:var(--text-3);font-style:italic;padding:4px 0;}
+.score-card{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+.sc-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;text-align:center;}
+.sc-val{font-size:28px;font-weight:700;}
+.sc-lbl{font-size:11px;color:var(--text-3);margin-top:4px;}
+.log-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;}
+.log-section-hdr{background:var(--bg-inset);padding:10px 18px;font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;font-weight:600;border-bottom:1px solid var(--border);}
+.log-entry{display:flex;align-items:flex-start;gap:12px;padding:10px 18px;border-bottom:1px solid var(--border);font-size:12px;}
 .log-entry:last-child{border-bottom:none;}
-.log-time{font-family:'Courier New',monospace;font-size:11px;color:#475569;white-space:nowrap;padding-top:1px;min-width:56px;}
-.log-badge{padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;}
-.lb-correct{background:#166534;color:#4ade80;}
-.lb-wrong{background:#7f1d1d;color:#fca5a5;}
+.log-time{font-family:'Courier New',monospace;font-size:11px;color:var(--text-3);white-space:nowrap;padding-top:1px;min-width:48px;}
+.log-badge{padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.lb-correct{background:var(--green-dim);color:#4ade80;}
+.lb-wrong{background:var(--red-dim);color:var(--red-soft);}
 .lb-action{background:#1e3a5f;color:#93c5fd;}
 .lb-toggle{background:#3b2a6b;color:#c4b5fd;}
-.lb-start{background:#1a1100;color:#fb923c;}
+.lb-start{background:#1a0a00;color:#fb923c;}
 .lb-eth{background:#0c2a3a;color:#67e8f9;}
-.log-msg{color:#94a3b8;line-height:1.5;}
-.log-msg strong{color:#e2e8f0;}
-.no-log{padding:16px 18px;font-size:13px;color:#475569;font-style:italic;}
-.admin-email-section{background:#1e293b;border:1px solid #334155;border-radius:10px;margin-bottom:16px;overflow:hidden;}
-.admin-email-hdr{background:#0f172a;padding:11px 18px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:600;border-bottom:1px solid #334155;}
+.log-msg{color:var(--text-2);line-height:1.5;}
+.log-msg strong{color:var(--text-1);}
+.no-log{padding:16px 18px;font-size:13px;color:var(--text-3);font-style:italic;}
+.admin-email-sec{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;}
+.admin-email-hdr{background:var(--bg-inset);padding:10px 18px;font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;font-weight:600;border-bottom:1px solid var(--border);}
 .admin-email-thread{padding:14px 18px;max-height:280px;overflow-y:auto;}
 .admin-bubble{margin-bottom:12px;}
 .admin-bubble.inbound{margin-right:20%;}
 .admin-bubble.outbound{margin-left:20%;text-align:right;}
-.admin-bubble .ab-meta{font-size:11px;color:#475569;margin-bottom:3px;}
-.admin-bubble .ab-body{display:inline-block;text-align:left;padding:9px 13px;border-radius:8px;font-size:12px;line-height:1.6;}
-.admin-bubble.inbound .ab-body{background:#0f172a;border:1px solid #334155;color:#94a3b8;}
-.admin-bubble.outbound .ab-body{background:#1e3a5f;border:1px solid #1d4ed8;color:#bfdbfe;}
-.admin-reply-row{padding:12px 18px;border-top:1px solid #334155;background:#0f172a;display:flex;flex-direction:column;gap:8px;}
-.admin-reply-input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:7px;padding:8px 12px;color:#e2e8f0;font-size:12px;outline:none;font-family:'Segoe UI',sans-serif;}
-.admin-reply-input:focus{border-color:#f97316;}
-.admin-reply-btn{background:#f97316;color:white;border:none;padding:8px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.admin-bubble .ab-meta{font-size:11px;color:var(--text-3);margin-bottom:3px;}
+.admin-bubble .ab-body{display:inline-block;text-align:left;padding:9px 13px;border-radius:var(--radius-md);font-size:12px;line-height:1.6;}
+.admin-bubble.inbound .ab-body{background:var(--bg-inset);border:1px solid var(--border);color:var(--text-2);}
+.admin-bubble.outbound .ab-body{background:var(--blue-bg);border:1px solid #2563eb;color:#bfdbfe;}
+.admin-reply-row{padding:12px 18px;border-top:1px solid var(--border);background:var(--bg-inset);display:flex;flex-direction:column;gap:10px;}
+.admin-reply-input{flex:1;background:var(--bg-raised);border:1px solid var(--border-md);border-radius:var(--radius-md);padding:8px 12px;color:var(--text-1);font-size:12px;outline:none;font-family:inherit;}
+.admin-reply-input:focus{border-color:var(--red);}
 
-/* Submission */
+/* ── Submission ── */
 .sub-group{margin-bottom:20px;}
-.sub-group-title{font-size:11px;color:#f97316;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #334155;}
-.sub-row{display:flex;gap:10px;padding:5px 0;font-size:12px;border-bottom:1px dashed #1e293b;}
+.sub-group-title{font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.sub-row{display:flex;gap:10px;padding:5px 0;font-size:12px;border-bottom:1px dashed var(--border);}
 .sub-row:last-child{border-bottom:none;}
-.sub-key{color:#475569;min-width:160px;flex-shrink:0;}
-.sub-val{color:#e2e8f0;font-family:'Courier New',monospace;word-break:break-all;}
-.sub-val.ok{color:#22c55e;font-family:inherit;}
-.sub-val.warn{color:#ef4444;font-family:inherit;}
-.sub-val.neutral{color:#94a3b8;font-family:inherit;}
+.sub-key{color:var(--text-3);min-width:160px;flex-shrink:0;}
+.sub-val{color:var(--text-1);font-family:'Courier New',monospace;word-break:break-all;}
+.sub-val.ok{color:var(--green);font-family:inherit;}
+.sub-val.warn{color:var(--red);font-family:inherit;}
+.sub-val.neutral{color:var(--text-2);font-family:inherit;}
 .sub-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;margin-right:4px;margin-bottom:3px;}
-.sub-tag.allow{background:#166534;color:#4ade80;}
-.sub-tag.deny,.sub-tag.block{background:#7f1d1d;color:#fca5a5;}
-.sub-submitted-badge{background:#14532d;border:1px solid #22c55e;border-radius:8px;padding:8px 14px;display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#4ade80;font-weight:700;margin-bottom:14px;}
+.sub-tag.allow{background:var(--green-dim);color:#4ade80;}
+.sub-tag.deny,.sub-tag.block{background:var(--red-dim);color:var(--red-soft);}
+.sub-done-badge{background:var(--green-bg);border:1px solid var(--green);border-radius:var(--radius-md);padding:8px 14px;display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#4ade80;font-weight:700;margin-bottom:16px;}
 
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 </style>
@@ -326,8 +367,11 @@ input:checked+.slider:before{transform:translateX(22px);}
 
   <!-- Sidebar -->
   <div class="sidebar">
-    <div class="sidebar-logo">Menu</div>
-    <div class="sidebar-brand">SST Case Project<br><span style="font-size:11px;font-weight:400;color:#555;">by Erik Millan</span></div>
+    <div class="sidebar-top">
+      <div class="sidebar-eyebrow">PlayOn Sports</div>
+      <div class="sidebar-brand">SST Case Project</div>
+      <div class="sidebar-sub">by Erik Millan</div>
+    </div>
     <div class="snav">
       <div class="sitem active" id="nav-case" onclick="showPage('case',this)"><span class="icon">📋</span> Case Study</div>
       <div class="sitem" id="nav-firewall" style="display:none;" onclick="showPage('firewall',this)"><span class="icon">🔒</span> RemoteShield</div>
@@ -342,7 +386,7 @@ input:checked+.slider:before{transform:translateX(22px);}
     <div class="sadmin">
       <div class="sitem" id="nav-admin" onclick="showPage('admin',this)"><span class="icon">🛡️</span> Admin</div>
     </div>
-    <div class="sidebar-footer"><span>RemoteShield FW-2000</span></div>
+    <div class="sidebar-footer"><span>RemoteShield v0.18</span></div>
   </div>
 
   <!-- Content -->
@@ -351,63 +395,74 @@ input:checked+.slider:before{transform:translateX(22px);}
     <!-- CASE STUDY -->
     <div class="page active" id="page-case">
       <div id="cs-landing" class="cs-landing">
-        <div class="cs-landing-hero">
+        <div class="hero">
           <div class="badge">New Tool Test — Field Exercise</div>
           <h1>RemoteShield Tool Testing<br>PlayOn High School</h1>
-          <p>Pixellot has given you early access to a remote tool — <strong style="color:#f97316;">RemoteShield</strong> — that can configure the network, firewall, and content filter settings of a Pixellot VPU from anywhere, as long as the device is powered on. You have been assigned to test it on a brand-new installation. You will report on your findings, methodology, and protocols to introduce this tool to the Senior Specialists. Treat this case study as close to a real scenario as possible. Note: External tools might not reflect the information given in this case study.</p>
+          <p>Pixellot has given you early access to a remote tool — <strong style="color:var(--red);">RemoteShield</strong> — that can configure the network, firewall, and content filter settings of a Pixellot VPU from anywhere, as long as the device is powered on. You have been assigned to test it on a brand-new installation. You will report on your findings, methodology, and protocols to introduce this tool to the Senior Specialists. Treat this case study as close to a real scenario as possible. Note: External tools might not reflect the information given in this case study.</p>
         </div>
-        <div class="cs-start-card">
+        <div class="start-card">
           <h3>Ready to begin?</h3>
           <p>Enter your name below and click <strong>Start</strong> to receive your task details and access RemoteShield. Your inputs and actions will be recorded throughout the exercise.</p>
-          <input class="name-input" id="candidateName" type="text" placeholder="Enter your full name…" maxlength="60" onkeydown="if(event.key==='Enter')startCase()" />
-          <div style="font-size:12px;color:#ef4444;margin-bottom:10px;min-height:16px;" id="nameErr"></div>
+          <input class="name-inp" id="candidateName" type="text" placeholder="Enter your full name…" maxlength="60" onkeydown="if(event.key==='Enter')startCase()" />
+          <div class="name-err" id="nameErr"></div>
           <button class="start-btn" onclick="startCase()"><span>▶</span> Start Exercise</button>
         </div>
       </div>
 
       <div class="cs-details" id="cs-details">
-        <div class="cs-page-hdr">
-          <div class="sub">Field Exercise</div>
-          <h1 style="font-size:22px;font-weight:700;color:#f1f5f9;">Case Study</h1>
-          <div style="font-size:13px;color:#64748b;margin-top:4px;" id="cs-cand-label"></div>
+        <div class="page-hdr">
+          <div class="eyebrow">Field Exercise</div>
+          <h1>Case Study</h1>
+          <p id="cs-cand-label"></p>
         </div>
-        <div class="email-card">
-          <div class="email-header">
-            <div class="email-subject">📧 New Pixellot System — Ready for Configuration</div>
-            <div class="email-meta">
-              <span class="k">From:</span><span class="v">Erik Millan &lt;erik.millan@playon.org&gt;</span>
-              <span class="k">To:</span><span class="v">Support &lt;support@playon.co&gt;</span>
-              <span class="k">Subject:</span><span class="v">New Pixellot System — Ready for Configuration</span>
+
+        <div class="email-preview">
+          <div class="email-preview-hdr">
+            <div class="email-preview-subj">📧 New Pixellot System — Ready for Configuration</div>
+            <div class="email-meta-grid">
+              <span class="emk">From:</span><span class="emv">Erik Millan &lt;erik.millan@playon.org&gt;</span>
+              <span class="emk">To:</span><span class="emv">Support &lt;support@playon.co&gt;</span>
+              <span class="emk">Subject:</span><span class="emv">New Pixellot System — Ready for Configuration</span>
             </div>
           </div>
-          <div class="email-body-cs">
+          <div class="email-preview-body">
             <p>Hello,</p>
-            <p>We have installed our new Pixellot system and it should be ready for configuration. Everything is hooked up correctly and powered on. The system name is <strong style="color:#e2e8f0;">PXLS2_5215</strong> and ID <strong style="color:#e2e8f0;">5cbd98b0118884077f6cc921</strong>.</p>
+            <p>We have installed our new Pixellot system and it should be ready for configuration. Everything is hooked up correctly and powered on. The system name is <strong style="color:var(--text-1);">PXLS2_5215</strong> and ID <strong style="color:var(--text-1);">5cbd98b0118884077f6cc921</strong>.</p>
             <p>I understand that you guys are testing a new tool to remotely set network settings. Please let me know if you need anything!</p>
             <div class="email-sig">Best,<br>Erik Millan — Network Administrator</div>
           </div>
         </div>
-        <div class="case-section"><h3>Your Task</h3><p>Pixellot has granted you early access to <strong style="color:#f97316;">RemoteShield</strong>, a new remote configuration tool. Use it to apply all necessary settings and complete the objectives below.</p></div>
-        <div class="case-section"><h3>✉️ Stay in Touch</h3><p>You have access to the <strong style="color:#f97316;">Email</strong> section in the left navigation where you can correspond directly with <strong style="color:#e2e8f0;">Erik Millan</strong>, Network Administrator at PlayOn High School.</p></div>
+
+        <div class="case-section"><h3>Your Task</h3><p>Pixellot has granted you early access to <strong style="color:var(--red);">RemoteShield</strong>, a new remote configuration tool. Use it to apply all necessary settings and complete the objectives below.</p></div>
+        <div class="case-section"><h3>✉️ Stay in Touch</h3><p>You have access to the <strong style="color:var(--red);">Email</strong> section in the left navigation where you can correspond directly with <strong style="color:var(--text-1);">Erik Millan</strong>, Network Administrator at PlayOn High School.</p></div>
         <div class="case-section"><h3>Completion Checklist</h3><ul class="case-ul"><li>Pixellot VPU is properly configured for all network settings.</li><li>Communication with PlayOn High School.</li><li>Findings &amp; feedback on RemoteShield.</li><li>Plan to implement the tool for the rest of SST.</li><li>Present the Case Study to the Hiring Manager(s).</li></ul></div>
         <div class="case-section"><h3>What You Have Access To</h3><ul class="case-ul"><li>RemoteShield FW-2000 — full read/write access via the RemoteShield tab</li><li>Ethernet Settings — configure IP addressing mode and network parameters</li><li>Firewall Policies — manage outbound port rules for the Pixellot VPU</li><li>Content Filter — manage domain whitelist entries</li><li>Advanced Settings — review security and performance settings</li></ul></div>
         <div class="case-section"><h3>Note</h3><p>This is a brand-new installation. No Pixellot-specific configuration has been applied yet.</p></div>
+
         <div style="margin-top:24px;text-align:center;" id="completeWrap">
-          <p style="font-size:12px;color:#64748b;margin-bottom:14px;">When you have completed all objectives, click the button below to submit your case study.</p>
-          <button onclick="completeCaseStudy()" style="background:#22c55e;color:white;border:none;padding:16px 40px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;width:100%;max-width:420px;">✅ Complete Case Study</button>
+          <p style="font-size:12px;color:var(--text-3);margin-bottom:14px;">When you have completed all objectives, click the button below to submit your case study.</p>
+          <button onclick="completeCaseStudy()" style="background:var(--green);color:white;border:none;padding:16px 40px;border-radius:var(--radius-lg);font-size:16px;font-weight:700;cursor:pointer;width:100%;max-width:420px;transition:background .15s;">✅ Complete Case Study</button>
         </div>
-        <div id="completeConfirm" style="display:none;margin-top:24px;background:#14532d;border:1px solid #22c55e;border-radius:12px;padding:20px 24px;text-align:center;">
-          <div style="font-size:22px;margin-bottom:8px;">✅</div>
-          <div style="font-size:15px;font-weight:700;color:#4ade80;margin-bottom:4px;">Case Study Submitted</div>
-          <div style="font-size:12px;color:#86efac;">Your submission has been recorded. The hiring manager will review your work in the Admin panel.</div>
+        <div id="completeConfirm" style="display:none;margin-top:24px;background:var(--green-bg);border:1px solid var(--green);border-radius:var(--radius-lg);padding:24px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:10px;">✅</div>
+          <div style="font-size:16px;font-weight:700;color:#4ade80;margin-bottom:6px;">Case Study Submitted</div>
+          <div style="font-size:13px;color:#86efac;">Your submission has been recorded. The hiring manager will review your work in the Admin panel.</div>
         </div>
       </div>
     </div>
 
     <!-- REMOTESHIELD -->
     <div class="page" id="page-firewall">
-      <div class="fw-hdr"><div class="fw-logo">🔒 RemoteShield <span>FW-2000 &nbsp;|&nbsp; Alpha-Build v0.18</span></div></div>
-      <div class="sbanner" id="sBanner"><span style="font-size:24px;">✅</span><div><strong style="color:#4ade80;font-size:14px;">All settings applied — Pixellot VPU is now ONLINE</strong><div style="font-size:12px;color:#86efac;margin-top:2px;">PlayOn High School is ready to stream.</div></div></div>
+      <div class="fw-hdr">
+        <div class="fw-logo">🔒 RemoteShield <span>FW-2000</span></div>
+        <div class="fw-build">Alpha-Build v0.18</div>
+      </div>
+
+      <div class="sbanner" id="sBanner">
+        <span style="font-size:22px;">✅</span>
+        <div><strong style="color:#4ade80;font-size:14px;">All settings applied — Pixellot VPU is now ONLINE</strong><div style="font-size:12px;color:#86efac;margin-top:2px;">PlayOn High School is ready to stream.</div></div>
+      </div>
+
       <div class="itabs">
         <div class="itab active" id="itab-nav-dash" onclick="showItab('dash',this)">Dashboard</div>
         <div class="itab itab-locked" id="itab-nav-ethernet" onclick="guardedItab()">Ethernet Settings</div>
@@ -418,27 +473,36 @@ input:checked+.slider:before{transform:translateX(22px);}
 
       <!-- Dashboard -->
       <div class="itab-content active" id="itab-dash">
-        <div id="vpuLookupWrap" class="vpu-lookup">
+        <div id="vpuLookupWrap" class="vpu-lookup-wrap">
           <h3>RemoteShield Link</h3>
           <p>Enter a System Name or System ID to establish a RemoteShield Link.</p>
           <div class="lookup-row">
-            <input class="lookup-input" id="vpuLookupInput" type="text" maxlength="60" onkeydown="if(event.key==='Enter')lookupVPU()" />
-            <button class="lookup-btn" onclick="lookupVPU()">Link</button>
+            <input class="inp mono" id="vpuLookupInput" type="text" maxlength="60" style="flex:1;" onkeydown="if(event.key==='Enter')lookupVPU()" />
+            <button class="btn-primary" onclick="lookupVPU()">Link</button>
           </div>
           <div class="lookup-err" id="vpuLookupErr"></div>
         </div>
+
         <div id="vpuDash" style="display:none;">
           <div class="vpu-status-bar">
-            <div style="display:flex;align-items:center;gap:10px;"><div style="width:9px;height:9px;border-radius:50%;background:#22c55e;flex-shrink:0;"></div><div><div style="font-size:13px;font-weight:700;color:#22c55e;">Connection: ESTABLISHED</div><div style="font-size:11px;color:#64748b;">PXLS2_5215 — PlayOn High School</div></div></div>
-            <button onclick="resetVPULookup()" style="background:#1e293b;color:#64748b;border:1px solid #334155;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;">✕ Disconnect</button>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 6px var(--green);"></div>
+              <div><div style="font-size:13px;font-weight:700;color:var(--green);">Connection: ESTABLISHED</div><div style="font-size:11px;color:var(--text-3);margin-top:1px;">PXLS2_5215 — PlayOn High School</div></div>
+            </div>
+            <button class="btn-secondary" onclick="resetVPULookup()">✕ Disconnect</button>
           </div>
+
           <div class="card" style="margin-bottom:16px;"><div class="ds-section">General</div><div class="gen-grid"><div id="genCol1"></div><div id="genCol2"></div><div id="genCol3"></div></div></div>
+
           <div class="g2">
-            <div class="card"><div class="ds-section">Configuration</div><div style="display:flex;align-items:center;gap:14px;margin-top:4px;"><div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 16px;font-size:22px;font-weight:700;color:#f97316;">S2</div><div><div style="font-size:14px;color:#e2e8f0;font-weight:600;">Pixellot S2</div><div style="font-size:11px;color:#64748b;margin-top:3px;">System Type</div></div></div></div>
-            <div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;"><div class="ds-section" style="margin-bottom:0;">Storage</div><span style="font-size:11px;color:#64748b;background:#0f172a;padding:3px 10px;border-radius:20px;border:1px solid #334155;">Disc C</span></div><div class="storage-wrap"><div class="storage-fill" style="width:71.2%"></div></div><div class="storage-meta"><span>Free: 43.14 GB</span><span>Total: 150.00 GB</span></div></div>
+            <div class="card"><div class="ds-section">Configuration</div><div style="display:flex;align-items:center;gap:14px;margin-top:4px;"><div style="background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 16px;font-size:22px;font-weight:700;color:var(--red);">S2</div><div><div style="font-size:14px;color:var(--text-1);font-weight:600;">Pixellot S2</div><div style="font-size:11px;color:var(--text-3);margin-top:3px;">System Type</div></div></div></div>
+            <div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;"><div class="ds-section" style="margin-bottom:0;">Storage</div><span style="font-size:11px;color:var(--text-3);background:var(--bg-inset);padding:3px 10px;border-radius:20px;border:1px solid var(--border);">Disc C</span></div><div class="storage-bar"><div class="storage-fill" style="width:71.2%"></div></div><div class="storage-meta"><span>Free: 43.14 GB</span><span>Total: 150.00 GB</span></div></div>
           </div>
-          <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;"><div style="padding:12px 16px;border-bottom:1px solid #334155;"><div class="ds-section" style="margin-bottom:0;">Camera Status</div></div><table class="dp-table"><thead><tr><th>№</th><th>TV System</th><th>Firmware</th><th>UID</th></tr></thead><tbody><tr><td>1</td><td>ntsc_60</td><td style="color:#22c55e;">px20221027T2</td><td>rtsp:////169.254.16.51/h264</td></tr><tr><td>2</td><td>ntsc_60</td><td style="color:#22c55e;">px20221027T2</td><td>rtsp:////169.254.16.50/h264</td></tr></tbody></table></div>
-          <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;"><div style="padding:12px 16px;border-bottom:1px solid #334155;"><div class="ds-section" style="margin-bottom:0;">POE Status</div></div><table class="dp-table"><thead><tr><th>POE Port</th><th>Status</th><th>Speed (Mbps)</th></tr></thead><tbody><tr><td>1</td><td><span class="poe-err">✕</span></td><td>—</td></tr><tr><td>2</td><td><span class="poe-err">✕</span></td><td>—</td></tr><tr><td>3</td><td><span class="poe-ok">✓</span></td><td>1000</td></tr><tr><td>4</td><td><span class="poe-ok">✓</span></td><td>1000</td></tr></tbody></table></div>
+
+          <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;"><div style="padding:12px 16px;border-bottom:1px solid var(--border);"><div class="ds-section" style="margin-bottom:0;">Camera Status</div></div><table class="dp-table"><thead><tr><th>№</th><th>TV System</th><th>Firmware</th><th>UID</th></tr></thead><tbody><tr><td>1</td><td>ntsc_60</td><td style="color:var(--green);">px20221027T2</td><td>rtsp:////169.254.16.51/h264</td></tr><tr><td>2</td><td>ntsc_60</td><td style="color:var(--green);">px20221027T2</td><td>rtsp:////169.254.16.50/h264</td></tr></tbody></table></div>
+
+          <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;"><div style="padding:12px 16px;border-bottom:1px solid var(--border);"><div class="ds-section" style="margin-bottom:0;">POE Status</div></div><table class="dp-table"><thead><tr><th>POE Port</th><th>Status</th><th>Speed (Mbps)</th></tr></thead><tbody><tr><td>1</td><td><span class="poe-err">✕</span></td><td>—</td></tr><tr><td>2</td><td><span class="poe-err">✕</span></td><td>—</td></tr><tr><td>3</td><td><span class="poe-ok">✓</span></td><td>1000</td></tr><tr><td>4</td><td><span class="poe-ok">✓</span></td><td>1000</td></tr></tbody></table></div>
+
           <div class="card"><div class="ds-section">System Status</div><div class="gauges-grid" id="gaugesGrid"></div></div>
         </div>
       </div>
@@ -447,28 +511,30 @@ input:checked+.slider:before{transform:translateX(22px);}
       <div class="itab-content" id="itab-ethernet">
         <div class="card" id="ethIPCard">
           <div class="ctitle">Target Device — IP Address</div>
-          <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:200px;"><div style="font-size:11px;color:#64748b;margin-bottom:6px;">Enter the IP address of the device to configure.</div><input class="eth-input" id="ethDeviceIP" type="text" maxlength="15" onkeydown="if(event.key==='Enter')lockEthIP()" /><div id="ethIPErr" style="font-size:11px;color:#ef4444;margin-top:5px;min-height:14px;"></div></div>
-            <button class="eth-apply" onclick="lockEthIP()" style="margin-bottom:19px;">Confirm</button>
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Enter the IP address of the device to configure.</div>
+          <div style="display:flex;gap:10px;align-items:flex-end;">
+            <div style="flex:1;"><input class="inp mono" id="ethDeviceIP" type="text" maxlength="15" onkeydown="if(event.key==='Enter')lockEthIP()" /></div>
+            <button class="btn-primary" onclick="lockEthIP()">Confirm</button>
           </div>
+          <div id="ethIPErr" style="font-size:11px;color:var(--red);margin-top:6px;min-height:14px;"></div>
         </div>
         <div id="ethBuilder" style="display:none;">
           <div class="card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px;">
               <div class="ctitle" style="margin-bottom:0;">IP Address Mode</div>
-              <div style="display:flex;align-items:center;gap:8px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:5px 12px;font-size:12px;"><span style="color:#64748b;">Device IP:</span><span id="ethIPDisplay" style="font-family:'Courier New',monospace;color:#f97316;font-weight:700;"></span><button onclick="unlockEthIP()" style="background:none;border:none;color:#475569;cursor:pointer;font-size:11px;margin-left:4px;">✎ Edit</button></div>
+              <div class="ip-bar"><span class="lbl">Device IP:</span><span class="val" id="ethIPDisplay"></span><button class="btn-ghost" onclick="unlockEthIP()" style="margin-left:6px;">✎ Edit</button></div>
             </div>
-            <div class="eth-mode-bar"><button class="eth-mode-btn active" id="ethDhcpBtn" onclick="setEthMode('dhcp')">🔄 DHCP (Automatic)</button><button class="eth-mode-btn" id="ethStaticBtn" onclick="setEthMode('static')">📌 Static IP</button></div>
-            <div id="ethDhcpInfo" class="dhcp-info"><strong>DHCP mode is active.</strong> The VPU will automatically obtain its IP address, subnet mask, default gateway, and DNS settings from the network's DHCP server.</div>
+            <div class="mode-bar"><button class="mode-btn active" id="ethDhcpBtn" onclick="setEthMode('dhcp')">🔄 DHCP (Automatic)</button><button class="mode-btn" id="ethStaticBtn" onclick="setEthMode('static')">📌 Static IP</button></div>
+            <div id="ethDhcpInfo" class="card-inset"><strong style="color:var(--text-1);">DHCP mode is active.</strong> The VPU will automatically obtain its IP address, subnet mask, default gateway, and DNS settings from the network's DHCP server.</div>
             <div id="ethStaticFields" style="display:none;">
-              <div class="eth-field-group">
-                <div class="eth-field"><label class="eth-label">IP Address</label><input class="eth-input" id="ethIP" type="text" maxlength="15" /></div>
-                <div class="eth-field"><label class="eth-label">Subnet Mask</label><input class="eth-input" id="ethMask" type="text" maxlength="15" /></div>
-                <div class="eth-field"><label class="eth-label">Default Gateway</label><input class="eth-input" id="ethGW" type="text" maxlength="15" /></div>
-                <div class="eth-field"><label class="eth-label">Preferred DNS</label><input class="eth-input" id="ethDNS" type="text" maxlength="15" /></div>
-                <div class="eth-field"><label class="eth-label">Alternate DNS</label><input class="eth-input" id="ethAltDNS" type="text" maxlength="15" /></div>
+              <div class="eth-fields">
+                <div class="eth-field"><label class="field-label">IP Address</label><input class="inp mono" id="ethIP" type="text" maxlength="15" /></div>
+                <div class="eth-field"><label class="field-label">Subnet Mask</label><input class="inp mono" id="ethMask" type="text" maxlength="15" /></div>
+                <div class="eth-field"><label class="field-label">Default Gateway</label><input class="inp mono" id="ethGW" type="text" maxlength="15" /></div>
+                <div class="eth-field"><label class="field-label">Preferred DNS</label><input class="inp mono" id="ethDNS" type="text" maxlength="15" /></div>
+                <div class="eth-field"><label class="field-label">Alternate DNS</label><input class="inp mono" id="ethAltDNS" type="text" maxlength="15" /></div>
               </div>
-              <button class="eth-apply" onclick="applyStatic()">Save</button>
+              <button class="btn-primary" onclick="applyStatic()">Save</button>
             </div>
             <div id="ethStatus" class="eth-status"></div>
           </div>
@@ -479,31 +545,33 @@ input:checked+.slider:before{transform:translateX(22px);}
       <div class="itab-content" id="itab-policies">
         <div class="card" id="fwIPCard">
           <div class="ctitle">Target Device — IP Address</div>
-          <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:200px;"><div style="font-size:11px;color:#64748b;margin-bottom:6px;">Enter the IP address of the Pixellot VPU to begin adding firewall rules.</div><input class="eth-input" id="fwIPInput" type="text" maxlength="15" onkeydown="if(event.key==='Enter')lockFwIP()" /><div id="fwIPErr" style="font-size:11px;color:#ef4444;margin-top:5px;min-height:14px;"></div></div>
-            <button class="eth-apply" onclick="lockFwIP()" style="margin-bottom:19px;">Confirm</button>
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Enter the IP address of the Pixellot VPU to begin adding firewall rules.</div>
+          <div style="display:flex;gap:10px;align-items:flex-end;">
+            <div style="flex:1;"><input class="inp mono" id="fwIPInput" type="text" maxlength="15" onkeydown="if(event.key==='Enter')lockFwIP()" /></div>
+            <button class="btn-primary" onclick="lockFwIP()">Confirm</button>
           </div>
+          <div id="fwIPErr" style="font-size:11px;color:var(--red);margin-top:6px;min-height:14px;"></div>
         </div>
         <div id="fwBuilder" style="display:none;">
           <div class="card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
               <div class="ctitle" style="margin-bottom:0;">Add Port Rule</div>
-              <div style="display:flex;align-items:center;gap:8px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-size:12px;"><span style="color:#64748b;">Target IP:</span><span id="fwIPDisplay" style="font-family:'Courier New',monospace;color:#f97316;font-weight:700;"></span><button onclick="unlockFwIP()" style="background:none;border:none;color:#475569;cursor:pointer;font-size:11px;margin-left:4px;">✎ Edit</button></div>
+              <div class="ip-bar"><span class="lbl">Target IP:</span><span class="val" id="fwIPDisplay"></span><button class="btn-ghost" onclick="unlockFwIP()" style="margin-left:6px;">✎ Edit</button></div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-              <div style="display:flex;flex-direction:column;gap:6px;min-width:90px;"><label class="eth-label">Port</label><input class="eth-input" id="fwPort" type="text" maxlength="20" style="width:100%;" /></div>
-              <div style="display:flex;flex-direction:column;gap:6px;min-width:90px;"><label class="eth-label">Protocol</label><select class="fw-select" id="fwProto"><option value="">— Select —</option><option>TCP</option><option>UDP</option><option>TCP+UDP</option></select></div>
-              <div style="display:flex;flex-direction:column;gap:6px;min-width:90px;"><label class="eth-label">Direction</label><select class="fw-select" id="fwDir"><option value="">— Select —</option><option>Outbound</option><option>Inbound</option></select></div>
-              <div style="display:flex;flex-direction:column;gap:6px;flex:2;min-width:160px;"><label class="eth-label">Purpose</label><input class="eth-input" id="fwPurpose" type="text" maxlength="80" style="width:100%;" /></div>
-              <div style="display:flex;flex-direction:column;gap:6px;"><label class="eth-label">Action</label><div style="display:flex;gap:6px;"><button class="fw-action-btn allow-btn" onclick="addRule('ALLOW')">+ ALLOW</button><button class="fw-action-btn deny-btn" onclick="addRule('DENY')">+ DENY</button></div></div>
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:90px;"><label class="field-label">Port</label><input class="inp mono" id="fwPort" type="text" maxlength="20" style="width:100%;" /></div>
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:100px;"><label class="field-label">Protocol</label><select class="sel" id="fwProto"><option value="">— Select —</option><option>TCP</option><option>UDP</option><option>TCP+UDP</option></select></div>
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:100px;"><label class="field-label">Direction</label><select class="sel" id="fwDir"><option value="">— Select —</option><option>Outbound</option><option>Inbound</option></select></div>
+              <div style="display:flex;flex-direction:column;gap:6px;flex:2;min-width:160px;"><label class="field-label">Purpose</label><input class="inp" id="fwPurpose" type="text" maxlength="80" style="width:100%;" /></div>
+              <div style="display:flex;flex-direction:column;gap:6px;"><label class="field-label">Action</label><div style="display:flex;gap:6px;"><button class="btn-allow" onclick="addRule('ALLOW')">+ ALLOW</button><button class="btn-deny" onclick="addRule('DENY')">+ DENY</button></div></div>
             </div>
-            <div id="fwRuleErr" style="font-size:11px;color:#ef4444;margin-top:8px;min-height:14px;"></div>
+            <div id="fwRuleErr" style="font-size:11px;color:var(--red);margin-top:8px;min-height:14px;"></div>
           </div>
           <div class="card" style="padding:0;overflow:hidden;">
-            <div style="background:#0f172a;padding:12px 18px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:600;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;"><span>Configured Port Rules</span><span id="fwRuleCount" style="background:#1e293b;border:1px solid #334155;border-radius:20px;padding:2px 10px;font-size:11px;color:#94a3b8;">0 rules</span></div>
-            <div id="fwRulesTable"><div style="padding:20px 18px;font-size:13px;color:#475569;font-style:italic;">No rules added yet.</div></div>
+            <div class="rule-hdr"><span>Configured Port Rules</span><span class="rule-count" id="fwRuleCount">0 rules</span></div>
+            <div id="fwRulesTable"><div class="cf-empty">No rules added yet.</div></div>
           </div>
-          <div style="margin-top:4px;"><button class="eth-apply" onclick="saveFwRules()">Save Firewall Policies</button><div id="fwSaveMsg" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px;"></div></div>
+          <div style="margin-top:12px;"><button class="btn-primary" onclick="saveFwRules()">Save Firewall Policies</button><div id="fwSaveMsg" style="font-size:12px;color:var(--green);margin-top:8px;min-height:16px;"></div></div>
         </div>
       </div>
 
@@ -511,30 +579,32 @@ input:checked+.slider:before{transform:translateX(22px);}
       <div class="itab-content" id="itab-filter">
         <div class="card" id="cfIPCard">
           <div class="ctitle">Target Device — IP Address</div>
-          <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:200px;"><div style="font-size:11px;color:#64748b;margin-bottom:6px;">Enter the IP address of the device to manage content filter rules for.</div><input class="eth-input" id="cfIPInput" type="text" maxlength="15" onkeydown="if(event.key==='Enter')lockCfIP()" /><div id="cfIPErr" style="font-size:11px;color:#ef4444;margin-top:5px;min-height:14px;"></div></div>
-            <button class="eth-apply" onclick="lockCfIP()" style="margin-bottom:19px;">Confirm</button>
+          <div style="font-size:12px;color:var(--text-3);margin-bottom:10px;">Enter the IP address of the device to manage content filter rules for.</div>
+          <div style="display:flex;gap:10px;align-items:flex-end;">
+            <div style="flex:1;"><input class="inp mono" id="cfIPInput" type="text" maxlength="15" onkeydown="if(event.key==='Enter')lockCfIP()" /></div>
+            <button class="btn-primary" onclick="lockCfIP()">Confirm</button>
           </div>
+          <div id="cfIPErr" style="font-size:11px;color:var(--red);margin-top:6px;min-height:14px;"></div>
         </div>
         <div id="cfBuilder" style="display:none;">
-          <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-            <div style="display:flex;align-items:center;gap:10px;"><div style="width:9px;height:9px;border-radius:50%;background:#f97316;flex-shrink:0;"></div><div><div style="font-size:12px;font-weight:700;color:#e2e8f0;">Content Filtering — Active</div><div style="font-size:11px;color:#64748b;margin-top:2px;">All outbound traffic is subject to domain filtering.</div></div></div>
-            <div style="display:flex;align-items:center;gap:8px;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-size:12px;"><span style="color:#64748b;">Device IP:</span><span id="cfIPDisplay" style="font-family:'Courier New',monospace;color:#f97316;font-weight:700;"></span><button onclick="unlockCfIP()" style="background:none;border:none;color:#475569;cursor:pointer;font-size:11px;margin-left:4px;">✎ Edit</button></div>
+          <div class="card-inset" style="border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;"></div><div><div style="font-size:12px;font-weight:600;color:var(--text-1);">Content Filtering — Active</div><div style="font-size:11px;color:var(--text-3);margin-top:2px;">All outbound traffic is subject to domain filtering. Unlisted domains are blocked by default.</div></div></div>
+            <div class="ip-bar"><span class="lbl">Device IP:</span><span class="val" id="cfIPDisplay"></span><button class="btn-ghost" onclick="unlockCfIP()" style="margin-left:6px;">✎ Edit</button></div>
           </div>
           <div class="card">
             <div class="ctitle">Add Whitelist Entry</div>
             <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
-              <div style="flex:2;min-width:220px;"><label class="eth-label" style="display:block;margin-bottom:6px;">Domain</label><input class="eth-input" id="cfDomain" type="text" maxlength="120" style="width:100%;" onkeydown="if(event.key==='Enter')addCfRule('ALLOW')" /></div>
-              <div style="min-width:160px;"><label class="eth-label" style="display:block;margin-bottom:6px;">Category / Notes</label><input class="eth-input" id="cfNote" type="text" maxlength="80" style="width:100%;" /></div>
-              <div style="display:flex;flex-direction:column;gap:6px;"><label class="eth-label">Action</label><div style="display:flex;gap:6px;"><button class="fw-action-btn allow-btn" onclick="addCfRule('ALLOW')">+ ALLOW</button><button class="fw-action-btn deny-btn" onclick="addCfRule('BLOCK')">+ BLOCK</button></div></div>
+              <div style="flex:2;min-width:220px;"><label class="field-label">Domain</label><input class="inp mono" id="cfDomain" type="text" maxlength="120" style="width:100%;margin-top:6px;" onkeydown="if(event.key==='Enter')addCfRule('ALLOW')" /></div>
+              <div style="min-width:160px;"><label class="field-label">Category / Notes</label><input class="inp" id="cfNote" type="text" maxlength="80" style="width:100%;margin-top:6px;" /></div>
+              <div style="display:flex;flex-direction:column;gap:6px;"><label class="field-label">Action</label><div style="display:flex;gap:6px;"><button class="btn-allow" onclick="addCfRule('ALLOW')">+ ALLOW</button><button class="btn-deny" onclick="addCfRule('BLOCK')">+ BLOCK</button></div></div>
             </div>
-            <div id="cfRuleErr" style="font-size:11px;color:#ef4444;margin-top:8px;min-height:14px;"></div>
+            <div id="cfRuleErr" style="font-size:11px;color:var(--red);margin-top:8px;min-height:14px;"></div>
           </div>
           <div class="card" style="padding:0;overflow:hidden;">
-            <div style="background:#0f172a;padding:12px 18px;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Whitelist Entries</span><span id="cfRuleCount" style="background:#1e293b;border:1px solid #334155;border-radius:20px;padding:2px 10px;font-size:11px;color:#94a3b8;">0 entries</span></div>
-            <div id="cfRulesTable"><div style="padding:20px 18px;font-size:13px;color:#475569;font-style:italic;">No entries yet.</div></div>
+            <div class="rule-hdr"><span>Whitelist Entries</span><span class="rule-count" id="cfRuleCount">0 entries</span></div>
+            <div id="cfRulesTable"><div class="cf-empty">No entries yet.</div></div>
           </div>
-          <div style="margin-top:4px;"><button class="eth-apply" onclick="saveCfRules()">Save Content Filter</button><div id="cfSaveMsg" style="font-size:12px;color:#4ade80;margin-top:8px;min-height:16px;"></div></div>
+          <div style="margin-top:12px;"><button class="btn-primary" onclick="saveCfRules()">Save Content Filter</button><div id="cfSaveMsg" style="font-size:12px;color:var(--green);margin-top:8px;min-height:16px;"></div></div>
         </div>
       </div>
 
@@ -546,32 +616,31 @@ input:checked+.slider:before{transform:translateX(22px);}
 
     <!-- EMAIL -->
     <div class="page" id="page-email">
-      <div class="ep-header">
-        <h2>✉️ Email</h2>
-        <p>erik.millan@playon.org — PlayOn High School, Network Administrator</p>
+      <div class="ep-hdr">
+        <div><h2>✉️ Email</h2><p>erik.millan@playon.org — PlayOn High School, Network Administrator</p></div>
       </div>
       <div id="ep-empty" class="ep-empty"><div style="font-size:32px;margin-bottom:12px;">✉️</div><div>Start the case study to load your inbox.</div></div>
       <div id="ep-active" style="display:none;">
-        <div class="ep-thread-wrap">
-          <div class="ep-meta">
+        <div class="ep-thread-outer">
+          <div class="ep-thread-meta">
             <div class="ep-meta-row"><span class="ep-mk">From:</span><span class="ep-mv hi">Erik Millan</span><span class="ep-mv" style="margin-left:6px;">&lt;erik.millan@playon.org&gt;</span></div>
             <div class="ep-meta-row"><span class="ep-mk">To:</span><span class="ep-mv">support@playon.co</span></div>
             <div class="ep-meta-row"><span class="ep-mk">Sub:</span><span class="ep-mv">New Pixellot System — Ready for Configuration</span></div>
           </div>
           <div class="ep-messages" id="ep-messages"></div>
-        </div>
-        <div class="ep-compose">
-          <div style="font-size:11px;color:#475569;margin-bottom:6px;">Reply to erik.millan@playon.org</div>
-          <textarea id="ep-reply" rows="3" placeholder="Write a reply…" oninput="updateCharCount()"></textarea>
-          <div id="ep-attach-bar" class="attach-bar"></div>
-          <div id="ep-attach-warn" style="font-size:11px;color:#f97316;margin-top:4px;"></div>
-          <input type="file" id="ep-file-input" multiple style="display:none;" onchange="handleCandidateAttach(event)" />
-          <div class="ep-compose-foot">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button class="attach-btn" onclick="document.getElementById('ep-file-input').click()">📎 Attach</button>
-              <span id="ep-char">0 characters</span>
+          <div class="ep-compose">
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:6px;">Reply to erik.millan@playon.org</div>
+            <textarea id="ep-reply" rows="3" placeholder="Write a reply…" oninput="updateCharCount()"></textarea>
+            <div id="ep-attach-bar" class="attach-bar"></div>
+            <div id="ep-attach-warn" style="font-size:11px;color:#fbbf24;margin-top:4px;"></div>
+            <input type="file" id="ep-file-input" multiple style="display:none;" onchange="handleCandidateAttach(event)" />
+            <div class="ep-compose-foot">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button class="attach-btn" onclick="document.getElementById('ep-file-input').click()">📎 Attach</button>
+                <span class="ep-char" id="ep-char">0 characters</span>
+              </div>
+              <button class="btn-primary" onclick="sendCandidateEmail()">Send ↗</button>
             </div>
-            <button class="ep-send" onclick="sendCandidateEmail()">Send ↗</button>
           </div>
         </div>
       </div>
@@ -580,42 +649,43 @@ input:checked+.slider:before{transform:translateX(22px);}
     <!-- ADMIN -->
     <div class="page" id="page-admin">
       <div class="admin-lock" id="adminLock">
-        <div style="font-size:48px;margin-bottom:16px;">🛡️</div>
+        <div style="font-size:52px;margin-bottom:18px;">🛡️</div>
         <h2>Admin Access Required</h2>
         <p>Enter the administrator password to view candidate activity logs.</p>
-        <div class="pinwrap"><input class="pin-input" id="pinInput" type="password" placeholder="Password" maxlength="10" onkeydown="if(event.key==='Enter')checkPin()" /><button class="pin-btn" onclick="checkPin()">Unlock</button></div>
+        <div class="pinwrap"><input class="pin-inp" id="pinInput" type="password" placeholder="••••" maxlength="10" onkeydown="if(event.key==='Enter')checkPin()" /><button class="btn-primary" style="padding:11px 20px;" onclick="checkPin()">Unlock</button></div>
         <div class="pin-err" id="pinErr"></div>
       </div>
       <div class="admin-content" id="adminContent">
         <div class="admin-hdr">
-          <h2>🛡️ Admin — Candidate Activity Log</h2>
+          <div class="page-hdr" style="border:none;margin-bottom:0;padding-bottom:0;"><h2>🛡️ Admin</h2><p>Candidate Activity Log</p></div>
           <div style="display:flex;gap:8px;">
-            <button onclick="clearAllSessions()" style="background:#450a0a;color:#fca5a5;border:1px solid #7f1d1d;padding:7px 14px;border-radius:7px;font-size:12px;cursor:pointer;">🗑 Clear All</button>
-            <button class="logout-btn" onclick="adminLogout()">🔒 Lock</button>
+            <button onclick="clearAllSessions()" class="btn-secondary" style="color:var(--red-soft);border-color:var(--red-dim);">🗑 Clear All</button>
+            <button class="btn-secondary" onclick="adminLogout()">🔒 Lock</button>
           </div>
         </div>
+        <div style="margin-bottom:20px;"></div>
         <div class="disclaimer"><span style="font-size:16px;">⚠️</span><span><strong>Disclaimer:</strong> This section is <strong>NOT</strong> part of the case study. Admin use only.</span></div>
         <div class="card" style="margin-bottom:20px;"><div class="ctitle">Candidate Sessions</div><div id="sessBar"><div class="no-sess">No sessions started yet.</div></div></div>
         <div id="sessView" style="display:none;">
           <div class="score-card">
             <div class="sc-item"><div class="sc-val" id="sc-total" style="color:#93c5fd;">0</div><div class="sc-lbl">Total Actions</div></div>
-            <div class="sc-item"><div class="sc-val" id="sc-emails" style="color:#4ade80;">0</div><div class="sc-lbl">Emails Sent</div></div>
+            <div class="sc-item"><div class="sc-val" id="sc-emails" style="color:var(--green);">0</div><div class="sc-lbl">Emails Sent</div></div>
           </div>
           <div class="log-section"><div class="log-section-hdr">📋 Session Log</div><div id="log-all"><div class="no-log">No activity yet.</div></div></div>
-          <div class="admin-email-section">
+          <div class="admin-email-sec">
             <div class="admin-email-hdr">✉️ Email Thread — Reply as Erik Millan</div>
             <div class="admin-email-thread" id="adminEmailThread"><div class="no-log">No messages yet.</div></div>
             <div class="admin-reply-row">
-              <div style="display:flex;gap:8px;"><input class="admin-reply-input" id="adminReplyInput" type="text" placeholder="Reply as Erik Millan…" onkeydown="if(event.key==='Enter')sendAdminReply()" /><button class="admin-reply-btn" onclick="sendAdminReply()">Send as Erik ↗</button></div>
+              <div style="display:flex;gap:8px;"><input class="admin-reply-input" id="adminReplyInput" type="text" placeholder="Reply as Erik Millan…" onkeydown="if(event.key==='Enter')sendAdminReply()" /><button class="btn-primary" onclick="sendAdminReply()">Send as Erik ↗</button></div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <button class="attach-btn" onclick="document.getElementById('admin-file-input').click()">📎 Attach file</button>
                 <input type="file" id="admin-file-input" multiple style="display:none;" onchange="handleAdminAttach(event)" />
                 <div id="admin-attach-bar" class="attach-bar" style="margin-top:0;"></div>
               </div>
-              <div id="admin-attach-warn" style="font-size:11px;color:#f97316;"></div>
+              <div id="admin-attach-warn" style="font-size:11px;color:#fbbf24;"></div>
             </div>
           </div>
-          <div class="admin-email-section" id="adminSubmissionSection" style="display:none;">
+          <div class="admin-email-sec" id="adminSubmissionSection" style="display:none;">
             <div class="admin-email-hdr">📝 Case Study Submission</div>
             <div id="adminSubmissionContent" style="padding:16px 18px;"></div>
           </div>
@@ -627,44 +697,24 @@ input:checked+.slider:before{transform:translateX(22px);}
 </div>
 
 <script>
-// ══ CORE STATE ══
+// ══ STATE ══
 const DEFAULT_S={port443udp:false,port2088udp:false,domainPixellotStream:false,domainBalena:false,sslInspection:false,rateLimiting:false,sleepSchedule:false};
 let S={...DEFAULT_S};
 const LABELS={port443udp:'Port 443 UDP — Allow outbound',port2088udp:'Port 2088 UDP — Allow outbound (Zixi)',domainPixellotStream:'Content filter — Whitelist *.pixellot.stream',domainBalena:'Content filter — Whitelist *.balena-cloud.com',sslInspection:'SSL/TLS Deep Packet Inspection — Disable',rateLimiting:'Device Rate Limiting — Disable',sleepSchedule:'Internet Sleep Schedule — Disable'};
 const TOTAL=7;
-let ethMode='dhcp';
-let fwIPLocked=false,fwRules=[];
-let cfIPLocked=false,cfRules=[];
-let vpuLinked=false;
+let ethMode='dhcp',fwIPLocked=false,fwRules=[],cfIPLocked=false,cfRules=[],vpuLinked=false;
 const VPU_VALID=['pxls2_5215','5cbd98b0118884077f6cc921'];
 const REQUIRED_CF=['*.pixellot.stream','*.balena-cloud.com'];
-
-// ══ SESSIONS ══
-let sessions=[],activeSession=null,viewingSession=null;
-let adminUnlocked=false;
+let sessions=[],activeSession=null,viewingSession=null,adminUnlocked=false;
 const ADMIN_PASS='T3NS';
 
 function ts(s){const sec=Math.floor((Date.now()-s.startedAt)/1000);return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');}
 
-function addLog(badge,cls,msg){
-  if(!activeSession)return;
-  activeSession.totalActions++;
-  activeSession.log.push({t:ts(activeSession),badge,cls,msg});
-  persistCurrentSession();
-  refreshAdmin();
-}
+function addLog(badge,cls,msg){if(!activeSession)return;activeSession.totalActions++;activeSession.log.push({t:ts(activeSession),badge,cls,msg});persistCurrentSession();refreshAdmin();}
 
-function newSession(name){
-  const s={name,startedAt:Date.now(),log:[],wrongAttempts:0,totalActions:0,fixedCount:0,submitted:false,
-    emails:[{dir:'inbound',body:'Hello,\n\nWe have installed our new Pixellot system and it should be ready for configuration. Everything is hooked up correctly and powered on. The system name is PXLS2_5215 and ID 5cbd98b0118884077f6cc921.\n\nI understand that you guys are testing a new tool to remotely set network settings. Please let me know if you need anything!\n\nBest,\nErik Millan — Network Administrator',t:'00:00',read:false,attachments:[]}]
-  };
-  sessions.push(s);
-  activeSession=s;
-  viewingSession=s;
-  return s;
-}
+function newSession(name){const s={name,startedAt:Date.now(),log:[],wrongAttempts:0,totalActions:0,fixedCount:0,submitted:false,emails:[{dir:'inbound',body:'Hello,\n\nWe have installed our new Pixellot system and it should be ready for configuration. Everything is hooked up correctly and powered on. The system name is PXLS2_5215 and ID 5cbd98b0118884077f6cc921.\n\nI understand that you guys are testing a new tool to remotely set network settings. Please let me know if you need anything!\n\nBest,\nErik Millan — Network Administrator',t:'00:00',read:false,attachments:[]}]};sessions.push(s);activeSession=s;viewingSession=s;return s;}
 
-// ══ INDEXEDDB FOR ATTACHMENTS ══
+// ══ INDEXEDDB ══
 const IDB_NAME='remoteshield_attachments',IDB_STORE='files';
 let idb=null;
 function openIDB(){return new Promise((res,rej)=>{if(idb){res(idb);return;}const req=indexedDB.open(IDB_NAME,1);req.onupgradeneeded=e=>e.target.result.createObjectStore(IDB_STORE);req.onsuccess=e=>{idb=e.target.result;res(idb);};req.onerror=()=>rej(req.error);});}
@@ -674,147 +724,37 @@ function idbDelete(key){return openIDB().then(db=>new Promise((res,rej)=>{const 
 function genID(){return 'att_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);}
 
 // ══ ATTACHMENTS ══
-const MAX_FILE_BYTES=10*1024*1024;
+const MAX_FILE=10*1024*1024;
 let pendingCandidateAttachments=[],pendingAdminAttachments=[];
-
-async function handleCandidateAttach(e){
-  const warn=document.getElementById('ep-attach-warn');warn.textContent='';
-  for(const f of e.target.files){if(f.size>MAX_FILE_BYTES){warn.textContent=`"${f.name}" exceeds 10MB limit.`;continue;}const id=genID();await idbPut(id,f);pendingCandidateAttachments.push({name:f.name,type:f.type,id,size:f.size});}
-  e.target.value='';
-  renderPendingAttachments('ep-attach-bar',pendingCandidateAttachments,'candidate');
-}
-
-async function handleAdminAttach(e){
-  const warn=document.getElementById('admin-attach-warn');warn.textContent='';
-  for(const f of e.target.files){if(f.size>MAX_FILE_BYTES){warn.textContent=`"${f.name}" exceeds 10MB limit.`;continue;}const id=genID();await idbPut(id,f);pendingAdminAttachments.push({name:f.name,type:f.type,id,size:f.size});}
-  e.target.value='';
-  renderPendingAttachments('admin-attach-bar',pendingAdminAttachments,'admin');
-}
-
-function renderPendingAttachments(barId,list,who){
-  const bar=document.getElementById(barId);if(!bar)return;
-  bar.innerHTML=list.map((f,i)=>`<div class="attach-chip"><span>${f.type.startsWith('image/')?'🖼':'📄'} ${f.name} <span style="color:#475569;">(${(f.size/1024).toFixed(0)}KB)</span></span><button onclick="removePendingAttach(${i},'${who}')">✕</button></div>`).join('');
-}
-
-function removePendingAttach(idx,who){
-  if(who==='candidate'){idbDelete(pendingCandidateAttachments[idx].id);pendingCandidateAttachments.splice(idx,1);renderPendingAttachments('ep-attach-bar',pendingCandidateAttachments,'candidate');}
-  else{idbDelete(pendingAdminAttachments[idx].id);pendingAdminAttachments.splice(idx,1);renderPendingAttachments('admin-attach-bar',pendingAdminAttachments,'admin');}
-}
-
-function loadAttachmentsInto(placeholderId,attachments){
-  if(!attachments||!attachments.length)return;
-  const el=document.getElementById(placeholderId);if(!el)return;
-  Promise.all(attachments.map(a=>{
-    if(!a.id)return Promise.resolve(`<span style="font-size:11px;color:#475569;">📎 ${a.name}</span>`);
-    return idbGet(a.id).then(blob=>{
-      if(!blob)return `<span style="font-size:11px;color:#475569;">📎 ${a.name} (unavailable)</span>`;
-      const url=URL.createObjectURL(blob);
-      if(a.type&&a.type.startsWith('image/'))return `<img class="msg-attach-img" src="${url}" alt="${a.name}" onclick="openLightbox('${url}')" title="${a.name}" />`;
-      return `<a class="msg-attach-file" href="${url}" download="${a.name}">📄 ${a.name}</a>`;
-    }).catch(()=>`<span style="font-size:11px;color:#475569;">📎 ${a.name}</span>`);
-  })).then(parts=>{if(el)el.innerHTML=parts.join('');}).catch(()=>{});
-}
-
+async function handleCandidateAttach(e){const w=document.getElementById('ep-attach-warn');w.textContent='';for(const f of e.target.files){if(f.size>MAX_FILE){w.textContent=`"${f.name}" exceeds 10MB.`;continue;}const id=genID();await idbPut(id,f);pendingCandidateAttachments.push({name:f.name,type:f.type,id,size:f.size});}e.target.value='';renderPendingAttachments('ep-attach-bar',pendingCandidateAttachments,'candidate');}
+async function handleAdminAttach(e){const w=document.getElementById('admin-attach-warn');w.textContent='';for(const f of e.target.files){if(f.size>MAX_FILE){w.textContent=`"${f.name}" exceeds 10MB.`;continue;}const id=genID();await idbPut(id,f);pendingAdminAttachments.push({name:f.name,type:f.type,id,size:f.size});}e.target.value='';renderPendingAttachments('admin-attach-bar',pendingAdminAttachments,'admin');}
+function renderPendingAttachments(barId,list,who){const bar=document.getElementById(barId);if(!bar)return;bar.innerHTML=list.map((f,i)=>`<div class="attach-chip"><span>${f.type.startsWith('image/')?'🖼':'📄'} ${f.name} <span style="color:var(--text-3);">(${(f.size/1024).toFixed(0)}KB)</span></span><button onclick="removePendingAttach(${i},'${who}')">✕</button></div>`).join('');}
+function removePendingAttach(idx,who){if(who==='candidate'){idbDelete(pendingCandidateAttachments[idx].id);pendingCandidateAttachments.splice(idx,1);renderPendingAttachments('ep-attach-bar',pendingCandidateAttachments,'candidate');}else{idbDelete(pendingAdminAttachments[idx].id);pendingAdminAttachments.splice(idx,1);renderPendingAttachments('admin-attach-bar',pendingAdminAttachments,'admin');}}
+function loadAttachmentsInto(placeholderId,attachments){if(!attachments||!attachments.length)return;const el=document.getElementById(placeholderId);if(!el)return;Promise.all(attachments.map(a=>{if(!a.id)return Promise.resolve(`<span style="font-size:11px;color:var(--text-3);">📎 ${a.name}</span>`);return idbGet(a.id).then(blob=>{if(!blob)return `<span style="font-size:11px;color:var(--text-3);">📎 ${a.name} (unavailable)</span>`;const url=URL.createObjectURL(blob);if(a.type&&a.type.startsWith('image/'))return `<img class="msg-attach-img" src="${url}" alt="${a.name}" onclick="openLightbox('${url}')" title="${a.name}"/>`;return `<a class="msg-attach-file" href="${url}" download="${a.name}">📄 ${a.name}</a>`;}).catch(()=>`<span style="font-size:11px;color:var(--text-3);">📎 ${a.name}</span>`);})).then(parts=>{if(el)el.innerHTML=parts.join('');}).catch(()=>{});}
 function openLightbox(src){const lb=document.createElement('div');lb.className='lightbox';lb.innerHTML=`<img src="${src}"/>`;lb.onclick=()=>lb.remove();document.body.appendChild(lb);}
 
 // ══ EMAIL ══
-function showEmailPanel(){
-  const empty=document.getElementById('ep-empty'),active=document.getElementById('ep-active');
-  if(!activeSession){empty.style.display='block';active.style.display='none';return;}
-  empty.style.display='none';active.style.display='block';
-  renderEmailThread();
-  markEmailsRead();
-}
-
-function renderEmailThread(){
-  if(!activeSession)return;
-  const el=document.getElementById('ep-messages');if(!el)return;
-  el.innerHTML=activeSession.emails.map((m,i)=>`
-    <div class="ep-bubble ${m.dir==='inbound'?'in':'out'}">
-      <div class="ep-bm">${m.dir==='inbound'?'Erik Millan · '+m.t:'You · '+m.t}</div>
-      <div class="ep-bb">${m.body.replace(/\n/g,'<br>')}${m.attachments&&m.attachments.length?`<div class="msg-attachments" id="att-t-${i}"></div>`:''}</div>
-    </div>`).join('');
-  el.scrollTop=el.scrollHeight;
-  activeSession.emails.forEach((m,i)=>{if(m.attachments&&m.attachments.length)loadAttachmentsInto('att-t-'+i,m.attachments);});
-}
-
-function renderAdminEmailThread(){
-  if(!viewingSession)return;
-  const el=document.getElementById('adminEmailThread');if(!el)return;
-  if(!viewingSession.emails||!viewingSession.emails.length){el.innerHTML='<div class="no-log">No messages yet.</div>';return;}
-  el.innerHTML=viewingSession.emails.map((m,i)=>`
-    <div class="admin-bubble ${m.dir==='inbound'?'inbound':'outbound'}">
-      <div class="ab-meta">${m.dir==='inbound'?'Erik Millan':'Candidate'} · ${m.t}</div>
-      <div class="ab-body">${m.body.replace(/\n/g,'<br>')}${m.attachments&&m.attachments.length?`<div class="msg-attachments" id="att-a-${i}"></div>`:''}</div>
-    </div>`).join('');
-  el.scrollTop=el.scrollHeight;
-  viewingSession.emails.forEach((m,i)=>{if(m.attachments&&m.attachments.length)loadAttachmentsInto('att-a-'+i,m.attachments);});
-}
-
+function showEmailPanel(){const empty=document.getElementById('ep-empty'),active=document.getElementById('ep-active');if(!activeSession){empty.style.display='block';active.style.display='none';return;}empty.style.display='none';active.style.display='block';renderEmailThread();markEmailsRead();}
+function renderEmailThread(){if(!activeSession)return;const el=document.getElementById('ep-messages');if(!el)return;el.innerHTML=activeSession.emails.map((m,i)=>`<div class="ep-bubble ${m.dir==='inbound'?'in':'out'}"><div class="ep-bm">${m.dir==='inbound'?'Erik Millan · '+m.t:'You · '+m.t}</div><div class="ep-bb">${m.body.replace(/\n/g,'<br>')}${m.attachments&&m.attachments.length?`<div class="msg-attachments" id="att-t-${i}"></div>`:''}</div></div>`).join('');el.scrollTop=el.scrollHeight;activeSession.emails.forEach((m,i)=>{if(m.attachments&&m.attachments.length)loadAttachmentsInto('att-t-'+i,m.attachments);});}
+function renderAdminEmailThread(){if(!viewingSession)return;const el=document.getElementById('adminEmailThread');if(!el)return;if(!viewingSession.emails||!viewingSession.emails.length){el.innerHTML='<div class="no-log">No messages yet.</div>';return;}el.innerHTML=viewingSession.emails.map((m,i)=>`<div class="admin-bubble ${m.dir==='inbound'?'inbound':'outbound'}"><div class="ab-meta">${m.dir==='inbound'?'Erik Millan':'Candidate'} · ${m.t}</div><div class="ab-body">${m.body.replace(/\n/g,'<br>')}${m.attachments&&m.attachments.length?`<div class="msg-attachments" id="att-a-${i}"></div>`:''}</div></div>`).join('');el.scrollTop=el.scrollHeight;viewingSession.emails.forEach((m,i)=>{if(m.attachments&&m.attachments.length)loadAttachmentsInto('att-a-'+i,m.attachments);});}
 function markEmailsRead(){if(!activeSession)return;activeSession.emails.forEach(m=>m.read=true);updateEmailBadge();}
 function updateEmailBadge(){const b=document.getElementById('emailBadge');if(!activeSession){b.style.display='none';return;}const u=activeSession.emails.filter(m=>!m.read&&m.dir==='inbound').length;b.style.display=u>0?'inline':'none';b.textContent=u;}
 function updateCharCount(){const v=document.getElementById('ep-reply').value;document.getElementById('ep-char').textContent=v.length+' character'+(v.length!==1?'s':'');}
-
-function sendCandidateEmail(){
-  if(!activeSession)return;
-  const box=document.getElementById('ep-reply');
-  const body=box.value.trim();
-  if(!body&&!pendingCandidateAttachments.length)return;
-  const attachments=[...pendingCandidateAttachments];
-  activeSession.emails.push({dir:'outbound',body,t:ts(activeSession),read:true,attachments});
-  const ai=attachments.length?' + '+attachments.length+' attachment'+(attachments.length>1?'s':''):'';
-  addLog('EMAIL SENT','lb-action','Reply to Erik — "'+body.substring(0,80)+(body.length>80?'…':'')+ai+'"');
-  box.value='';pendingCandidateAttachments=[];
-  renderPendingAttachments('ep-attach-bar',pendingCandidateAttachments,'candidate');
-  document.getElementById('ep-attach-warn').textContent='';
-  updateCharCount();renderEmailThread();refreshAdmin();
-}
-
-function sendAdminReply(){
-  if(!viewingSession)return;
-  const inp=document.getElementById('adminReplyInput');
-  const body=inp.value.trim();
-  const attachments=[...pendingAdminAttachments];
-  if(!body&&!attachments.length)return;
-  viewingSession.emails.push({dir:'inbound',body,t:ts(viewingSession),read:false,attachments});
-  inp.value='';pendingAdminAttachments=[];
-  renderPendingAttachments('admin-attach-bar',pendingAdminAttachments,'admin');
-  document.getElementById('admin-attach-warn').textContent='';
-  if(viewingSession===activeSession){renderEmailThread();updateEmailBadge();}
-  renderAdminEmailThread();
-  persistCurrentSession();
-}
+function sendCandidateEmail(){if(!activeSession)return;const box=document.getElementById('ep-reply');const body=box.value.trim();if(!body&&!pendingCandidateAttachments.length)return;const attachments=[...pendingCandidateAttachments];activeSession.emails.push({dir:'outbound',body,t:ts(activeSession),read:true,attachments});const ai=attachments.length?' + '+attachments.length+' attachment'+(attachments.length>1?'s':''):'';addLog('EMAIL SENT','lb-action','Reply to Erik — "'+body.substring(0,80)+(body.length>80?'…':'')+ai+'"');box.value='';pendingCandidateAttachments=[];renderPendingAttachments('ep-attach-bar',pendingCandidateAttachments,'candidate');document.getElementById('ep-attach-warn').textContent='';updateCharCount();renderEmailThread();refreshAdmin();}
+function sendAdminReply(){if(!viewingSession)return;const inp=document.getElementById('adminReplyInput');const body=inp.value.trim();const attachments=[...pendingAdminAttachments];if(!body&&!attachments.length)return;viewingSession.emails.push({dir:'inbound',body,t:ts(viewingSession),read:false,attachments});inp.value='';pendingAdminAttachments=[];renderPendingAttachments('admin-attach-bar',pendingAdminAttachments,'admin');document.getElementById('admin-attach-warn').textContent='';if(viewingSession===activeSession){renderEmailThread();updateEmailBadge();}renderAdminEmailThread();persistCurrentSession();}
 
 // ══ NAV ══
-function showPage(name,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  el.classList.add('active');
-  if(name==='email')showEmailPanel();
-}
-
-function showItab(name,el){
-  document.querySelectorAll('.itab-content').forEach(t=>{t.style.display='none';t.classList.remove('active');});
-  document.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));
-  const t=document.getElementById('itab-'+name);t.style.display='block';t.classList.add('active');
-  el.classList.add('active');
-}
-
+function showPage(name,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');el.classList.add('active');if(name==='email')showEmailPanel();}
+function showItab(name,el){document.querySelectorAll('.itab-content').forEach(t=>{t.style.display='none';t.classList.remove('active');});document.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));const t=document.getElementById('itab-'+name);t.style.display='block';t.classList.add('active');el.classList.add('active');}
 function guardedItab(){}
-
 function unlockRemoteShieldTabs(){['ethernet','policies','filter','advanced'].forEach(n=>{const el=document.getElementById('itab-nav-'+n);if(el){el.classList.remove('itab-locked');el.setAttribute('onclick',`showItab('${n}',this)`);}});}
 function lockRemoteShieldTabs(){['ethernet','policies','filter','advanced'].forEach(n=>{const el=document.getElementById('itab-nav-'+n);if(el){el.classList.add('itab-locked');el.setAttribute('onclick','guardedItab()');}});showItab('dash',document.getElementById('itab-nav-dash'));}
 
-// ══ CASE STUDY START ══
+// ══ START ══
 function startCase(){
-  const nameEl=document.getElementById('candidateName');
-  const name=nameEl.value.trim();
+  const nameEl=document.getElementById('candidateName');const name=nameEl.value.trim();
   if(!name){nameEl.classList.add('err');document.getElementById('nameErr').textContent='Please enter your name.';setTimeout(()=>{nameEl.classList.remove('err');document.getElementById('nameErr').textContent='';},2000);return;}
-  // Reset state
-  S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;
-  resetAdvState();
-  // Reset UI panels
+  S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;resetAdvState();
   document.getElementById('ethIPCard').style.display='block';document.getElementById('ethBuilder').style.display='none';document.getElementById('ethDeviceIP').value='';
   document.getElementById('fwIPCard').style.display='block';document.getElementById('fwBuilder').style.display='none';document.getElementById('fwIPInput').value='';
   document.getElementById('cfIPCard').style.display='block';document.getElementById('cfBuilder').style.display='none';document.getElementById('cfIPInput').value='';
@@ -830,150 +770,41 @@ function startCase(){
   document.getElementById('cs-landing').style.display='none';
   document.getElementById('cs-details').classList.add('show');
   document.getElementById('cs-cand-label').textContent='Candidate: '+name;
-  renderAdvanced();refresh();renderAdminSessions();
-  updateEmailBadge();
+  renderAdvanced();refresh();renderAdminSessions();updateEmailBadge();
 }
 
 // ══ VPU LOOKUP ══
-function lookupVPU(){
-  const inp=document.getElementById('vpuLookupInput'),val=inp.value.trim(),err=document.getElementById('vpuLookupErr');
-  if(!val){err.textContent='Please enter a System Name or System ID.';return;}
-  if(!VPU_VALID.includes(val.toLowerCase())){inp.classList.add('err');err.textContent='Pixellot Not Found.';addLog('NOT FOUND','lb-wrong','VPU lookup — <strong>"'+val+'"</strong> returned no results.');setTimeout(()=>inp.classList.remove('err'),1200);return;}
-  err.textContent='';vpuLinked=true;
-  document.getElementById('vpuLookupWrap').style.display='none';
-  document.getElementById('vpuDash').style.display='block';
-  unlockRemoteShieldTabs();
-  addLog('LOOKUP','lb-correct','VPU linked — <strong>'+val+'</strong>. Configuration tabs unlocked.');
-  renderGenInfo();renderGauges();persistCurrentSession();
-}
-
-function resetVPULookup(){
-  vpuLinked=false;
-  document.getElementById('vpuLookupWrap').style.display='block';
-  document.getElementById('vpuDash').style.display='none';
-  document.getElementById('vpuLookupInput').value='';
-  document.getElementById('vpuLookupErr').textContent='';
-  lockRemoteShieldTabs();
-  addLog('DISCONNECT','lb-wrong','RemoteShield link disconnected.');
-  persistCurrentSession();
-}
-
-function renderGenInfo(){
-  const cols=[[['System Name','PXLS2_5215'],['System ID','5cbd98b0118884077f6cc921'],['Dongle ID','10-E7-C6-44-C8-97'],['Tenant','playOnPoly'],['Version','5.21.8'],['OS Type','Win10'],['System Online','2 hrs 13 min'],['Installation Date','3/27/2026']],[['System Type','S2'],['TV System Mode','ntsc_60'],['Scoreboard Type','SportzCast'],['Scoreboard Connection','Ok','ok'],['Scoreboard Data','Ok','ok'],['Backup Full PIP','Scoreboard Backup'],['GEO Location','Chamblee, Georgia']],[['Part Number','PXL-422-3580'],['Head Type','2x80x0004_3840x2160'],['Physical Mode','N/A'],['Paired Mode','—'],['Chosen FPS','25'],['Type','DYNACOLOR'],['Firmware','px20221027T2'],['Issues','Network Pending','warn']]];
-  cols.forEach((col,i)=>{document.getElementById('genCol'+(i+1)).innerHTML=col.map(([k,v,c])=>`<div class="gen-item"><span class="gen-k">${k}</span><span class="gen-v ${c||''}">${v}</span></div>`).join('');});
-}
-
-function renderGauges(){
-  const items=[{label:'GPU',pct:30,color:'#f97316'},{label:'CPU',pct:30,color:'#3b82f6'},{label:'Memory',pct:22,color:'#8b5cf6'},{label:'Temperature',plain:'28°C'},{label:'Total Memory',plain:'32 GB'}];
-  const r=30,C=+(2*Math.PI*r).toFixed(2),off=+(C/4).toFixed(2);
-  document.getElementById('gaugesGrid').innerHTML=items.map(g=>{
-    if(g.plain)return `<div class="gauge-item"><div style="width:70px;height:70px;border-radius:50%;background:#0f172a;border:1px solid #334155;display:flex;align-items:center;justify-content:center;"><span style="font-size:13px;font-weight:700;color:#f1f5f9;">${g.plain}</span></div><div class="gauge-lbl">${g.label}</div></div>`;
-    const d=+((g.pct/100)*C).toFixed(2);
-    return `<div class="gauge-item"><svg viewBox="0 0 80 80" width="70" height="70"><circle cx="40" cy="40" r="${r}" fill="none" stroke="#1e293b" stroke-width="7"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="${g.color}" stroke-width="7" stroke-dasharray="${d} ${C}" stroke-dashoffset="${off}" stroke-linecap="round"/><text x="40" y="45" text-anchor="middle" font-size="14" fill="#f1f5f9" font-weight="600">${g.pct}%</text></svg><div class="gauge-lbl">${g.label}</div></div>`;
-  }).join('');
-}
+function lookupVPU(){const inp=document.getElementById('vpuLookupInput'),val=inp.value.trim(),err=document.getElementById('vpuLookupErr');if(!val){err.textContent='Please enter a System Name or System ID.';return;}if(!VPU_VALID.includes(val.toLowerCase())){inp.style.borderColor='var(--red)';err.textContent='Pixellot Not Found.';addLog('NOT FOUND','lb-wrong','VPU lookup — <strong>"'+val+'"</strong> returned no results.');setTimeout(()=>{inp.style.borderColor='';},1200);return;}err.textContent='';vpuLinked=true;document.getElementById('vpuLookupWrap').style.display='none';document.getElementById('vpuDash').style.display='block';unlockRemoteShieldTabs();addLog('LOOKUP','lb-correct','VPU linked — <strong>'+val+'</strong>. Configuration tabs unlocked.');renderGenInfo();renderGauges();persistCurrentSession();}
+function resetVPULookup(){vpuLinked=false;document.getElementById('vpuLookupWrap').style.display='block';document.getElementById('vpuDash').style.display='none';document.getElementById('vpuLookupInput').value='';document.getElementById('vpuLookupErr').textContent='';lockRemoteShieldTabs();addLog('DISCONNECT','lb-wrong','RemoteShield link disconnected.');persistCurrentSession();}
+function renderGenInfo(){const cols=[[['System Name','PXLS2_5215'],['System ID','5cbd98b0118884077f6cc921'],['Dongle ID','10-E7-C6-44-C8-97'],['Tenant','playOnPoly'],['Version','5.21.8'],['OS Type','Win10'],['System Online','2 hrs 13 min'],['Installation Date','3/27/2026']],[['System Type','S2'],['TV System Mode','ntsc_60'],['Scoreboard Type','SportzCast'],['Scoreboard Connection','Ok','ok'],['Scoreboard Data','Ok','ok'],['Backup Full PIP','Scoreboard Backup'],['GEO Location','Chamblee, Georgia']],[['Part Number','PXL-422-3580'],['Head Type','2x80x0004_3840x2160'],['Physical Mode','N/A'],['Paired Mode','—'],['Chosen FPS','25'],['Type','DYNACOLOR'],['Firmware','px20221027T2'],['Issues','Network Pending','warn']]];cols.forEach((col,i)=>{document.getElementById('genCol'+(i+1)).innerHTML=col.map(([k,v,c])=>`<div class="gen-item"><span class="gen-k">${k}</span><span class="gen-v ${c||''}">${v}</span></div>`).join('');});}
+function renderGauges(){const items=[{label:'GPU',pct:30,color:'#ef4444'},{label:'CPU',pct:30,color:'#3b82f6'},{label:'Memory',pct:22,color:'#8b5cf6'},{label:'Temperature',plain:'28°C'},{label:'Total Memory',plain:'32 GB'}];const r=30,C=+(2*Math.PI*r).toFixed(2),off=+(C/4).toFixed(2);document.getElementById('gaugesGrid').innerHTML=items.map(g=>{if(g.plain)return `<div class="gauge-item"><div style="width:70px;height:70px;border-radius:50%;background:var(--bg-inset);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;"><span style="font-size:13px;font-weight:700;color:var(--text-1);">${g.plain}</span></div><div class="gauge-lbl">${g.label}</div></div>`;const d=+((g.pct/100)*C).toFixed(2);return `<div class="gauge-item"><svg viewBox="0 0 80 80" width="70" height="70"><circle cx="40" cy="40" r="${r}" fill="none" stroke="#1e1e1e" stroke-width="7"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="${g.color}" stroke-width="7" stroke-dasharray="${d} ${C}" stroke-dashoffset="${off}" stroke-linecap="round"/><text x="40" y="45" text-anchor="middle" font-size="14" fill="#f1f5f9" font-weight="600">${g.pct}%</text></svg><div class="gauge-lbl">${g.label}</div></div>`;}).join('');}
 
 // ══ REFRESH ══
-function refresh(){
-  const n=Object.values(S).filter(Boolean).length,done=n===TOTAL,pct=Math.round(n/TOTAL*100);
-  if(activeSession)activeSession.fixedCount=n;
-  const sb=document.getElementById('sBanner');if(sb)sb.className='sbanner'+(done?' show':'');
-  const ic=document.getElementById('iCnt');if(ic){ic.textContent=n+' / '+TOTAL;ic.className='icnt '+(done?'good':'bad');}
-  const ir=document.getElementById('iRemain');if(ir){ir.textContent=TOTAL-n;ir.style.color=done?'#22c55e':'#ef4444';}
-  const pb=document.getElementById('pBar');if(pb){pb.style.width=pct+'%';pb.className='pb'+(done?' done':'');}
-  renderChecklist();
-}
-
-function renderChecklist(){const el=document.getElementById('checklist');if(!el)return;el.innerHTML=Object.keys(S).map(k=>`<div class="clitem"><span style="font-size:14px;">${S[k]?'✅':'⭕'}</span><span style="color:${S[k]?'#4ade80':'#fca5a5'}">${LABELS[k]}</span></div>`).join('');}
+function refresh(){const n=Object.values(S).filter(Boolean).length,done=n===TOTAL,pct=Math.round(n/TOTAL*100);if(activeSession)activeSession.fixedCount=n;const sb=document.getElementById('sBanner');if(sb)sb.className='sbanner'+(done?' show':'');renderChecklist();}
+function renderChecklist(){const el=document.getElementById('checklist');if(!el)return;el.innerHTML=Object.keys(S).map(k=>`<div class="clitem"><span style="font-size:14px;">${S[k]?'✅':'⭕'}</span><span style="color:${S[k]?'var(--green)':'var(--red)'}">${LABELS[k]}</span></div>`).join('');}
 
 // ══ ETHERNET ══
 function isValidIP(v){return /^(\d{1,3}\.){3}\d{1,3}$/.test(v)&&v.split('.').every(n=>+n>=0&&+n<=255);}
-
-function lockEthIP(){
-  const inp=document.getElementById('ethDeviceIP'),val=inp.value.trim(),err=document.getElementById('ethIPErr');
-  if(!val){err.textContent='IP address is required.';return;}
-  if(!isValidIP(val)){err.textContent='Please enter a valid IP address.';inp.classList.add('invalid');return;}
-  inp.classList.remove('invalid');err.textContent='';
-  document.getElementById('ethIPCard').style.display='none';document.getElementById('ethBuilder').style.display='block';
-  document.getElementById('ethIPDisplay').textContent=val;
-  addLog('IP SET','lb-eth','Ethernet target IP: <strong>'+val+'</strong>.');persistCurrentSession();
-}
+function lockEthIP(){const inp=document.getElementById('ethDeviceIP'),val=inp.value.trim(),err=document.getElementById('ethIPErr');if(!val){err.textContent='IP address is required.';return;}if(!isValidIP(val)){err.textContent='Please enter a valid IP address.';inp.classList.add('invalid');return;}inp.classList.remove('invalid');err.textContent='';document.getElementById('ethIPCard').style.display='none';document.getElementById('ethBuilder').style.display='block';document.getElementById('ethIPDisplay').textContent=val;addLog('IP SET','lb-eth','Ethernet target IP: <strong>'+val+'</strong>.');persistCurrentSession();}
 function unlockEthIP(){document.getElementById('ethIPCard').style.display='block';document.getElementById('ethBuilder').style.display='none';persistCurrentSession();}
-
-function setEthMode(mode){
-  ethMode=mode;
-  document.getElementById('ethDhcpBtn').classList.toggle('active',mode==='dhcp');
-  document.getElementById('ethStaticBtn').classList.toggle('active',mode==='static');
-  document.getElementById('ethDhcpInfo').style.display=mode==='dhcp'?'block':'none';
-  document.getElementById('ethStaticFields').style.display=mode==='static'?'block':'none';
-  document.getElementById('ethStatus').className='eth-status';
-  addLog(mode==='dhcp'?'DHCP':'STATIC','lb-eth','Ethernet mode: <strong>'+(mode==='dhcp'?'DHCP (Automatic)':'Static IP')+'</strong>.');
-  persistCurrentSession();
-}
-
-function applyStatic(){
-  const ip=document.getElementById('ethIP').value.trim(),mask=document.getElementById('ethMask').value.trim(),gw=document.getElementById('ethGW').value.trim(),dns=document.getElementById('ethDNS').value.trim(),alt=document.getElementById('ethAltDNS').value.trim();
-  const status=document.getElementById('ethStatus');
-  const fields=[{el:document.getElementById('ethIP'),val:ip,name:'IP Address'},{el:document.getElementById('ethMask'),val:mask,name:'Subnet Mask'},{el:document.getElementById('ethGW'),val:gw,name:'Default Gateway'},{el:document.getElementById('ethDNS'),val:dns,name:'Preferred DNS'},{el:document.getElementById('ethAltDNS'),val:alt,name:'Alternate DNS'}];
-  let errors=[];fields.forEach(f=>{f.el.classList.remove('invalid');if(!f.val){errors.push(f.name+' required.');f.el.classList.add('invalid');}else if(!isValidIP(f.val)){errors.push(f.name+' invalid.');f.el.classList.add('invalid');}});
-  if(errors.length){status.className='eth-status err';status.textContent='✗ '+errors.join(' ');addLog('INVALID','lb-wrong','Static IP errors: '+errors.join(' '));return;}
-  status.className='eth-status ok';status.textContent='✓ Saved — IP: '+ip+', Mask: '+mask+', GW: '+gw+', DNS: '+dns+', Alt: '+alt;
-  addLog('APPLIED','lb-eth','Static IP saved — IP: '+ip+' Mask: '+mask+' GW: '+gw+' DNS: '+dns+' Alt: '+alt);
-  persistCurrentSession();
-}
+function setEthMode(mode){ethMode=mode;document.getElementById('ethDhcpBtn').classList.toggle('active',mode==='dhcp');document.getElementById('ethStaticBtn').classList.toggle('active',mode==='static');document.getElementById('ethDhcpInfo').style.display=mode==='dhcp'?'block':'none';document.getElementById('ethStaticFields').style.display=mode==='static'?'block':'none';document.getElementById('ethStatus').className='eth-status';addLog(mode==='dhcp'?'DHCP':'STATIC','lb-eth','Ethernet mode: <strong>'+(mode==='dhcp'?'DHCP (Automatic)':'Static IP')+'</strong>.');persistCurrentSession();}
+function applyStatic(){const ip=document.getElementById('ethIP').value.trim(),mask=document.getElementById('ethMask').value.trim(),gw=document.getElementById('ethGW').value.trim(),dns=document.getElementById('ethDNS').value.trim(),alt=document.getElementById('ethAltDNS').value.trim();const status=document.getElementById('ethStatus');const fields=[{el:document.getElementById('ethIP'),val:ip,name:'IP Address'},{el:document.getElementById('ethMask'),val:mask,name:'Subnet Mask'},{el:document.getElementById('ethGW'),val:gw,name:'Default Gateway'},{el:document.getElementById('ethDNS'),val:dns,name:'Preferred DNS'},{el:document.getElementById('ethAltDNS'),val:alt,name:'Alternate DNS'}];let errors=[];fields.forEach(f=>{f.el.classList.remove('invalid');if(!f.val){errors.push(f.name+' required.');f.el.classList.add('invalid');}else if(!isValidIP(f.val)){errors.push(f.name+' invalid.');f.el.classList.add('invalid');}});if(errors.length){status.className='eth-status err';status.textContent='✗ '+errors.join(' ');addLog('INVALID','lb-wrong','Static IP errors: '+errors.join(' '));return;}status.className='eth-status ok';status.textContent='✓ Saved — IP: '+ip+', Mask: '+mask+', GW: '+gw+', DNS: '+dns+', Alt: '+alt;addLog('APPLIED','lb-eth','Static IP saved — IP: '+ip+' Mask: '+mask+' GW: '+gw+' DNS: '+dns+' Alt: '+alt);persistCurrentSession();}
 
 // ══ FIREWALL ══
-function lockFwIP(){
-  const inp=document.getElementById('fwIPInput'),val=inp.value.trim(),err=document.getElementById('fwIPErr');
-  if(!val){err.textContent='IP address is required.';return;}
-  if(!isValidIP(val)){err.textContent='Valid IP required.';inp.classList.add('invalid');return;}
-  inp.classList.remove('invalid');err.textContent='';fwIPLocked=true;
-  document.getElementById('fwIPCard').style.display='none';document.getElementById('fwBuilder').style.display='block';
-  document.getElementById('fwIPDisplay').textContent=val;
-  addLog('IP SET','lb-eth','Firewall target IP: <strong>'+val+'</strong>.');persistCurrentSession();
-}
+function lockFwIP(){const inp=document.getElementById('fwIPInput'),val=inp.value.trim(),err=document.getElementById('fwIPErr');if(!val){err.textContent='IP address is required.';return;}if(!isValidIP(val)){err.textContent='Valid IP required.';inp.classList.add('invalid');return;}inp.classList.remove('invalid');err.textContent='';fwIPLocked=true;document.getElementById('fwIPCard').style.display='none';document.getElementById('fwBuilder').style.display='block';document.getElementById('fwIPDisplay').textContent=val;addLog('IP SET','lb-eth','Firewall target IP: <strong>'+val+'</strong>.');persistCurrentSession();}
 function unlockFwIP(){fwIPLocked=false;document.getElementById('fwIPCard').style.display='block';document.getElementById('fwBuilder').style.display='none';addLog('IP EDIT','lb-action','Firewall IP edit triggered.');persistCurrentSession();}
-
-function addRule(action){
-  const port=document.getElementById('fwPort').value.trim(),proto=document.getElementById('fwProto').value,dir=document.getElementById('fwDir').value,purpose=document.getElementById('fwPurpose').value.trim(),errEl=document.getElementById('fwRuleErr');
-  if(!port){errEl.textContent='Port required.';return;}if(!proto){errEl.textContent='Select a protocol.';return;}if(!dir){errEl.textContent='Select a direction.';return;}errEl.textContent='';
-  fwRules.push({port,proto,dir,purpose,action,id:Date.now()});
-  addLog(action,action==='ALLOW'?'lb-correct':'lb-wrong','Port rule — <strong>'+port+'</strong> '+proto+' '+dir+': <strong>'+action+'</strong>'+(purpose?' ('+purpose+')':''));
-  checkPortProgress();renderFwRules();
-  document.getElementById('fwPort').value='';document.getElementById('fwProto').value='';document.getElementById('fwDir').value='';document.getElementById('fwPurpose').value='';
-}
+function addRule(action){const port=document.getElementById('fwPort').value.trim(),proto=document.getElementById('fwProto').value,dir=document.getElementById('fwDir').value,purpose=document.getElementById('fwPurpose').value.trim(),errEl=document.getElementById('fwRuleErr');if(!port){errEl.textContent='Port required.';return;}if(!proto){errEl.textContent='Select a protocol.';return;}if(!dir){errEl.textContent='Select a direction.';return;}errEl.textContent='';fwRules.push({port,proto,dir,purpose,action,id:Date.now()});addLog(action,action==='ALLOW'?'lb-correct':'lb-wrong','Port rule — <strong>'+port+'</strong> '+proto+' '+dir+': <strong>'+action+'</strong>'+(purpose?' ('+purpose+')':''));checkPortProgress();renderFwRules();document.getElementById('fwPort').value='';document.getElementById('fwProto').value='';document.getElementById('fwDir').value='';document.getElementById('fwPurpose').value='';}
 function removeRule(id){const r=fwRules.find(x=>x.id===id);fwRules=fwRules.filter(x=>x.id!==id);if(r)addLog('REMOVED','lb-wrong','Rule removed — Port '+r.port+' '+r.proto+' '+r.action);checkPortProgress();renderFwRules();}
-function renderFwRules(){
-  const el=document.getElementById('fwRulesTable');document.getElementById('fwRuleCount').textContent=fwRules.length+' rule'+(fwRules.length!==1?'s':'');
-  if(!fwRules.length){el.innerHTML='<div style="padding:20px 18px;font-size:13px;color:#475569;font-style:italic;">No rules added yet.</div>';return;}
-  el.innerHTML='<div class="fw-th"><span>Port</span><span>Protocol</span><span>Direction</span><span>Purpose</span><span>Action</span><span></span></div>'+fwRules.map(r=>`<div class="fw-rule-entry"><span style="font-family:'Courier New',monospace;font-weight:700;">${r.port}</span><span style="color:#94a3b8;">${r.proto}</span><span style="color:#94a3b8;">${r.dir}</span><span style="color:#64748b;font-size:12px;">${r.purpose||'—'}</span><span class="fw-badge ${r.action.toLowerCase()}">${r.action}</span><button class="fw-del" onclick="removeRule(${r.id})">✕</button></div>`).join('');
-}
+function renderFwRules(){const el=document.getElementById('fwRulesTable');document.getElementById('fwRuleCount').textContent=fwRules.length+' rule'+(fwRules.length!==1?'s':'');if(!fwRules.length){el.innerHTML='<div class="cf-empty">No rules added yet.</div>';return;}el.innerHTML='<div class="fw-th"><span>Port</span><span>Protocol</span><span>Direction</span><span>Purpose</span><span>Action</span><span></span></div>'+fwRules.map(r=>`<div class="fw-row"><span style="font-family:'Courier New',monospace;font-weight:700;color:var(--text-1);">${r.port}</span><span style="color:var(--text-2);">${r.proto}</span><span style="color:var(--text-2);">${r.dir}</span><span style="color:var(--text-3);font-size:12px;">${r.purpose||'—'}</span><span class="pill ${r.action==='ALLOW'?'pill-green':'pill-red'}">${r.action}</span><button class="btn-del" onclick="removeRule(${r.id})">✕</button></div>`).join('');}
 function checkPortProgress(){S.port443udp=fwRules.some(r=>r.port==='443'&&r.proto==='UDP'&&r.dir==='Outbound'&&r.action==='ALLOW');S.port2088udp=fwRules.some(r=>r.port==='2088'&&r.proto==='UDP'&&r.dir==='Outbound'&&r.action==='ALLOW');refresh();}
 function saveFwRules(){addLog('SAVED','lb-correct','Firewall policies saved — '+fwRules.length+' rule'+(fwRules.length!==1?'s':'')+'.');persistCurrentSession();const msg=document.getElementById('fwSaveMsg');msg.textContent='✓ Firewall policies saved.';setTimeout(()=>msg.textContent='',2500);}
 
 // ══ CONTENT FILTER ══
-function lockCfIP(){
-  const inp=document.getElementById('cfIPInput'),val=inp.value.trim(),err=document.getElementById('cfIPErr');
-  if(!val){err.textContent='IP address is required.';return;}if(!isValidIP(val)){err.textContent='Valid IP required.';inp.classList.add('invalid');return;}
-  inp.classList.remove('invalid');err.textContent='';cfIPLocked=true;
-  document.getElementById('cfIPCard').style.display='none';document.getElementById('cfBuilder').style.display='block';
-  document.getElementById('cfIPDisplay').textContent=val;
-  addLog('IP SET','lb-eth','Content filter target IP: <strong>'+val+'</strong>.');persistCurrentSession();
-}
+function lockCfIP(){const inp=document.getElementById('cfIPInput'),val=inp.value.trim(),err=document.getElementById('cfIPErr');if(!val){err.textContent='IP address is required.';return;}if(!isValidIP(val)){err.textContent='Valid IP required.';inp.classList.add('invalid');return;}inp.classList.remove('invalid');err.textContent='';cfIPLocked=true;document.getElementById('cfIPCard').style.display='none';document.getElementById('cfBuilder').style.display='block';document.getElementById('cfIPDisplay').textContent=val;addLog('IP SET','lb-eth','Content filter target IP: <strong>'+val+'</strong>.');persistCurrentSession();}
 function unlockCfIP(){cfIPLocked=false;document.getElementById('cfIPCard').style.display='block';document.getElementById('cfBuilder').style.display='none';addLog('IP EDIT','lb-action','CF IP edit triggered.');persistCurrentSession();}
-function addCfRule(action){
-  const domain=document.getElementById('cfDomain').value.trim(),note=document.getElementById('cfNote').value.trim(),errEl=document.getElementById('cfRuleErr');
-  if(!domain){errEl.textContent='Domain required.';return;}errEl.textContent='';
-  cfRules.push({domain,note,action,id:Date.now()});
-  addLog(action,'lb-correct','CF entry — <strong>'+domain+'</strong>: <strong>'+action+'</strong>'+(note?' ('+note+')':''));
-  checkCfProgress();renderCfRules();document.getElementById('cfDomain').value='';document.getElementById('cfNote').value='';
-}
+function addCfRule(action){const domain=document.getElementById('cfDomain').value.trim(),note=document.getElementById('cfNote').value.trim(),errEl=document.getElementById('cfRuleErr');if(!domain){errEl.textContent='Domain required.';return;}errEl.textContent='';cfRules.push({domain,note,action,id:Date.now()});addLog(action,'lb-correct','CF entry — <strong>'+domain+'</strong>: <strong>'+action+'</strong>'+(note?' ('+note+')':''));checkCfProgress();renderCfRules();document.getElementById('cfDomain').value='';document.getElementById('cfNote').value='';}
 function removeCfRule(id){const r=cfRules.find(x=>x.id===id);cfRules=cfRules.filter(x=>x.id!==id);if(r)addLog('REMOVED','lb-wrong','CF entry removed — '+r.domain);checkCfProgress();renderCfRules();}
-function renderCfRules(){
-  const el=document.getElementById('cfRulesTable');document.getElementById('cfRuleCount').textContent=cfRules.length+' entr'+(cfRules.length!==1?'ies':'y');
-  if(!cfRules.length){el.innerHTML='<div style="padding:20px 18px;font-size:13px;color:#475569;font-style:italic;">No entries yet.</div>';return;}
-  el.innerHTML='<div class="cf-th"><span>Domain</span><span>Category / Notes</span><span>Action</span><span></span></div>'+cfRules.map(r=>`<div class="cf-entry"><span style="font-family:'Courier New',monospace;font-size:13px;color:#93c5fd;">${r.domain}</span><span style="font-size:12px;color:#64748b;">${r.note||'—'}</span><span class="cf-badge ${r.action.toLowerCase()}">${r.action}</span><button class="fw-del" onclick="removeCfRule(${r.id})">✕</button></div>`).join('');
-}
+function renderCfRules(){const el=document.getElementById('cfRulesTable');document.getElementById('cfRuleCount').textContent=cfRules.length+' entr'+(cfRules.length!==1?'ies':'y');if(!cfRules.length){el.innerHTML='<div class="cf-empty">No entries yet.</div>';return;}el.innerHTML='<div class="cf-th"><span>Domain</span><span>Category / Notes</span><span>Action</span><span></span></div>'+cfRules.map(r=>`<div class="cf-row"><span style="font-family:'Courier New',monospace;font-size:13px;color:#93c5fd;">${r.domain}</span><span style="font-size:12px;color:var(--text-3);">${r.note||'—'}</span><span class="pill ${r.action==='ALLOW'?'pill-green':'pill-red'}">${r.action}</span><button class="btn-del" onclick="removeCfRule(${r.id})">✕</button></div>`).join('');}
 function checkCfProgress(){REQUIRED_CF.forEach(req=>{const key=req==='*.pixellot.stream'?'domainPixellotStream':'domainBalena';S[key]=cfRules.some(r=>r.domain.toLowerCase()===req.toLowerCase()&&r.action==='ALLOW');});refresh();}
 function saveCfRules(){addLog('SAVED','lb-correct','Content filter saved — '+cfRules.length+' entr'+(cfRules.length!==1?'ies':'y')+'.');persistCurrentSession();const msg=document.getElementById('cfSaveMsg');msg.textContent='✓ Content filter saved.';setTimeout(()=>msg.textContent='',2500);}
 
@@ -989,278 +820,75 @@ const ADV_SETTINGS=[
 let advState={};
 ADV_SETTINGS.forEach(s=>{if(s.type==='toggle')advState[s.id]=s.startOn;});
 function resetAdvState(){ADV_SETTINGS.forEach(s=>{if(s.type==='toggle')advState[s.id]=s.startOn;});}
+function renderAdvanced(){const groups={},icons={};ADV_SETTINGS.forEach(s=>{if(!groups[s.group]){groups[s.group]=[];icons[s.group]=s.icon||'⚙️';}groups[s.group].push(s);});document.getElementById('advSettings').innerHTML=Object.keys(groups).map(g=>`<div class="adv-group"><div class="adv-group-hdr"><span>${icons[g]}</span><span>${g}</span></div>${groups[g].map(s=>{const on=advState[s.id];let lc='var(--text-3)';if(s.required)lc=on?'var(--red)':'var(--green)';return `<div class="adv-row"><div class="adv-info"><h4>${s.title}</h4><p>${s.desc}</p></div><div class="adv-ctrl"><label class="tswitch"><input type="checkbox" ${on?'checked':''} onchange="toggleAdv('${s.id}',this)"/><span class="slider"></span></label><div class="adv-lbl" style="color:${lc};">${on?'ENABLED':'DISABLED'}</div></div></div>`;}).join('')}</div>`).join('');}
+function toggleAdv(id,cb){const s=ADV_SETTINGS.find(x=>x.id===id),now=cb.checked;advState[id]=now;if(s.required&&s.key){const ok=(s.correctAction==='disable'&&!now)||(s.correctAction==='enable'&&now);S[s.key]=ok;addLog(ok?'CONFIGURED':'REVERTED',ok?'lb-correct':'lb-wrong','<strong>'+s.title+'</strong> — '+(now?'ENABLED':'DISABLED')+'.');renderAdvanced();refresh();return;}const bad=(s.enableIsBad&&now)||(s.disableIsBad&&!now);if(bad){if(activeSession)activeSession.wrongAttempts++;addLog('⚠ FLAGGED','lb-wrong','<strong>'+s.title+'</strong> — set to '+(now?'ENABLED':'DISABLED')+'. May interfere with VPU connectivity.');}else{addLog('TOGGLED','lb-toggle','<strong>'+s.title+'</strong> — '+(now?'ENABLED':'DISABLED')+'.');}renderAdvanced();}
 
-function renderAdvanced(){
-  const groups={},icons={};ADV_SETTINGS.forEach(s=>{if(!groups[s.group]){groups[s.group]=[];icons[s.group]=s.icon||'⚙️';}groups[s.group].push(s);});
-  document.getElementById('advSettings').innerHTML=Object.keys(groups).map(g=>`<div class="adv-group"><div class="adv-group-hdr"><span class="adv-group-icon">${icons[g]}</span><span>${g}</span></div>${groups[g].map(s=>{const on=advState[s.id];let lc='#94a3b8';if(s.required)lc=on?'#fca5a5':'#4ade80';return `<div class="adv-row"><div class="adv-row-info"><h4>${s.title}</h4><p>${s.desc}</p></div><div class="adv-row-ctrl"><label class="tswitch"><input type="checkbox" ${on?'checked':''} onchange="toggleAdv('${s.id}',this)"/><span class="slider"></span></label><div class="adv-lbl" style="color:${lc};">${on?'ENABLED':'DISABLED'}</div></div></div>`;}).join('')}</div>`).join('');
-}
-
-function toggleAdv(id,cb){
-  const s=ADV_SETTINGS.find(x=>x.id===id),now=cb.checked;advState[id]=now;
-  if(s.required&&s.key){const ok=(s.correctAction==='disable'&&!now)||(s.correctAction==='enable'&&now);S[s.key]=ok;addLog(ok?'CONFIGURED':'REVERTED',ok?'lb-correct':'lb-wrong','<strong>'+s.title+'</strong> — '+(now?'ENABLED':'DISABLED')+'.');renderAdvanced();refresh();return;}
-  const bad=(s.enableIsBad&&now)||(s.disableIsBad&&!now);
-  if(bad){if(activeSession)activeSession.wrongAttempts++;addLog('⚠ FLAGGED','lb-wrong','<strong>'+s.title+'</strong> — set to '+(now?'ENABLED':'DISABLED')+'. May interfere with VPU connectivity.');}
-  else{addLog('TOGGLED','lb-toggle','<strong>'+s.title+'</strong> — '+(now?'ENABLED':'DISABLED')+'.');}
-  renderAdvanced();
-}
-
-// ══ COMPLETE CASE STUDY ══
+// ══ COMPLETE ══
 function completeCaseStudy(){
   if(!activeSession)return;
   activeSession.submitted=true;activeSession.submittedAt=ts(activeSession);
   activeSession.snapshot={ethMode,ethFields:ethMode==='static'?{ip:document.getElementById('ethIP')?.value.trim()||'—',mask:document.getElementById('ethMask')?.value.trim()||'—',gw:document.getElementById('ethGW')?.value.trim()||'—',dns:document.getElementById('ethDNS')?.value.trim()||'—',altdns:document.getElementById('ethAltDNS')?.value.trim()||'—'}:null,fwIP:document.getElementById('fwIPInput')?.value.trim()||'—',fwRules:[...fwRules],cfIP:document.getElementById('cfIPInput')?.value.trim()||'—',cfRules:[...cfRules],advState:{...advState},fixedCount:activeSession.fixedCount,vpuLooked:vpuLinked};
-  addLog('SUBMITTED','lb-correct','Case study submitted.');
-  persistCurrentSession();
-
-  // ── Reset candidate view back to landing ──
-  setTimeout(() => {
-    // Reset all state
-    S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;
-    resetAdvState();activeSession=null;
-    pendingCandidateAttachments=[];
-
-    // Reset UI panels
+  addLog('SUBMITTED','lb-correct','Case study submitted.');persistCurrentSession();
+  setTimeout(()=>{
+    S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;resetAdvState();activeSession=null;pendingCandidateAttachments=[];
     document.getElementById('ethIPCard').style.display='block';document.getElementById('ethBuilder').style.display='none';document.getElementById('ethDeviceIP').value='';
     document.getElementById('fwIPCard').style.display='block';document.getElementById('fwBuilder').style.display='none';document.getElementById('fwIPInput').value='';
     document.getElementById('cfIPCard').style.display='block';document.getElementById('cfBuilder').style.display='none';document.getElementById('cfIPInput').value='';
     document.getElementById('vpuLookupWrap').style.display='block';document.getElementById('vpuDash').style.display='none';document.getElementById('vpuLookupInput').value='';
     document.getElementById('completeWrap').style.display='block';document.getElementById('completeConfirm').style.display='none';
-
-    // Hide nav items and candidate badge
-    document.getElementById('nav-firewall').style.display='none';
-    document.getElementById('nav-email').style.display='none';
-    document.getElementById('sidebar-cand').style.display='none';
-    document.getElementById('cand-name-display').textContent='—';
-
-    // Reset case study view to landing
-    document.getElementById('cs-details').classList.remove('show');
-    document.getElementById('cs-landing').style.display='block';
-    document.getElementById('candidateName').value='';
-    document.getElementById('nameErr').textContent='';
-    document.getElementById('cs-cand-label').textContent='';
-
-    // Lock RemoteShield tabs
+    document.getElementById('nav-firewall').style.display='none';document.getElementById('nav-email').style.display='none';document.getElementById('sidebar-cand').style.display='none';document.getElementById('cand-name-display').textContent='—';
+    document.getElementById('cs-details').classList.remove('show');document.getElementById('cs-landing').style.display='block';
+    document.getElementById('candidateName').value='';document.getElementById('nameErr').textContent='';document.getElementById('cs-cand-label').textContent='';
     lockRemoteShieldTabs();
-
-    // Reset email panel
-    document.getElementById('ep-empty').style.display='block';
-    document.getElementById('ep-active').style.display='none';
-    document.getElementById('ep-reply').value='';
-    document.getElementById('ep-attach-bar').innerHTML='';
-    document.getElementById('emailBadge').style.display='none';
-
-    // Navigate back to Case Study
-    showPage('case', document.getElementById('nav-case'));
-    document.getElementById('nav-case').classList.add('active');
-
+    document.getElementById('ep-empty').style.display='block';document.getElementById('ep-active').style.display='none';document.getElementById('ep-reply').value='';document.getElementById('ep-attach-bar').innerHTML='';document.getElementById('emailBadge').style.display='none';
+    showPage('case',document.getElementById('nav-case'));document.getElementById('nav-case').classList.add('active');
     renderAdvanced();refresh();
-  }, 3000); // 3 second delay so they see the confirmation message before reset
+  },3000);
 }
 
-function renderSubmission(sess){
-  if(!sess||!sess.submitted||!sess.snapshot)return'';
-  const snap=sess.snapshot;let h=`<div class="sub-submitted-badge">✅ Submitted at ${sess.submittedAt} elapsed</div>`;
-  h+=`<div class="sub-group"><div class="sub-group-title">Ethernet</div>`;h+=srow('Mode',snap.ethMode==='dhcp'?'DHCP':'Static IP',snap.ethMode==='dhcp'?'ok':'neutral');
-  if(snap.ethMode==='static'&&snap.ethFields){const f=snap.ethFields;h+=srow('IP',f.ip)+srow('Mask',f.mask)+srow('Gateway',f.gw)+srow('Preferred DNS',f.dns)+srow('Alternate DNS',f.altdns);}h+=`</div>`;
-  h+=`<div class="sub-group"><div class="sub-group-title">Firewall Policies</div>`;h+=srow('Target IP',snap.fwIP);
-  snap.fwRules.length?snap.fwRules.forEach(r=>{h+=`<div class="sub-row"><span class="sub-key">${r.port}/${r.proto}/${r.dir}</span><span class="sub-val"><span class="sub-tag ${r.action.toLowerCase()}">${r.action}</span>${r.purpose||'<span style="color:#475569">No purpose</span>'}</span></div>`;}):(h+=srow('Rules','None added','warn'));h+=`</div>`;
-  h+=`<div class="sub-group"><div class="sub-group-title">Content Filter</div>`;h+=srow('Target IP',snap.cfIP);
-  snap.cfRules.length?snap.cfRules.forEach(r=>{h+=`<div class="sub-row"><span class="sub-key" style="font-family:'Courier New',monospace">${r.domain}</span><span class="sub-val"><span class="sub-tag ${r.action.toLowerCase()}">${r.action}</span>${r.note||'<span style="color:#475569">No notes</span>'}</span></div>`;}):(h+=srow('Entries','None added','warn'));h+=`</div>`;
-  h+=`<div class="sub-group"><div class="sub-group-title">Advanced Settings</div>`;ADV_SETTINGS.filter(s=>s.type==='toggle').forEach(s=>{const on=snap.advState[s.id];const correct=s.required?(s.correctAction==='disable'?!on:on):null;h+=srow(s.title,on?'ENABLED':'DISABLED',correct===true?'ok':correct===false?'warn':'neutral');});h+=`</div>`;
-  h+=`<div class="sub-group"><div class="sub-group-title">Summary</div>`;
-  const emailsSent=sess.emails?sess.emails.filter(m=>m.dir==='outbound').length:0;
-  h+=srow('VPU Linked',snap.vpuLooked?'Yes':'No',snap.vpuLooked?'ok':'warn')+srow('Emails Sent to Erik',String(emailsSent))+srow('Total Actions',String(sess.totalActions))+srow('Time to Submit',sess.submittedAt);h+=`</div>`;return h;
-}
+function renderSubmission(sess){if(!sess||!sess.submitted||!sess.snapshot)return'';const snap=sess.snapshot;let h=`<div class="sub-done-badge">✅ Submitted at ${sess.submittedAt} elapsed</div>`;h+=`<div class="sub-group"><div class="sub-group-title">Ethernet</div>`;h+=srow('Mode',snap.ethMode==='dhcp'?'DHCP':'Static IP',snap.ethMode==='dhcp'?'ok':'neutral');if(snap.ethMode==='static'&&snap.ethFields){const f=snap.ethFields;h+=srow('IP',f.ip)+srow('Mask',f.mask)+srow('Gateway',f.gw)+srow('Preferred DNS',f.dns)+srow('Alternate DNS',f.altdns);}h+=`</div>`;h+=`<div class="sub-group"><div class="sub-group-title">Firewall Policies</div>`;h+=srow('Target IP',snap.fwIP);snap.fwRules.length?snap.fwRules.forEach(r=>{h+=`<div class="sub-row"><span class="sub-key">${r.port}/${r.proto}/${r.dir}</span><span class="sub-val"><span class="sub-tag ${r.action.toLowerCase()}">${r.action}</span>${r.purpose||'<span style="color:var(--text-3)">No purpose</span>'}</span></div>`;}):(h+=srow('Rules','None added','warn'));h+=`</div>`;h+=`<div class="sub-group"><div class="sub-group-title">Content Filter</div>`;h+=srow('Target IP',snap.cfIP);snap.cfRules.length?snap.cfRules.forEach(r=>{h+=`<div class="sub-row"><span class="sub-key" style="font-family:'Courier New',monospace">${r.domain}</span><span class="sub-val"><span class="sub-tag ${r.action.toLowerCase()}">${r.action}</span>${r.note||'<span style="color:var(--text-3)">No notes</span>'}</span></div>`;}):(h+=srow('Entries','None added','warn'));h+=`</div>`;h+=`<div class="sub-group"><div class="sub-group-title">Advanced Settings</div>`;ADV_SETTINGS.filter(s=>s.type==='toggle').forEach(s=>{const on=snap.advState[s.id];const correct=s.required?(s.correctAction==='disable'?!on:on):null;h+=srow(s.title,on?'ENABLED':'DISABLED',correct===true?'ok':correct===false?'warn':'neutral');});h+=`</div>`;h+=`<div class="sub-group"><div class="sub-group-title">Summary</div>`;const emailsSent=sess.emails?sess.emails.filter(m=>m.dir==='outbound').length:0;h+=srow('VPU Linked',snap.vpuLooked?'Yes':'No',snap.vpuLooked?'ok':'warn')+srow('Emails Sent to Erik',String(emailsSent))+srow('Total Actions',String(sess.totalActions))+srow('Time to Submit',sess.submittedAt);h+=`</div>`;return h;}
 function srow(k,v,c=''){return `<div class="sub-row"><span class="sub-key">${k}</span><span class="sub-val ${c}">${v}</span></div>`;}
 
 // ══ ADMIN ══
-function checkPin(){
-  const val=document.getElementById('pinInput').value;
-  if(val===ADMIN_PASS){adminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').className='admin-content show';renderAdminSessions();refreshAdmin();}
-  else{const inp=document.getElementById('pinInput');inp.style.borderColor='#ef4444';document.getElementById('pinErr').textContent='Incorrect password.';inp.value='';setTimeout(()=>{inp.style.borderColor='';document.getElementById('pinErr').textContent='';},2000);}
-}
-function adminLogout(){adminUnlocked=false;document.getElementById('adminLock').style.display='flex';document.getElementById('adminContent').className='admin-content';document.getElementById('pinInput').value='';}
-function renderAdminSessions(){
-  if(!adminUnlocked)return;
-  const bar=document.getElementById('sessBar');
-  if(!sessions.length){bar.innerHTML='<div class="no-sess">No sessions started yet.</div>';document.getElementById('sessView').style.display='none';return;}
-  bar.innerHTML=sessions.map((s,i)=>`<button class="sess-btn ${viewingSession===s?'active':''}" onclick="selectSession(${i})">${s.name}${s.submitted?' ✅':''}</button>`).join('');
-  document.getElementById('sessView').style.display='block';
-}
+function checkPin(){const val=document.getElementById('pinInput').value;if(val===ADMIN_PASS){adminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').className='admin-content show';renderAdminSessions();refreshAdmin();startAdminPoll();}else{const inp=document.getElementById('pinInput');inp.style.borderColor='var(--red)';document.getElementById('pinErr').textContent='Incorrect password.';inp.value='';setTimeout(()=>{inp.style.borderColor='';document.getElementById('pinErr').textContent='';},2000);}}
+function adminLogout(){adminUnlocked=false;stopAdminPoll();document.getElementById('adminLock').style.display='flex';document.getElementById('adminContent').className='admin-content';document.getElementById('pinInput').value='';}
+function renderAdminSessions(){if(!adminUnlocked)return;const bar=document.getElementById('sessBar');if(!sessions.length){bar.innerHTML='<div class="no-sess">No sessions started yet.</div>';document.getElementById('sessView').style.display='none';return;}bar.innerHTML=sessions.map((s,i)=>`<button class="sess-btn ${viewingSession===s?'active':''}" onclick="selectSession(${i})">${s.name}${s.submitted?' ✅':''}</button>`).join('');document.getElementById('sessView').style.display='block';}
 function selectSession(idx){viewingSession=sessions[idx];renderAdminSessions();refreshAdmin();}
-function refreshAdmin(){
-  if(!adminUnlocked||!viewingSession)return;
-  const s=viewingSession;
-  document.getElementById('sc-fixed').textContent=s.fixedCount;document.getElementById('sc-remain').textContent=TOTAL-s.fixedCount;document.getElementById('sc-wrong').textContent=s.wrongAttempts;document.getElementById('sc-total').textContent=s.totalActions;
-  const el=document.getElementById('log-all');el.innerHTML=s.log.length?s.log.map(e=>`<div class="log-entry"><span class="log-time">${e.t}</span><span class="log-badge ${e.cls}">${e.badge}</span><span class="log-msg">${e.msg}</span></div>`).join(''):'<div class="no-log">No activity yet.</div>';
-  const emailsSent=s.emails?s.emails.filter(m=>m.dir==='outbound').length:0;
-  document.getElementById('sc-total').textContent=s.totalActions;
-  document.getElementById('sc-emails').textContent=emailsSent;
-  renderAdminEmailThread();
-  const subSec=document.getElementById('adminSubmissionSection'),subCont=document.getElementById('adminSubmissionContent');
-  if(s.submitted){subSec.style.display='block';subCont.innerHTML=renderSubmission(s);}else{subSec.style.display='none';}
-  renderAdminSessions();
-}
-function clearAllSessions(){if(!confirm('Clear all saved sessions? This cannot be undone.'))return;try{localStorage.removeItem('remoteshield_sessions');localStorage.removeItem('remoteshield_active');}catch(e){}sessions=[];activeSession=null;viewingSession=null;renderAdminSessions();document.getElementById('sessView').style.display='none';}
+function refreshAdmin(){if(!adminUnlocked||!viewingSession)return;const s=viewingSession;const emailsSent=s.emails?s.emails.filter(m=>m.dir==='outbound').length:0;document.getElementById('sc-total').textContent=s.totalActions;document.getElementById('sc-emails').textContent=emailsSent;const el=document.getElementById('log-all');el.innerHTML=s.log.length?s.log.map(e=>`<div class="log-entry"><span class="log-time">${e.t}</span><span class="log-badge ${e.cls}">${e.badge}</span><span class="log-msg">${e.msg}</span></div>`).join(''):'<div class="no-log">No activity yet.</div>';renderAdminEmailThread();const subSec=document.getElementById('adminSubmissionSection'),subCont=document.getElementById('adminSubmissionContent');if(s.submitted){subSec.style.display='block';subCont.innerHTML=renderSubmission(s);}else{subSec.style.display='none';}renderAdminSessions();}
+function clearAllSessions(){if(!confirm('Clear all saved sessions? This cannot be undone.'))return;fetch('/api/sessions',{method:'DELETE'}).catch(()=>{});sessions=[];activeSession=null;viewingSession=null;renderAdminSessions();document.getElementById('sessView').style.display='none';}
 
-// ══ PERSISTENCE — server-backed ══
-let saveInFlight = false;
-
-async function persistCurrentSession() {
-  if (!activeSession) return;
-  // Snapshot live state into session object
-  activeSession.savedAdvState    = {...advState};
-  activeSession.savedEthMode     = ethMode;
-  activeSession.savedFwRules     = [...fwRules];
-  activeSession.savedCfRules     = [...cfRules];
-  activeSession.savedVpuLinked   = vpuLinked;
-  activeSession.savedFwIPLocked  = fwIPLocked;
-  activeSession.savedFwIP        = document.getElementById('fwIPInput')?.value.trim() || '';
-  activeSession.savedCfIPLocked  = cfIPLocked;
-  activeSession.savedCfIP        = document.getElementById('cfIPInput')?.value.trim() || '';
-  activeSession.savedEthIPLocked = document.getElementById('ethBuilder')?.style.display === 'block';
-  activeSession.savedEthDeviceIP = document.getElementById('ethDeviceIP')?.value.trim() || '';
-  activeSession.savedStaticFields = {
-    ip:     document.getElementById('ethIP')?.value.trim()     || '',
-    mask:   document.getElementById('ethMask')?.value.trim()   || '',
-    gw:     document.getElementById('ethGW')?.value.trim()     || '',
-    dns:    document.getElementById('ethDNS')?.value.trim()    || '',
-    altdns: document.getElementById('ethAltDNS')?.value.trim() || '',
-  };
-  // Strip attachment blob data before sending (IndexedDB handles blobs locally)
-  const sanitized = JSON.parse(JSON.stringify(activeSession));
-  if (sanitized.emails) {
-    sanitized.emails = sanitized.emails.map(m => ({
-      ...m,
-      attachments: (m.attachments || []).map(a => ({name:a.name, type:a.type, id:a.id, size:a.size}))
-    }));
-  }
-  try {
-    await fetch('/api/sessions', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(sanitized)
-    });
-  } catch(e) { /* offline or server not running — fail silently */ }
+// ══ PERSISTENCE ══
+async function persistCurrentSession(){
+  if(!activeSession)return;
+  activeSession.savedAdvState={...advState};activeSession.savedEthMode=ethMode;activeSession.savedFwRules=[...fwRules];activeSession.savedCfRules=[...cfRules];activeSession.savedVpuLinked=vpuLinked;activeSession.savedFwIPLocked=fwIPLocked;activeSession.savedFwIP=document.getElementById('fwIPInput')?.value.trim()||'';activeSession.savedCfIPLocked=cfIPLocked;activeSession.savedCfIP=document.getElementById('cfIPInput')?.value.trim()||'';activeSession.savedEthIPLocked=document.getElementById('ethBuilder')?.style.display==='block';activeSession.savedEthDeviceIP=document.getElementById('ethDeviceIP')?.value.trim()||'';activeSession.savedStaticFields={ip:document.getElementById('ethIP')?.value.trim()||'',mask:document.getElementById('ethMask')?.value.trim()||'',gw:document.getElementById('ethGW')?.value.trim()||'',dns:document.getElementById('ethDNS')?.value.trim()||'',altdns:document.getElementById('ethAltDNS')?.value.trim()||''};
+  const sanitized=JSON.parse(JSON.stringify(activeSession));
+  if(sanitized.emails)sanitized.emails=sanitized.emails.map(m=>({...m,attachments:(m.attachments||[]).map(a=>({name:a.name,type:a.type,id:a.id,size:a.size}))}));
+  try{await fetch('/api/sessions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sanitized)});}catch(e){}
 }
 
-async function loadState() {
-  try {
-    const res = await fetch('/api/sessions');
-    if (!res.ok) return;
-    const loaded = await res.json();
-    if (!Array.isArray(loaded) || !loaded.length) return;
-    sessions = loaded;
-    // Restore the most recently active session
-    activeSession = sessions[sessions.length - 1];
-    viewingSession = activeSession;
-    if (!activeSession) return;
-    restoreSessionState(activeSession);
-  } catch(e) { /* server not running — start fresh */ }
+async function loadState(){
+  try{const res=await fetch('/api/sessions');if(!res.ok)return;const loaded=await res.json();if(!Array.isArray(loaded)||!loaded.length)return;sessions=loaded;activeSession=sessions[sessions.length-1];viewingSession=activeSession;if(!activeSession)return;restoreSessionState(activeSession);}catch(e){}
 }
 
-function restoreSessionState(sess) {
-  if (sess.savedAdvState) advState = {...sess.savedAdvState};
-  if (sess.savedEthMode)  ethMode  = sess.savedEthMode;
-  if (sess.savedFwRules)  fwRules  = sess.savedFwRules;
-  if (sess.savedCfRules)  cfRules  = sess.savedCfRules;
-  // Recompute S from saved rules
-  if (sess.savedFwRules) {
-    S.port443udp  = fwRules.some(r=>r.port==='443' &&r.proto==='UDP'&&r.dir==='Outbound'&&r.action==='ALLOW');
-    S.port2088udp = fwRules.some(r=>r.port==='2088'&&r.proto==='UDP'&&r.dir==='Outbound'&&r.action==='ALLOW');
-  }
-  if (sess.savedCfRules) {
-    S.domainPixellotStream = cfRules.some(r=>r.domain.toLowerCase()==='*.pixellot.stream'&&r.action==='ALLOW');
-    S.domainBalena         = cfRules.some(r=>r.domain.toLowerCase()==='*.balena-cloud.com' &&r.action==='ALLOW');
-  }
-  if (sess.savedAdvState) {
-    const a = sess.savedAdvState;
-    ADV_SETTINGS.filter(s=>s.required&&s.key).forEach(s=>{
-      const on=a[s.id]; S[s.key]=(s.correctAction==='disable'&&!on)||(s.correctAction==='enable'&&on);
-    });
-  }
-  // Restore UI
-  document.getElementById('cs-landing').style.display='none';
-  document.getElementById('cs-details').classList.add('show');
-  document.getElementById('cs-cand-label').textContent='Candidate: '+sess.name;
-  document.getElementById('cand-name-display').textContent=sess.name;
-  document.getElementById('sidebar-cand').style.display='block';
-  document.getElementById('nav-firewall').style.display='flex';
-  document.getElementById('nav-email').style.display='flex';
-  if (sess.submitted) {
-    document.getElementById('completeWrap').style.display='none';
-    document.getElementById('completeConfirm').style.display='block';
-  }
-  if (sess.savedVpuLinked) {
-    vpuLinked=true;
-    document.getElementById('vpuLookupWrap').style.display='none';
-    document.getElementById('vpuDash').style.display='block';
-    unlockRemoteShieldTabs(); renderGenInfo(); renderGauges();
-  }
-  if (sess.savedFwIPLocked) {
-    fwIPLocked=true;
-    document.getElementById('fwIPCard').style.display='none';
-    document.getElementById('fwBuilder').style.display='block';
-    document.getElementById('fwIPDisplay').textContent=sess.savedFwIP||'';
-    document.getElementById('fwIPInput').value=sess.savedFwIP||'';
-    renderFwRules();
-  }
-  if (sess.savedCfIPLocked) {
-    cfIPLocked=true;
-    document.getElementById('cfIPCard').style.display='none';
-    document.getElementById('cfBuilder').style.display='block';
-    document.getElementById('cfIPDisplay').textContent=sess.savedCfIP||'';
-    document.getElementById('cfIPInput').value=sess.savedCfIP||'';
-    renderCfRules();
-  }
-  if (sess.savedEthIPLocked) {
-    document.getElementById('ethIPCard').style.display='none';
-    document.getElementById('ethBuilder').style.display='block';
-    document.getElementById('ethIPDisplay').textContent=sess.savedEthDeviceIP||'';
-    document.getElementById('ethDeviceIP').value=sess.savedEthDeviceIP||'';
-    setEthMode(ethMode);
-    if (ethMode==='static' && sess.savedStaticFields) {
-      const f=sess.savedStaticFields;
-      document.getElementById('ethIP').value=f.ip||'';
-      document.getElementById('ethMask').value=f.mask||'';
-      document.getElementById('ethGW').value=f.gw||'';
-      document.getElementById('ethDNS').value=f.dns||'';
-      document.getElementById('ethAltDNS').value=f.altdns||'';
-    }
-  }
-  renderAdvanced(); refresh(); updateEmailBadge();
+function restoreSessionState(sess){
+  if(sess.savedAdvState)advState={...sess.savedAdvState};if(sess.savedEthMode)ethMode=sess.savedEthMode;if(sess.savedFwRules)fwRules=sess.savedFwRules;if(sess.savedCfRules)cfRules=sess.savedCfRules;
+  if(sess.savedFwRules){S.port443udp=fwRules.some(r=>r.port==='443'&&r.proto==='UDP'&&r.dir==='Outbound'&&r.action==='ALLOW');S.port2088udp=fwRules.some(r=>r.port==='2088'&&r.proto==='UDP'&&r.dir==='Outbound'&&r.action==='ALLOW');}
+  if(sess.savedCfRules){S.domainPixellotStream=cfRules.some(r=>r.domain.toLowerCase()==='*.pixellot.stream'&&r.action==='ALLOW');S.domainBalena=cfRules.some(r=>r.domain.toLowerCase()==='*.balena-cloud.com'&&r.action==='ALLOW');}
+  if(sess.savedAdvState){const a=sess.savedAdvState;ADV_SETTINGS.filter(s=>s.required&&s.key).forEach(s=>{const on=a[s.id];S[s.key]=(s.correctAction==='disable'&&!on)||(s.correctAction==='enable'&&on);});}
+  document.getElementById('cs-landing').style.display='none';document.getElementById('cs-details').classList.add('show');document.getElementById('cs-cand-label').textContent='Candidate: '+sess.name;document.getElementById('cand-name-display').textContent=sess.name;document.getElementById('sidebar-cand').style.display='block';document.getElementById('nav-firewall').style.display='flex';document.getElementById('nav-email').style.display='flex';
+  if(sess.submitted){document.getElementById('completeWrap').style.display='none';document.getElementById('completeConfirm').style.display='block';}
+  if(sess.savedVpuLinked){vpuLinked=true;document.getElementById('vpuLookupWrap').style.display='none';document.getElementById('vpuDash').style.display='block';unlockRemoteShieldTabs();renderGenInfo();renderGauges();}
+  if(sess.savedFwIPLocked){fwIPLocked=true;document.getElementById('fwIPCard').style.display='none';document.getElementById('fwBuilder').style.display='block';document.getElementById('fwIPDisplay').textContent=sess.savedFwIP||'';document.getElementById('fwIPInput').value=sess.savedFwIP||'';renderFwRules();}
+  if(sess.savedCfIPLocked){cfIPLocked=true;document.getElementById('cfIPCard').style.display='none';document.getElementById('cfBuilder').style.display='block';document.getElementById('cfIPDisplay').textContent=sess.savedCfIP||'';document.getElementById('cfIPInput').value=sess.savedCfIP||'';renderCfRules();}
+  if(sess.savedEthIPLocked){document.getElementById('ethIPCard').style.display='none';document.getElementById('ethBuilder').style.display='block';document.getElementById('ethIPDisplay').textContent=sess.savedEthDeviceIP||'';document.getElementById('ethDeviceIP').value=sess.savedEthDeviceIP||'';setEthMode(ethMode);if(ethMode==='static'&&sess.savedStaticFields){const f=sess.savedStaticFields;document.getElementById('ethIP').value=f.ip||'';document.getElementById('ethMask').value=f.mask||'';document.getElementById('ethGW').value=f.gw||'';document.getElementById('ethDNS').value=f.dns||'';document.getElementById('ethAltDNS').value=f.altdns||'';}}
+  renderAdvanced();refresh();updateEmailBadge();
 }
 
-// Admin: poll server every 5 seconds for live updates from other machines
-let adminPollInterval = null;
-
-async function pollAdminSessions() {
-  if (!adminUnlocked) return;
-  try {
-    const res = await fetch('/api/sessions');
-    if (!res.ok) return;
-    const loaded = await res.json();
-    if (!Array.isArray(loaded)) return;
-    // Merge in any new/updated sessions from other machines
-    loaded.forEach(remote => {
-      const idx = sessions.findIndex(s => s.name === remote.name);
-      if (idx >= 0) sessions[idx] = remote;
-      else sessions.push(remote);
-    });
-    // Keep viewingSession reference current
-    if (viewingSession) {
-      const updated = sessions.find(s => s.name === viewingSession.name);
-      if (updated) viewingSession = updated;
-    }
-    renderAdminSessions();
-    refreshAdmin();
-  } catch(e) {}
-}
-
-function startAdminPoll()  { if (!adminPollInterval) adminPollInterval = setInterval(pollAdminSessions, 5000); }
-function stopAdminPoll()   { clearInterval(adminPollInterval); adminPollInterval = null; }
-
-window.addEventListener('beforeunload', persistCurrentSession);
+let adminPollInterval=null;
+async function pollAdminSessions(){if(!adminUnlocked)return;try{const res=await fetch('/api/sessions');if(!res.ok)return;const loaded=await res.json();if(!Array.isArray(loaded))return;loaded.forEach(remote=>{const idx=sessions.findIndex(s=>s.name===remote.name);if(idx>=0)sessions[idx]=remote;else sessions.push(remote);});if(viewingSession){const updated=sessions.find(s=>s.name===viewingSession.name);if(updated)viewingSession=updated;}renderAdminSessions();refreshAdmin();}catch(e){}}
+function startAdminPoll(){if(!adminPollInterval)adminPollInterval=setInterval(pollAdminSessions,5000);}
+function stopAdminPoll(){clearInterval(adminPollInterval);adminPollInterval=null;}
+window.addEventListener('beforeunload',persistCurrentSession);
 
 // ══ INIT ══
 document.querySelectorAll('.itab-content').forEach(el=>el.style.display='none');
