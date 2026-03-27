@@ -804,13 +804,16 @@ function startCase(){
     setTimeout(()=>{nameEl.classList.remove('err');document.getElementById('landingErr').textContent='';},2000);
     return;
   }
-  // Admin flow — show password prompt
   if(ADMIN_LANDING_NAMES.includes(name)){
     document.getElementById('landingAdminPw').style.display='block';
+    document.getElementById('landingAdminPwInp').value='';
     document.getElementById('landingAdminPwInp').focus();
     document.getElementById('landingErr').textContent='';
     return;
   }
+  // Hide admin pw prompt in case it was shown before
+  document.getElementById('landingAdminPw').style.display='none';
+  document.getElementById('landingErr').textContent='';
   launchCandidate(name);
 }
 
@@ -822,14 +825,14 @@ function submitAdminLogin(){
     setTimeout(()=>document.getElementById('landingErr').textContent='',2000);
     return;
   }
-  // Unlock admin view
-  adminUnlocked = true;
+  adminUnlocked=true;
   document.getElementById('landingOverlay').style.display='none';
   document.getElementById('sadmin').style.display='block';
+  // Skip internal lock screen — go straight to admin content
   document.getElementById('adminLock').style.display='none';
   document.getElementById('adminContent').className='admin-content show';
-  showPage('admin', document.getElementById('nav-admin'));
-  renderAdminSessions(); refreshAdmin(); startAdminPoll();
+  showPage('admin',document.getElementById('nav-admin'));
+  renderAdminSessions();refreshAdmin();startAdminPoll();
 }
 
 function launchCandidate(name){
@@ -844,10 +847,10 @@ function launchCandidate(name){
   addLog('START','lb-start','Candidate <strong>'+name+'</strong> started the exercise.');
   document.getElementById('cand-name-display').textContent=name;
   document.getElementById('sidebar-cand').style.display='block';
-  document.getElementById('sadmin').style.display='none'; // hide admin nav for candidates
+  document.getElementById('sadmin').style.display='none';
   document.getElementById('cs-cand-label').textContent='Candidate: '+name;
   document.getElementById('landingOverlay').style.display='none';
-  renderAdvanced();refresh();renderAdminSessions();updateEmailBadge();
+  renderAdvanced();refresh();updateEmailBadge();
 }
 
 // ══ VPU LOOKUP ══
@@ -930,7 +933,17 @@ function renderSubmission(sess){if(!sess||!sess.submitted||!sess.snapshot)return
 function srow(k,v,c=''){return `<div class="sub-row"><span class="sub-key">${k}</span><span class="sub-val ${c}">${v}</span></div>`;}
 
 // ══ ADMIN ══
-function checkPin(){const val=document.getElementById('pinInput').value;if(val===ADMIN_PASS){adminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').className='admin-content show';renderAdminSessions();refreshAdmin();startAdminPoll();}else{const inp=document.getElementById('pinInput');inp.style.borderColor='var(--red)';document.getElementById('pinErr').textContent='Incorrect password.';inp.value='';setTimeout(()=>{inp.style.borderColor='';document.getElementById('pinErr').textContent='';},2000);}}
+function checkPin(){
+  // If already unlocked via landing, skip straight to content
+  if(adminUnlocked){
+    document.getElementById('adminLock').style.display='none';
+    document.getElementById('adminContent').className='admin-content show';
+    return;
+  }
+  const val=document.getElementById('pinInput').value;
+  if(val===ADMIN_PASS){adminUnlocked=true;document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').className='admin-content show';renderAdminSessions();refreshAdmin();startAdminPoll();}
+  else{const inp=document.getElementById('pinInput');inp.style.borderColor='var(--red)';document.getElementById('pinErr').textContent='Incorrect password.';inp.value='';setTimeout(()=>{inp.style.borderColor='';document.getElementById('pinErr').textContent='';},2000);}
+}
 function adminLogout(){adminUnlocked=false;stopAdminPoll();document.getElementById('adminLock').style.display='flex';document.getElementById('adminContent').className='admin-content';document.getElementById('pinInput').value='';}
 function renderAdminSessions(){if(!adminUnlocked)return;const bar=document.getElementById('sessBar');if(!sessions.length){bar.innerHTML='<div class="no-sess">No sessions started yet.</div>';document.getElementById('sessView').style.display='none';return;}bar.innerHTML=sessions.map((s,i)=>`<button class="sess-btn ${viewingSession===s?'active':''}" onclick="selectSession(${i})">${s.name}${s.submitted?' ✅':''}</button>`).join('');document.getElementById('sessView').style.display='block';}
 function selectSession(idx){viewingSession=sessions[idx];renderAdminSessions();refreshAdmin();}
