@@ -72,7 +72,26 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
-  // GET /api/sessions
+  // GET /api/health — diagnostic
+  if (req.method === 'GET' && req.url === '/api/health') {
+    const hasUrl = !!SUPABASE_URL;
+    const hasKey = !!SUPABASE_KEY;
+    let dbOk = false;
+    let dbError = null;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/sessions?select=name&limit=1`, {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      });
+      dbOk = res.ok;
+      if (!res.ok) dbError = await res.text();
+    } catch (e) { dbError = e.message; }
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ hasUrl, hasKey, dbOk, dbError }));
+    return;
+  }
   if (req.method === 'GET' && req.url === '/api/sessions') {
     const sessions = await getAllSessions();
     res.writeHead(200, { 'Content-Type': 'application/json' });
