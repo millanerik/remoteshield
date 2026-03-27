@@ -785,7 +785,19 @@ function sendCandidateEmail(){if(!activeSession)return;const box=document.getEle
 function sendAdminReply(){if(!viewingSession)return;const inp=document.getElementById('adminReplyInput');const body=inp.value.trim();const attachments=[...pendingAdminAttachments];if(!body&&!attachments.length)return;viewingSession.emails.push({dir:'inbound',body,t:ts(viewingSession),read:false,attachments});inp.value='';pendingAdminAttachments=[];renderPendingAttachments('admin-attach-bar',pendingAdminAttachments,'admin');document.getElementById('admin-attach-warn').textContent='';if(viewingSession===activeSession){renderEmailThread();updateEmailBadge();}renderAdminEmailThread();persistCurrentSession();}
 
 // ══ NAV ══
-function showPage(name,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');el.classList.add('active');if(name==='email')showEmailPanel();}
+function showPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  if(name==='email') showEmailPanel();
+  // If already authenticated as admin, skip the lock screen automatically
+  if(name==='admin' && adminUnlocked){
+    document.getElementById('adminLock').style.display='none';
+    document.getElementById('adminContent').className='admin-content show';
+    renderAdminSessions(); refreshAdmin(); startAdminPoll();
+  }
+}
 function showItab(name,el){document.querySelectorAll('.itab-content').forEach(t=>{t.style.display='none';t.classList.remove('active');});document.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));const t=document.getElementById('itab-'+name);t.style.display='block';t.classList.add('active');el.classList.add('active');}
 function guardedItab(){}
 function unlockRemoteShieldTabs(){['ethernet','policies','filter','advanced'].forEach(n=>{const el=document.getElementById('itab-nav-'+n);if(el){el.classList.remove('itab-locked');el.setAttribute('onclick',`showItab('${n}',this)`);}});}
@@ -827,7 +839,7 @@ function submitAdminLogin(){
   }
   adminUnlocked=true;
   document.getElementById('landingOverlay').style.display='none';
-  document.getElementById('sadmin').style.display='block';
+  document.getElementById('sadmin').style.setProperty('display','block','important');
   // Skip internal lock screen — go straight to admin content
   document.getElementById('adminLock').style.display='none';
   document.getElementById('adminContent').className='admin-content show';
@@ -838,7 +850,7 @@ function submitAdminLogin(){
 function launchCandidate(name){
   // Hide overlay first — before anything else can throw
   document.getElementById('landingOverlay').style.display='none';
-  document.getElementById('sadmin').style.display='none';
+    document.getElementById('sadmin').style.setProperty('display','none','important');
 
   try {
     S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;
