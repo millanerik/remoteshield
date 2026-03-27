@@ -371,7 +371,10 @@ input:checked+.tslider:before{transform:translateX(22px);}
     <div class="sb-admin" id="sbAdmin" style="display:none;">
       <div class="sitem" id="nav-admin" onclick="nav('admin',this)"><span class="ico">🛡️</span>Admin</div>
     </div>
-    <div class="sb-foot"><span>RemoteShield v0.18</span></div>
+    <div class="sb-foot">
+      <div onclick="switchUser()" style="cursor:pointer;font-size:11px;color:var(--t3);padding:6px 0;border-top:1px solid var(--border);margin-bottom:6px;transition:color .15s;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--t3)'">⇄ Switch User</div>
+      <span style="font-size:10px;color:#2a2a2a;">RemoteShield v0.18</span>
+    </div>
   </div>
 
   <!-- Content -->
@@ -745,6 +748,8 @@ function doComplete(){
     advState:{...advState},fixedCount:activeSess.fixedCount,vpuLooked:vpuLinked
   };
   log('SUBMITTED','lb-ok','Case study submitted.');
+  // Clear localStorage so refresh shows splash for next user
+  try{localStorage.removeItem('rs_active_name');}catch(e){}
   document.getElementById('completeWrap').style.display='none';
   document.getElementById('completeDone').style.display='block';
   setTimeout(()=>{
@@ -769,7 +774,26 @@ function doComplete(){
   },3000);
 }
 
-function v(id){return(document.getElementById(id)?.value||'').trim();}
+function switchUser(){
+  if(!confirm('Switch user? Your current progress has been saved.'))return;
+  try{localStorage.removeItem('rs_active_name');}catch(e){}
+  activeSess=null;
+  document.getElementById('sbCand').style.display='none';
+  document.getElementById('sbName').textContent='—';
+  document.getElementById('sbAdmin').style.display='none';
+  document.getElementById('csCandLabel').textContent='';
+  document.getElementById('emailThread').innerHTML='';
+  document.getElementById('emailReply').value='';
+  document.getElementById('emailAttachBar').innerHTML='';
+  document.getElementById('ebadge').style.display='none';
+  document.getElementById('completeWrap').style.display='block';
+  document.getElementById('completeDone').style.display='none';
+  resetFwState();renderAdv();refresh();
+  document.getElementById('spName').value='';document.getElementById('spPw').value='';
+  document.getElementById('spPwWrap').style.display='none';document.getElementById('spErr').textContent='';
+  nav('case',document.getElementById('nav-case'));
+  showSplash(true);
+}
 
 // ══ NAV ══
 function nav(name,el){
