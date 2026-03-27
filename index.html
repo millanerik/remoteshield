@@ -34,6 +34,29 @@ body{font-family:'Segoe UI',sans-serif;background:#0c0c0c;color:#e2e8f0;min-heig
   --radius-lg: 12px;
 }
 
+/* ── Landing overlay ── */
+.landing-overlay{position:fixed;inset:0;background:#0c0c0c;z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;}
+.landing-box{width:100%;max-width:560px;}
+.landing-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+.landing-logo .lock{font-size:22px;}
+.landing-logo .brand{font-size:18px;font-weight:700;color:var(--red);}
+.landing-logo .sub{font-size:12px;color:var(--text-3);margin-left:4px;}
+.landing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+.landing-card-top{background:var(--bg-inset);padding:28px 28px 24px;border-bottom:1px solid var(--border);}
+.landing-card-top .eyebrow{font-size:9px;color:var(--red);text-transform:uppercase;letter-spacing:.14em;font-weight:700;margin-bottom:10px;}
+.landing-card-top h1{font-size:20px;font-weight:700;color:var(--text-1);margin-bottom:14px;line-height:1.35;}
+.landing-card-top p{font-size:13px;color:var(--text-2);line-height:1.85;}
+.landing-card-bot{padding:24px 28px;}
+.landing-card-bot label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;font-weight:600;display:block;margin-bottom:8px;}
+.landing-row{display:flex;gap:10px;}
+.landing-inp{flex:1;background:var(--bg-inset);border:1px solid var(--border-md);border-radius:var(--radius-md);padding:11px 14px;color:var(--text-1);font-size:14px;outline:none;transition:border .2s;font-family:inherit;}
+.landing-inp:focus{border-color:var(--red);}
+.landing-inp.err{border-color:var(--red);animation:shake .3s;}
+.landing-err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px;}
+.landing-start{background:var(--red);color:white;border:none;padding:11px 24px;border-radius:var(--radius-md);font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s;font-family:inherit;}
+.landing-start:hover{background:var(--red-hover);}
+.landing-footer{margin-top:16px;font-size:11px;color:var(--text-3);text-align:center;}
+
 .layout{display:flex;width:100%;min-height:100vh;}
 
 /* ── Sidebar ── */
@@ -363,6 +386,34 @@ input:checked+.slider:before{transform:translateX(22px);}
 </style>
 </head>
 <body>
+
+<!-- ══ LANDING OVERLAY ══ -->
+<div class="landing-overlay" id="landingOverlay">
+  <div class="landing-box">
+    <div class="landing-logo">
+      <span class="lock">🔒</span>
+      <span class="brand">RemoteShield</span>
+      <span class="sub">SST Case Project by Erik Millan</span>
+    </div>
+    <div class="landing-card">
+      <div class="landing-card-top">
+        <div class="eyebrow">New Tool Test — Field Exercise</div>
+        <h1>RemoteShield Tool Testing<br>PlayOn High School</h1>
+        <p>Pixellot has given you early access to a remote tool — <strong style="color:var(--red);">RemoteShield</strong> — that can configure the network, firewall, and content filter settings of a Pixellot VPU from anywhere, as long as the device is powered on. You have been assigned to test it on a brand-new installation. You will report on your findings, methodology, and protocols to introduce this tool to the Senior Specialists. Treat this case study as close to a real scenario as possible.<br><br><em style="color:var(--text-3);font-size:12px;">Note: External tools might not reflect the information given in this case study.</em></p>
+      </div>
+      <div class="landing-card-bot">
+        <label>Enter your full name to begin</label>
+        <div class="landing-row">
+          <input class="landing-inp" id="landingName" type="text" placeholder="Your full name…" maxlength="60" onkeydown="if(event.key==='Enter')startCase()" />
+          <button class="landing-start" onclick="startCase()">Start ▶</button>
+        </div>
+        <div class="landing-err" id="landingErr"></div>
+      </div>
+    </div>
+    <div class="landing-footer">Your actions and inputs will be recorded throughout this exercise.</div>
+  </div>
+</div>
+
 <div class="layout">
 
   <!-- Sidebar -->
@@ -374,8 +425,8 @@ input:checked+.slider:before{transform:translateX(22px);}
     </div>
     <div class="snav">
       <div class="sitem active" id="nav-case" onclick="showPage('case',this)"><span class="icon">📋</span> Case Study</div>
-      <div class="sitem" id="nav-firewall" style="display:none;" onclick="showPage('firewall',this)"><span class="icon">🔒</span> RemoteShield</div>
-      <div class="sitem" id="nav-email" style="display:none;" onclick="showPage('email',this)">
+      <div class="sitem" id="nav-firewall" onclick="showPage('firewall',this)"><span class="icon">🔒</span> RemoteShield</div>
+      <div class="sitem" id="nav-email" onclick="showPage('email',this)">
         <span class="icon">✉️</span> Email
         <span class="ebadge" id="emailBadge">1</span>
       </div>
@@ -394,60 +445,43 @@ input:checked+.slider:before{transform:translateX(22px);}
 
     <!-- CASE STUDY -->
     <div class="page active" id="page-case">
-      <div id="cs-landing" class="cs-landing">
-        <div class="hero">
-          <div class="badge">New Tool Test — Field Exercise</div>
-          <h1>RemoteShield Tool Testing<br>PlayOn High School</h1>
-          <p>Pixellot has given you early access to a remote tool — <strong style="color:var(--red);">RemoteShield</strong> — that can configure the network, firewall, and content filter settings of a Pixellot VPU from anywhere, as long as the device is powered on. You have been assigned to test it on a brand-new installation. You will report on your findings, methodology, and protocols to introduce this tool to the Senior Specialists. Treat this case study as close to a real scenario as possible. Note: External tools might not reflect the information given in this case study.</p>
+      <div class="page-hdr">
+        <div class="eyebrow">Field Exercise</div>
+        <h1>Case Study</h1>
+        <p id="cs-cand-label"></p>
+      </div>
+
+      <div class="email-preview">
+        <div class="email-preview-hdr">
+          <div class="email-preview-subj">📧 New Pixellot System — Ready for Configuration</div>
+          <div class="email-meta-grid">
+            <span class="emk">From:</span><span class="emv">Erik Millan &lt;erik.millan@playon.org&gt;</span>
+            <span class="emk">To:</span><span class="emv">Support &lt;support@playon.co&gt;</span>
+            <span class="emk">Subject:</span><span class="emv">New Pixellot System — Ready for Configuration</span>
+          </div>
         </div>
-        <div class="start-card">
-          <h3>Ready to begin?</h3>
-          <p>Enter your name below and click <strong>Start</strong> to receive your task details and access RemoteShield. Your inputs and actions will be recorded throughout the exercise.</p>
-          <input class="name-inp" id="candidateName" type="text" placeholder="Enter your full name…" maxlength="60" onkeydown="if(event.key==='Enter')startCase()" />
-          <div class="name-err" id="nameErr"></div>
-          <button class="start-btn" onclick="startCase()"><span>▶</span> Start Exercise</button>
+        <div class="email-preview-body">
+          <p>Hello,</p>
+          <p>We have installed our new Pixellot system and it should be ready for configuration. Everything is hooked up correctly and powered on. The system name is <strong style="color:var(--text-1);">PXLS2_5215</strong> and ID <strong style="color:var(--text-1);">5cbd98b0118884077f6cc921</strong>.</p>
+          <p>I understand that you guys are testing a new tool to remotely set network settings. Please let me know if you need anything!</p>
+          <div class="email-sig">Best,<br>Erik Millan — Network Administrator</div>
         </div>
       </div>
 
-      <div class="cs-details" id="cs-details">
-        <div class="page-hdr">
-          <div class="eyebrow">Field Exercise</div>
-          <h1>Case Study</h1>
-          <p id="cs-cand-label"></p>
-        </div>
+      <div class="case-section"><h3>Your Task</h3><p>Pixellot has granted you early access to <strong style="color:var(--red);">RemoteShield</strong>, a new remote configuration tool. Use it to apply all necessary settings and complete the objectives below.</p></div>
+      <div class="case-section"><h3>✉️ Stay in Touch</h3><p>You have access to the <strong style="color:var(--red);">Email</strong> section in the left navigation where you can correspond directly with <strong style="color:var(--text-1);">Erik Millan</strong>, Network Administrator at PlayOn High School.</p></div>
+      <div class="case-section"><h3>Completion Checklist</h3><ul class="case-ul"><li>Pixellot VPU is properly configured for all network settings.</li><li>Communication with PlayOn High School.</li><li>Findings &amp; feedback on RemoteShield.</li><li>Plan to implement the tool for the rest of SST.</li><li>Present the Case Study to the Hiring Manager(s).</li></ul></div>
+      <div class="case-section"><h3>What You Have Access To</h3><ul class="case-ul"><li>RemoteShield FW-2000 — full read/write access via the RemoteShield tab</li><li>Ethernet Settings — configure IP addressing mode and network parameters</li><li>Firewall Policies — manage outbound port rules for the Pixellot VPU</li><li>Content Filter — manage domain whitelist entries</li><li>Advanced Settings — review security and performance settings</li></ul></div>
+      <div class="case-section"><h3>Note</h3><p>This is a brand-new installation. No Pixellot-specific configuration has been applied yet.</p></div>
 
-        <div class="email-preview">
-          <div class="email-preview-hdr">
-            <div class="email-preview-subj">📧 New Pixellot System — Ready for Configuration</div>
-            <div class="email-meta-grid">
-              <span class="emk">From:</span><span class="emv">Erik Millan &lt;erik.millan@playon.org&gt;</span>
-              <span class="emk">To:</span><span class="emv">Support &lt;support@playon.co&gt;</span>
-              <span class="emk">Subject:</span><span class="emv">New Pixellot System — Ready for Configuration</span>
-            </div>
-          </div>
-          <div class="email-preview-body">
-            <p>Hello,</p>
-            <p>We have installed our new Pixellot system and it should be ready for configuration. Everything is hooked up correctly and powered on. The system name is <strong style="color:var(--text-1);">PXLS2_5215</strong> and ID <strong style="color:var(--text-1);">5cbd98b0118884077f6cc921</strong>.</p>
-            <p>I understand that you guys are testing a new tool to remotely set network settings. Please let me know if you need anything!</p>
-            <div class="email-sig">Best,<br>Erik Millan — Network Administrator</div>
-          </div>
-        </div>
-
-        <div class="case-section"><h3>Your Task</h3><p>Pixellot has granted you early access to <strong style="color:var(--red);">RemoteShield</strong>, a new remote configuration tool. Use it to apply all necessary settings and complete the objectives below.</p></div>
-        <div class="case-section"><h3>✉️ Stay in Touch</h3><p>You have access to the <strong style="color:var(--red);">Email</strong> section in the left navigation where you can correspond directly with <strong style="color:var(--text-1);">Erik Millan</strong>, Network Administrator at PlayOn High School.</p></div>
-        <div class="case-section"><h3>Completion Checklist</h3><ul class="case-ul"><li>Pixellot VPU is properly configured for all network settings.</li><li>Communication with PlayOn High School.</li><li>Findings &amp; feedback on RemoteShield.</li><li>Plan to implement the tool for the rest of SST.</li><li>Present the Case Study to the Hiring Manager(s).</li></ul></div>
-        <div class="case-section"><h3>What You Have Access To</h3><ul class="case-ul"><li>RemoteShield FW-2000 — full read/write access via the RemoteShield tab</li><li>Ethernet Settings — configure IP addressing mode and network parameters</li><li>Firewall Policies — manage outbound port rules for the Pixellot VPU</li><li>Content Filter — manage domain whitelist entries</li><li>Advanced Settings — review security and performance settings</li></ul></div>
-        <div class="case-section"><h3>Note</h3><p>This is a brand-new installation. No Pixellot-specific configuration has been applied yet.</p></div>
-
-        <div style="margin-top:24px;text-align:center;" id="completeWrap">
-          <p style="font-size:12px;color:var(--text-3);margin-bottom:14px;">When you have completed all objectives, click the button below to submit your case study.</p>
-          <button onclick="completeCaseStudy()" style="background:var(--green);color:white;border:none;padding:16px 40px;border-radius:var(--radius-lg);font-size:16px;font-weight:700;cursor:pointer;width:100%;max-width:420px;transition:background .15s;">✅ Complete Case Study</button>
-        </div>
-        <div id="completeConfirm" style="display:none;margin-top:24px;background:var(--green-bg);border:1px solid var(--green);border-radius:var(--radius-lg);padding:24px;text-align:center;">
-          <div style="font-size:28px;margin-bottom:10px;">✅</div>
-          <div style="font-size:16px;font-weight:700;color:#4ade80;margin-bottom:6px;">Case Study Submitted</div>
-          <div style="font-size:13px;color:#86efac;">Your submission has been recorded. The hiring manager will review your work in the Admin panel.</div>
-        </div>
+      <div style="margin-top:24px;text-align:center;" id="completeWrap">
+        <p style="font-size:12px;color:var(--text-3);margin-bottom:14px;">When you have completed all objectives, click the button below to submit your case study.</p>
+        <button onclick="completeCaseStudy()" style="background:var(--green);color:white;border:none;padding:16px 40px;border-radius:var(--radius-lg);font-size:16px;font-weight:700;cursor:pointer;width:100%;max-width:420px;transition:background .15s;">✅ Complete Case Study</button>
+      </div>
+      <div id="completeConfirm" style="display:none;margin-top:24px;background:var(--green-bg);border:1px solid var(--green);border-radius:var(--radius-lg);padding:24px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:10px;">✅</div>
+        <div style="font-size:16px;font-weight:700;color:#4ade80;margin-bottom:6px;">Case Study Submitted</div>
+        <div style="font-size:13px;color:#86efac;">Your submission has been recorded. The hiring manager will review your work in the Admin panel.</div>
       </div>
     </div>
 
@@ -752,8 +786,14 @@ function lockRemoteShieldTabs(){['ethernet','policies','filter','advanced'].forE
 
 // ══ START ══
 function startCase(){
-  const nameEl=document.getElementById('candidateName');const name=nameEl.value.trim();
-  if(!name){nameEl.classList.add('err');document.getElementById('nameErr').textContent='Please enter your name.';setTimeout(()=>{nameEl.classList.remove('err');document.getElementById('nameErr').textContent='';},2000);return;}
+  const nameEl=document.getElementById('landingName');
+  const name=nameEl.value.trim();
+  if(!name){
+    nameEl.classList.add('err');
+    document.getElementById('landingErr').textContent='Please enter your name to begin.';
+    setTimeout(()=>{nameEl.classList.remove('err');document.getElementById('landingErr').textContent='';},2000);
+    return;
+  }
   S={...DEFAULT_S};ethMode='dhcp';fwRules=[];fwIPLocked=false;cfRules=[];cfIPLocked=false;vpuLinked=false;resetAdvState();
   document.getElementById('ethIPCard').style.display='block';document.getElementById('ethBuilder').style.display='none';document.getElementById('ethDeviceIP').value='';
   document.getElementById('fwIPCard').style.display='block';document.getElementById('fwBuilder').style.display='none';document.getElementById('fwIPInput').value='';
@@ -765,11 +805,9 @@ function startCase(){
   addLog('START','lb-start','Candidate <strong>'+name+'</strong> started the exercise.');
   document.getElementById('cand-name-display').textContent=name;
   document.getElementById('sidebar-cand').style.display='block';
-  document.getElementById('nav-firewall').style.display='flex';
-  document.getElementById('nav-email').style.display='flex';
-  document.getElementById('cs-landing').style.display='none';
-  document.getElementById('cs-details').classList.add('show');
   document.getElementById('cs-cand-label').textContent='Candidate: '+name;
+  // Hide landing overlay
+  document.getElementById('landingOverlay').style.display='none';
   renderAdvanced();refresh();renderAdminSessions();updateEmailBadge();
 }
 
@@ -836,11 +874,13 @@ function completeCaseStudy(){
     document.getElementById('cfIPCard').style.display='block';document.getElementById('cfBuilder').style.display='none';document.getElementById('cfIPInput').value='';
     document.getElementById('vpuLookupWrap').style.display='block';document.getElementById('vpuDash').style.display='none';document.getElementById('vpuLookupInput').value='';
     document.getElementById('completeWrap').style.display='block';document.getElementById('completeConfirm').style.display='none';
-    document.getElementById('nav-firewall').style.display='none';document.getElementById('nav-email').style.display='none';document.getElementById('sidebar-cand').style.display='none';document.getElementById('cand-name-display').textContent='—';
-    document.getElementById('cs-details').classList.remove('show');document.getElementById('cs-landing').style.display='block';
-    document.getElementById('candidateName').value='';document.getElementById('nameErr').textContent='';document.getElementById('cs-cand-label').textContent='';
+    document.getElementById('sidebar-cand').style.display='none';document.getElementById('cand-name-display').textContent='—';
+    document.getElementById('cs-cand-label').textContent='';
     lockRemoteShieldTabs();
     document.getElementById('ep-empty').style.display='block';document.getElementById('ep-active').style.display='none';document.getElementById('ep-reply').value='';document.getElementById('ep-attach-bar').innerHTML='';document.getElementById('emailBadge').style.display='none';
+    // Show landing overlay again for next candidate
+    document.getElementById('landingName').value='';document.getElementById('landingErr').textContent='';
+    document.getElementById('landingOverlay').style.display='flex';
     showPage('case',document.getElementById('nav-case'));document.getElementById('nav-case').classList.add('active');
     renderAdvanced();refresh();
   },3000);
