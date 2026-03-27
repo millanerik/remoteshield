@@ -706,6 +706,10 @@ function onAdminPw(){
 function launchCandidate(name){
   showSplash(false);
   mkSession(name);
+
+  // Persist immediately so admin sees the session right away
+  persist();
+
   document.getElementById('sbName').textContent=name;
   document.getElementById('sbCand').style.display='block';
   document.getElementById('sbAdmin').style.display='none';
@@ -713,7 +717,12 @@ function launchCandidate(name){
   resetFwState();
   renderAdv();refresh();
   renderEmailThread();
-  log('START','lb-start','Candidate <strong>'+name+'</strong> started the exercise.');
+
+  // Log start after persist so it shows in the activity log
+  activeSess.totalActions++;
+  activeSess.log.push({t:ts(activeSess),badge:'START',cls:'lb-start',msg:'Candidate <strong>'+name+'</strong> started the exercise.'});
+  persist();
+  refreshAdmin();
 }
 
 function showSplash(show){
@@ -770,6 +779,7 @@ function nav(name,el){
   if(name==='admin'&&adminUnlocked){
     document.getElementById('adminLock').style.display='none';
     document.getElementById('adminContent').className='admin-content show';
+    pollAdmin(); // immediate refresh
     renderSessions();refreshAdmin();startPoll();
   }
 }
@@ -1164,7 +1174,10 @@ async function pollAdmin(){
     renderSessions();refreshAdmin();
   }catch(e){}
 }
-function startPoll(){if(!adminPollTimer)adminPollTimer=setInterval(pollAdmin,5000);}
+function startPoll(){
+  pollAdmin(); // run immediately on open
+  if(!adminPollTimer)adminPollTimer=setInterval(pollAdmin,5000);
+}
 function stopPoll(){clearInterval(adminPollTimer);adminPollTimer=null;}
 window.addEventListener('beforeunload',persist);
 
