@@ -453,14 +453,30 @@ input:checked+.tslider:before{transform:translateX(22px);}
             </div>
             <button class="btn btn-ghost" onclick="doUnlink()">✕ Disconnect</button>
           </div>
-          <div class="card" style="margin-bottom:16px;"><div class="ds-lbl">General</div><div class="gen-grid"><div id="genC1"></div><div id="genC2"></div><div id="genC3"></div></div></div>
+          <!-- System Status (moved to top) -->
+          <div class="card"><div class="ds-lbl">System Status</div><div class="gauges" id="gauges"></div></div>
+          <!-- General (collapsible, starts collapsed) -->
+          <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden;">
+            <div onclick="toggleCollapse('generalBody',this)" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;user-select:none;">
+              <div class="ds-lbl" style="margin-bottom:0;">General</div>
+              <span style="font-size:12px;color:var(--t3);transition:transform .2s;" id="generalChevron">▶</span>
+            </div>
+            <div id="generalBody" style="display:none;padding:0 20px 16px;"><div class="gen-grid"><div id="genC1"></div><div id="genC2"></div><div id="genC3"></div></div></div>
+          </div>
           <div class="g2">
             <div class="card"><div class="ds-lbl">Configuration</div><div style="display:flex;align-items:center;gap:14px;"><div style="background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 16px;font-size:22px;font-weight:700;color:var(--red);">S2</div><div><div style="font-size:14px;color:var(--t1);font-weight:600;">Pixellot S2</div><div style="font-size:11px;color:var(--t3);margin-top:3px;">System Type</div></div></div></div>
             <div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;"><div class="ds-lbl" style="margin-bottom:0;">Storage</div><span style="font-size:11px;color:var(--t3);background:var(--bg-inset);padding:3px 10px;border-radius:20px;border:1px solid var(--border);">Disc C</span></div><div class="stor-bar"><div class="stor-fill" style="width:71.2%"></div></div><div class="stor-meta"><span>Free: 43.14 GB</span><span>Total: 150.00 GB</span></div></div>
           </div>
           <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;"><div style="padding:12px 16px;border-bottom:1px solid var(--border);"><div class="ds-lbl" style="margin-bottom:0;">Camera Status</div></div><table class="dp-tbl"><thead><tr><th>№</th><th>TV System</th><th>Firmware</th><th>UID</th></tr></thead><tbody><tr><td>1</td><td>ntsc_60</td><td style="color:var(--green);">px20221027T2</td><td>rtsp:////169.254.16.51/h264</td></tr><tr><td>2</td><td>ntsc_60</td><td style="color:var(--green);">px20221027T2</td><td>rtsp:////169.254.16.50/h264</td></tr></tbody></table></div>
           <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;"><div style="padding:12px 16px;border-bottom:1px solid var(--border);"><div class="ds-lbl" style="margin-bottom:0;">POE Status</div></div><table class="dp-tbl"><thead><tr><th>POE Port</th><th>Status</th><th>Speed (Mbps)</th></tr></thead><tbody><tr><td>1</td><td><span class="poe-err">✕</span></td><td>—</td></tr><tr><td>2</td><td><span class="poe-err">✕</span></td><td>—</td></tr><tr><td>3</td><td><span class="poe-ok">✓</span></td><td>1000</td></tr><tr><td>4</td><td><span class="poe-ok">✓</span></td><td>1000</td></tr></tbody></table></div>
-          <div class="card"><div class="ds-lbl">System Status</div><div class="gauges" id="gauges"></div></div>
+          <!-- Hardware Information (collapsible, starts collapsed) -->
+          <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden;">
+            <div onclick="toggleCollapse('hwBody',this)" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;user-select:none;">
+              <div class="ds-lbl" style="margin-bottom:0;">Hardware Information</div>
+              <span style="font-size:12px;color:var(--t3);transition:transform .2s;" id="hwChevron">▶</span>
+            </div>
+            <div id="hwBody" style="display:none;padding:0 20px 16px;" ><div id="hwVPU"></div><div id="hwCHU" style="margin-top:16px;"></div></div>
+          </div>
         </div>
       </div>
 
@@ -876,7 +892,7 @@ function doLink(){
   document.getElementById('vpuDash').style.display='block';
   unlockItabs();
   log('LOOKUP','lb-ok','VPU linked — <strong>'+val+'</strong>. Configuration tabs unlocked.');
-  renderGenInfo();renderGauges();persist();
+  renderGenInfo();renderGauges();renderHardware();persist();
 }
 function doUnlink(){
   vpuLinked=false;
@@ -894,13 +910,62 @@ function renderGenInfo(){
   cols.forEach((col,i)=>{document.getElementById('genC'+(i+1)).innerHTML=col.map(([k,v,c])=>`<div class="gen-item"><span class="gen-k">${k}</span><span class="gen-v ${c||''}">${v}</span></div>`).join('');});
 }
 function renderGauges(){
-  const items=[{l:'GPU',p:30,c:'#ef4444'},{l:'CPU',p:30,c:'#3b82f6'},{l:'Memory',p:22,c:'#8b5cf6'},{l:'Temperature',pl:'28°C'},{l:'Total Memory',pl:'32 GB'}];
+  const items=[{l:'GPU',p:18,c:'#ef4444'},{l:'CPU',p:30,c:'#3b82f6'},{l:'Memory',p:22,c:'#8b5cf6'},{l:'Temperature',pl:'28°C'},{l:'Total Memory',pl:'32 GB'}];
   const r=30,C=+(2*Math.PI*r).toFixed(2),off=+(C/4).toFixed(2);
   document.getElementById('gauges').innerHTML=items.map(g=>{
     if(g.pl)return `<div class="gauge-item"><div style="width:70px;height:70px;border-radius:50%;background:var(--bg-inset);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;"><span style="font-size:13px;font-weight:700;color:var(--t1);">${g.pl}</span></div><div class="gauge-lbl">${g.l}</div></div>`;
     const d=+((g.p/100)*C).toFixed(2);
     return `<div class="gauge-item"><svg viewBox="0 0 80 80" width="70" height="70"><circle cx="40" cy="40" r="${r}" fill="none" stroke="#1e1e1e" stroke-width="7"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="${g.c}" stroke-width="7" stroke-dasharray="${d} ${C}" stroke-dashoffset="${off}" stroke-linecap="round"/><text x="40" y="45" text-anchor="middle" font-size="14" fill="#f1f5f9" font-weight="600">${g.p}%</text></svg><div class="gauge-lbl">${g.l}</div></div>`;
   }).join('');
+}
+
+// ══ COLLAPSIBLE SECTIONS ══
+function toggleCollapse(bodyId,hdrEl){
+  const body=document.getElementById(bodyId);
+  const chevron=hdrEl.querySelector('span');
+  if(body.style.display==='none'){
+    body.style.display='block';
+    if(chevron)chevron.textContent='▼';
+  }else{
+    body.style.display='none';
+    if(chevron)chevron.textContent='▶';
+  }
+}
+
+// ══ HARDWARE INFO ══
+function renderHardware(){
+  const vpuData=[
+    ['CPU Name','Intel Core i5-10500'],
+    ['GPU Name','NVIDIA NVIDIA GeForce GTX 1650'],
+    ['GPU Driver','31.0.15.3667'],
+    ['GPU S\\N','N/A'],
+    ['Intel GPU name','N/A'],
+    ['Intel GPU Driver','N/A'],
+    ['VPU S/N','N/A'],
+    ['VPU P/N','N/A'],
+    ['VPU MAC','9c-7b-ef-4d-96-9d'],
+    ['OEM S/N','CZC1128QP0'],
+    ['Cloud Status','● Enable','ok']
+  ];
+  const chuData=[
+    ['Camera 1 Type','DYNACOLOR'],
+    ['Camera 1 MAC','00:D0:89:1B:9A:27'],
+    ['Camera 1 IP','169.254.16.51'],
+    ['Camera 1 Model','T2SF-B'],
+    ['Camera 2 Type','DYNACOLOR'],
+    ['Camera 2 MAC','00:D0:89:1B:9B:99'],
+    ['Camera 2 IP','169.254.16.50'],
+    ['Camera 2 Model','T2SF-B'],
+    ['Camera S/N','N/A'],
+    ['Camera P/N','PXL-422-3582']
+  ];
+  const renderSection=(title,data)=>{
+    return `<div style="margin-bottom:4px;"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">${title}</div>${data.map(([k,val,c])=>`<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--t3);min-width:160px;flex-shrink:0;">${k}</span><span style="color:${c==='ok'?'var(--green)':'var(--t1)'};font-family:'Courier New',monospace;">${val}</span></div>`).join('')}</div>`;
+  };
+  const vpuEl=document.getElementById('hwVPU');
+  const chuEl=document.getElementById('hwCHU');
+  if(vpuEl)vpuEl.innerHTML=renderSection('VPU',vpuData);
+  if(chuEl)chuEl.innerHTML=renderSection('CHU',chuData);
 }
 
 // ══ ETHERNET ══
@@ -1225,7 +1290,7 @@ function restoreSession(sess){
   document.getElementById('csCandLabel').textContent='Candidate: '+sess.name;
   document.getElementById('sbAdmin').style.display='none';
   if(sess.submitted){document.getElementById('completeWrap').style.display='none';document.getElementById('completeDone').style.display='block';}
-  if(sess.savedVpuLinked){vpuLinked=true;document.getElementById('vpuLookupWrap').style.display='none';document.getElementById('vpuDash').style.display='block';unlockItabs();renderGenInfo();renderGauges();}
+  if(sess.savedVpuLinked){vpuLinked=true;document.getElementById('vpuLookupWrap').style.display='none';document.getElementById('vpuDash').style.display='block';unlockItabs();renderGenInfo();renderGauges();renderHardware();}
   if(sess.savedFwIPLocked){fwIPLocked=true;document.getElementById('fwIPCard').style.display='none';document.getElementById('fwBuilder').style.display='block';document.getElementById('fwIPDisp').textContent=sess.savedFwIP||'';if(document.getElementById('fwIPInp'))document.getElementById('fwIPInp').value=sess.savedFwIP||'';renderFwRules();}
   if(sess.savedCfIPLocked){cfIPLocked=true;document.getElementById('cfIPCard').style.display='none';document.getElementById('cfBuilder').style.display='block';document.getElementById('cfIPDisp').textContent=sess.savedCfIP||'';if(document.getElementById('cfIPInp'))document.getElementById('cfIPInp').value=sess.savedCfIP||'';renderCfRules();}
   if(sess.savedEthMode)setEthMode(sess.savedEthMode);
