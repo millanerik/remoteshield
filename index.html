@@ -1096,7 +1096,7 @@ function renderAdminThread(){
   const emails=viewSess.emails||[];
   if(!emails.length){el.innerHTML='<div class="no-log">No messages yet.</div>';return;}
   el.innerHTML=emails.map((m,i)=>`
-    <div class="admin-bubble ${m.dir==='inbound'?'in':'out'}">
+    <div class="admin-bubble ${m.dir==='inbound'?'out':'in'}">
       <div class="ab-meta">${m.dir==='inbound'?'Erik Millan':'Candidate'} · ${m.t}</div>
       <div class="ab-body">${m.body.replace(/\n/g,'<br>')}${m.attachments&&m.attachments.length?'<div class="msg-attachments" id="aatt-'+i+'"></div>':''}</div>
     </div>`).join('');
