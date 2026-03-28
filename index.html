@@ -660,6 +660,7 @@ let sessions=[],activeSess=null,viewSess=null;
 let adminUnlocked=false;
 let pendingCandAtt=[],pendingAdminAtt=[];
 let adminPollTimer=null;
+let candidatePollTimer=null;
 
 // ══ HELPERS ══
 function v(id){ return (document.getElementById(id)?.value||'').trim(); }
@@ -730,6 +731,7 @@ async function launchCandidate(name){
           try{localStorage.setItem('rs_active_name',name);}catch(e){}
           restoreSession(existing);
           log('RESUMED','lb-info','Candidate <strong>'+name+'</strong> resumed the exercise.');
+          startCandidatePoll();
           return;
         }
       }
@@ -755,6 +757,7 @@ async function launchCandidate(name){
     else{console.error('Failed to save session:',res.status,await res.text());}
   }catch(e){console.error('Session save error:',e);}
   refreshAdmin();
+  startCandidatePoll();
 }
 
 function showSplash(show){
@@ -765,6 +768,7 @@ function showSplash(show){
 // ══ COMPLETE ══
 function doComplete(){
   if(!activeSess)return;
+  stopCandidatePoll();
   activeSess.submitted=true;
   activeSess.submittedAt=ts(activeSess);
   activeSess.snapshot={
@@ -805,6 +809,7 @@ function doComplete(){
 function switchUser(){
   if(!confirm('Switch user? Your current progress has been saved.'))return;
   persist();
+  stopCandidatePoll();
   try{localStorage.removeItem('rs_active_name');}catch(e){}
   activeSess=null;
   document.getElementById('sbCand').style.display='none';
@@ -1202,6 +1207,7 @@ async function loadState(){
     sessions=loaded;activeSess=sessions[sessions.length-1];viewSess=activeSess;
     if(!activeSess)return;
     restoreSession(activeSess);
+    startCandidatePoll();
   }catch(e){}
 }
 
@@ -1241,6 +1247,35 @@ function startPoll(){
   if(!adminPollTimer)adminPollTimer=setInterval(pollAdmin,5000);
 }
 function stopPoll(){clearInterval(adminPollTimer);adminPollTimer=null;}
+
+// Candidate polling — checks for new inbound emails from admin
+async function pollCandidate(){
+  if(!activeSess)return;
+  try{
+    const res=await fetch('/api/sessions');
+    if(!res.ok)return;
+    const loaded=await res.json();
+    if(!Array.isArray(loaded))return;
+    const serverSess=loaded.find(s=>s.name===activeSess.name);
+    if(!serverSess||!serverSess.emails)return;
+    const localInbound=activeSess.emails.filter(m=>m.dir==='inbound');
+    const serverInbound=serverSess.emails.filter(m=>m.dir==='inbound');
+    if(serverInbound.length>localInbound.length){
+      const newEmails=serverInbound.slice(localInbound.length);
+      newEmails.forEach(m=>{m.read=false;activeSess.emails.push(m);});
+      updateBadge();
+      if(document.getElementById('page-email').classList.contains('active')){
+        renderEmailThread();
+      }
+    }
+  }catch(e){}
+}
+function startCandidatePoll(){
+  pollCandidate();
+  if(!candidatePollTimer)candidatePollTimer=setInterval(pollCandidate,3000);
+}
+function stopCandidatePoll(){clearInterval(candidatePollTimer);candidatePollTimer=null;}
+
 window.addEventListener('beforeunload',persist);
 
 // ══ INIT ══
