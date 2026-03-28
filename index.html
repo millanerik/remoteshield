@@ -713,6 +713,29 @@ function onAdminPw(){
 
 async function launchCandidate(name){
   showSplash(false);
+  // Check Supabase for an existing non-submitted session with this name
+  try{
+    const res=await fetch('/api/sessions');
+    if(res.ok){
+      const loaded=await res.json();
+      if(Array.isArray(loaded)){
+        sessions=loaded;
+        const existing=sessions.find(s=>s.name===name&&!s.submitted);
+        if(existing){
+          activeSess=existing;viewSess=existing;
+          document.getElementById('sbName').textContent=name;
+          document.getElementById('sbCand').style.display='block';
+          document.getElementById('sbAdmin').style.display='none';
+          document.getElementById('csCandLabel').textContent='Candidate: '+name;
+          try{localStorage.setItem('rs_active_name',name);}catch(e){}
+          restoreSession(existing);
+          log('RESUMED','lb-info','Candidate <strong>'+name+'</strong> resumed the exercise.');
+          return;
+        }
+      }
+    }
+  }catch(e){console.warn('Could not check for existing session:',e);}
+  // No existing session — create a new one
   mkSession(name);
   document.getElementById('sbName').textContent=name;
   document.getElementById('sbCand').style.display='block';
@@ -781,6 +804,7 @@ function doComplete(){
 
 function switchUser(){
   if(!confirm('Switch user? Your current progress has been saved.'))return;
+  persist();
   try{localStorage.removeItem('rs_active_name');}catch(e){}
   activeSess=null;
   document.getElementById('sbCand').style.display='none';
@@ -1106,7 +1130,7 @@ function sendAdminReply(){
   renderPendingAtt('adminAttachBar',pendingAdminAtt,'admin');
   document.getElementById('adminAttachWarn').textContent='';
   if(viewSess===activeSess){renderEmailThread();updateBadge();}
-  renderAdminThread();persist();
+  renderAdminThread();persistSession(viewSess);
 }
 
 // ══ ADMIN ══
@@ -1160,6 +1184,13 @@ async function persist(){
   activeSess.savedCfIPLocked=cfIPLocked;activeSess.savedCfIP=v('cfIPInp');
   activeSess.savedStaticFields={ip:v('ethIP'),mask:v('ethMask'),gw:v('ethGW'),dns:v('ethDNS'),altdns:v('ethAltDNS')};
   const san=JSON.parse(JSON.stringify(activeSess));
+  if(san.emails)san.emails=san.emails.map(m=>({...m,attachments:(m.attachments||[]).map(a=>({name:a.name,type:a.type,id:a.id,size:a.size}))}));
+  try{await fetch('/api/sessions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(san)});}catch(e){}
+}
+
+async function persistSession(sess){
+  if(!sess)return;
+  const san=JSON.parse(JSON.stringify(sess));
   if(san.emails)san.emails=san.emails.map(m=>({...m,attachments:(m.attachments||[]).map(a=>({name:a.name,type:a.type,id:a.id,size:a.size}))}));
   try{await fetch('/api/sessions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(san)});}catch(e){}
 }
