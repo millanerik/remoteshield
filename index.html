@@ -160,7 +160,7 @@ function testConnectivity(){
   log('TEST','lb-info','Connectivity test initiated.');
   setTimeout(()=>{
     btn.disabled=false;btn.textContent='Test Connectivity';
-    if(ethMode==='dhcp'){res.innerHTML='<span style="color:var(--green);">✓ DHCP — Connected. IP assigned automatically.</span>';log('TEST PASS','lb-ok','Connectivity test passed (DHCP).');return;}
+    if(ethMode==='dhcp'){res.innerHTML='<span style="color:var(--red);">✗ Failed — No DHCP server responded. Unable to obtain an IP address.</span>';log('TEST FAIL','lb-bad','Connectivity test failed — no DHCP server responded.');return;}
     if(!ip||!mask||!gw){res.innerHTML='<span style="color:var(--red);">✗ Failed — IP, Subnet Mask, and Gateway are required.</span>';log('TEST FAIL','lb-bad','Connectivity test failed — missing fields.');return;}
     const ipOk=ip==='10.1.5.80',maskOk=mask==='255.255.255.0',gwOk=gw==='10.1.5.1';
     if(ipOk&&maskOk&&gwOk){res.innerHTML='<span style="color:var(--green);">✓ Connected — Gateway 10.1.5.1 is reachable. Network configuration verified.</span>';log('TEST PASS','lb-ok','Connectivity test passed.');}
