@@ -45,7 +45,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0c0c0c;color:#e2e8f0;min-heig
 .admin-reply-area{padding:12px 18px;border-top:1px solid var(--border);background:var(--bg-inset);display:flex;flex-direction:column;gap:10px;}.admin-reply-input{flex:1;background:var(--bg-raised);border:1px solid var(--border-md);border-radius:var(--r-md);padding:8px 12px;color:var(--t1);font-size:12px;outline:none;font-family:inherit;}.admin-reply-input:focus{border-color:var(--red);}
 .sub-group{margin-bottom:20px;}.sub-title{font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}.sub-row{display:flex;gap:10px;padding:5px 0;font-size:12px;border-bottom:1px dashed var(--border);}.sub-row:last-child{border-bottom:none;}.sub-key{color:var(--t3);min-width:160px;flex-shrink:0;}.sub-val{color:var(--t1);font-family:'Courier New',monospace;word-break:break-all;}.sub-val.ok{color:var(--green);font-family:inherit;}.sub-val.warn{color:var(--red);font-family:inherit;}.sub-val.neu{color:var(--t2);font-family:inherit;}.sub-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;margin-right:4px;margin-bottom:3px;}.sub-tag.allow{background:var(--green-dim);color:#4ade80;}.sub-tag.deny,.sub-tag.block{background:var(--red-dim);color:var(--red-soft);}
 /* SOFTWARE MANAGER */
-.sw-row{display:grid;grid-template-columns:1fr 140px 100px 80px 90px;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;}.sw-row:last-child{border-bottom:none;}.sw-row:hover{background:rgba(255,255,255,.02);}.sw-th{display:grid;grid-template-columns:1fr 140px 100px 80px 90px;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}.sw-name{color:var(--t1);font-weight:600;}.sw-pub{color:var(--t3);}.sw-ver{color:var(--t2);font-family:'Courier New',monospace;}.sw-size{color:var(--t3);}.sw-flag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-left:6px;}.sw-flag-warn{background:var(--red-dim);color:var(--red-soft);}.sw-flag-ok{background:var(--green-dim);color:#4ade80;}.btn-uninstall{background:var(--bg-raised);border:1px solid var(--border-md);color:var(--t3);padding:5px 12px;border-radius:var(--r-sm);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s;}.btn-uninstall:hover{background:var(--red-dim);color:var(--red-soft);border-color:var(--red);}
+.sw-row{display:grid;grid-template-columns:1fr 140px 100px 80px 90px;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;}.sw-row:last-child{border-bottom:none;}.sw-row:hover{background:rgba(255,255,255,.02);}.sw-th{display:grid;grid-template-columns:1fr 140px 100px 80px 90px;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}.sw-name{color:var(--t1);font-weight:600;}.sw-pub{color:var(--t3);}.sw-ver{color:var(--t2);font-family:'Courier New',monospace;}.sw-size{color:var(--t3);}.btn-uninstall{background:var(--bg-raised);border:1px solid var(--border-md);color:var(--t3);padding:5px 12px;border-radius:var(--r-sm);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s;}.btn-uninstall:hover{background:var(--red-dim);color:var(--red-soft);border-color:var(--red);}
 /* TERMINAL */
 .terminal-wrap{background:#0a0a0a;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column;height:calc(100vh - 120px);}.terminal-hdr{background:#111;padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--t3);}.terminal-dots{display:flex;gap:6px;}.terminal-dot{width:10px;height:10px;border-radius:50%;}.terminal-output{flex:1;overflow-y:auto;padding:16px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:#c8c8c8;white-space:pre-wrap;word-break:break-all;}.terminal-input-line{display:flex;align-items:center;padding:8px 16px;border-top:1px solid var(--border);background:#0d0d0d;}.terminal-prompt{font-family:'Courier New',monospace;font-size:12px;color:#4ade80;white-space:nowrap;margin-right:8px;}.terminal-input{flex:1;background:transparent;border:none;outline:none;color:#e2e8f0;font-family:'Courier New',monospace;font-size:12px;caret-color:#4ade80;}.term-cmd{color:#67e8f9;}.term-ok{color:#4ade80;}.term-err{color:#f87171;}.term-warn{color:#fbbf24;}.term-dim{color:#555;}.term-info{color:#93c5fd;}.term-h{color:#e2e8f0;font-weight:700;}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
@@ -132,7 +132,7 @@ async function launchCandidate(name){
   refreshAdmin();startCandidatePoll();
 }
 
-function doComplete(){if(!activeSess)return;stopCandidatePoll();activeSess.submitted=true;activeSess.submittedAt=ts(activeSess);  activeSess.snapshot={ethMode,ethFields:ethMode==='static'?{ip:v('ethIP'),mask:v('ethMask'),gw:v('ethGW'),dns:v('ethDNS'),altdns:v('ethAltDNS')}:null,fwIP:v('fwIPInp'),fwRules:[...fwRules],cfIP:v('cfIPInp'),cfRules:[...cfRules],advState:{...advState},fixedCount:activeSess.fixedCount,vpuLooked:vpuLinked,swRemoved:swInstalled.filter(p=>!p.installed).map(p=>({name:p.name,legit:p.legit,problem:p.problem||null})),swRemaining:swInstalled.filter(p=>p.installed&&!p.legit).map(p=>({name:p.name,problem:p.problem}))};log('SUBMITTED','lb-ok','Case study submitted.');try{localStorage.removeItem('rs_active_name');}catch(e){}document.getElementById('completeWrap').style.display='none';document.getElementById('completeDone').style.display='block';setTimeout(()=>{S={...DS};ethMode='dhcp';fwIPLocked=false;fwRules=[];cfIPLocked=false;cfRules=[];vpuLinked=false;resetAdvState();activeSess=null;pendingCandAtt=[];document.getElementById('completeWrap').style.display='block';document.getElementById('completeDone').style.display='none';document.getElementById('sbCand').style.display='none';document.getElementById('sbName').textContent='—';document.getElementById('sbAdmin').style.display='none';document.getElementById('csCandLabel').textContent='';document.getElementById('emailThread').innerHTML='';document.getElementById('emailReply').value='';document.getElementById('emailAttachBar').innerHTML='';document.getElementById('ebadge').style.display='none';try{localStorage.removeItem('rs_active_name');}catch(e){}resetFwState();renderAdv();refresh();nav('case',document.getElementById('nav-case'));document.getElementById('spName').value='';document.getElementById('spPw').value='';document.getElementById('spPwWrap').style.display='none';document.getElementById('spErr').textContent='';showSplash(true);},3000);}
+function doComplete(){if(!activeSess)return;stopCandidatePoll();activeSess.submitted=true;activeSess.submittedAt=ts(activeSess);  activeSess.snapshot={ethMode,ethFields:ethMode==='static'?{ip:v('ethIP'),mask:v('ethMask'),gw:v('ethGW'),dns:v('ethDNS'),altdns:v('ethAltDNS')}:null,fwIP:v('fwIPInp'),fwRules:[...fwRules],cfIP:v('cfIPInp'),cfRules:[...cfRules],advState:{...advState},fixedCount:activeSess.fixedCount,vpuLooked:vpuLinked,swRemoved:swInstalled.filter(p=>!p.installed).map(p=>p.name),swRemaining:swInstalled.filter(p=>p.installed).map(p=>p.name)};log('SUBMITTED','lb-ok','Case study submitted.');try{localStorage.removeItem('rs_active_name');}catch(e){}document.getElementById('completeWrap').style.display='none';document.getElementById('completeDone').style.display='block';setTimeout(()=>{S={...DS};ethMode='dhcp';fwIPLocked=false;fwRules=[];cfIPLocked=false;cfRules=[];vpuLinked=false;resetAdvState();activeSess=null;pendingCandAtt=[];document.getElementById('completeWrap').style.display='block';document.getElementById('completeDone').style.display='none';document.getElementById('sbCand').style.display='none';document.getElementById('sbName').textContent='—';document.getElementById('sbAdmin').style.display='none';document.getElementById('csCandLabel').textContent='';document.getElementById('emailThread').innerHTML='';document.getElementById('emailReply').value='';document.getElementById('emailAttachBar').innerHTML='';document.getElementById('ebadge').style.display='none';try{localStorage.removeItem('rs_active_name');}catch(e){}resetFwState();renderAdv();refresh();nav('case',document.getElementById('nav-case'));document.getElementById('spName').value='';document.getElementById('spPw').value='';document.getElementById('spPwWrap').style.display='none';document.getElementById('spErr').textContent='';showSplash(true);},3000);}
 function switchUser(){if(!confirm('Switch user? Your current progress has been saved.'))return;persist();stopCandidatePoll();try{localStorage.removeItem('rs_active_name');}catch(e){}activeSess=null;document.getElementById('sbCand').style.display='none';document.getElementById('sbName').textContent='—';document.getElementById('sbAdmin').style.display='none';document.getElementById('csCandLabel').textContent='';document.getElementById('emailThread').innerHTML='';document.getElementById('emailReply').value='';document.getElementById('emailAttachBar').innerHTML='';document.getElementById('ebadge').style.display='none';document.getElementById('completeWrap').style.display='block';document.getElementById('completeDone').style.display='none';resetFwState();renderAdv();refresh();document.getElementById('spName').value='';document.getElementById('spPw').value='';document.getElementById('spPwWrap').style.display='none';document.getElementById('spErr').textContent='';nav('case',document.getElementById('nav-case'));showSplash(true);}
 
 function nav(name,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');if(el)el.classList.add('active');if(name==='email')renderEmailThread();if(name==='admin'&&adminUnlocked){document.getElementById('adminLock').style.display='none';document.getElementById('adminContent').className='admin-content show';pollAdmin();renderSessions();refreshAdmin();startPoll();}}
@@ -171,26 +171,23 @@ function saveCfRules(){log('SAVED','lb-ok','Content filter saved — '+cfRules.l
 
 // ══ SOFTWARE MANAGER ══
 const SW_PROGRAMS=[
-  {name:'Pixellot EngineeringStation',pub:'Pixellot Ltd.',ver:'5.21.8',size:'1.2 GB',legit:true,critical:true},
-  {name:'Pixellot Streaming Engine',pub:'Pixellot Ltd.',ver:'5.21.8',size:'890 MB',legit:true,critical:true},
-  {name:'Pixellot Camera Driver Pack',pub:'Pixellot Ltd.',ver:'3.4.1',size:'245 MB',legit:true,critical:true},
-  {name:'SportzCast ScoreBot',pub:'SportzCast Inc.',ver:'4.7.2',size:'156 MB',legit:true,critical:true},
-  {name:'LogMeIn Remote Access',pub:'GoTo Technologies',ver:'4.1.0.14316',size:'198 MB',legit:true,critical:true},
-  {name:'Canopy Agent',pub:'Canopy Manage LLC',ver:'2.8.5',size:'87 MB',legit:true,critical:true},
-  {name:'Google Chrome',pub:'Google LLC',ver:'124.0.6367.91',size:'312 MB',legit:true,critical:false},
-  {name:'Intel(R) Network Connections',pub:'Intel Corporation',ver:'28.1.1',size:'76 MB',legit:true,critical:true},
-  {name:'NVIDIA Graphics Driver 531.61',pub:'NVIDIA Corporation',ver:'531.61',size:'645 MB',legit:true,critical:true},
-  {name:'Microsoft Visual C++ 2015-2022 Redistributable',pub:'Microsoft Corporation',ver:'14.38.33130.0',size:'24 MB',legit:true,critical:true},
-  {name:'Zixi Broadcaster',pub:'Zixi LLC',ver:'16.4.44243',size:'112 MB',legit:true,critical:true},
-  {name:'Windows Defender (Managed)',pub:'Microsoft Corporation',ver:'4.18.23110.3',size:'N/A',legit:true,critical:true},
-  {name:'Norton 360 Deluxe',pub:'Gen Digital Inc.',ver:'22.24.2.16',size:'1.8 GB',legit:false,problem:'Third-party antivirus — can block Pixellot services and streaming connections. Windows Defender is the pre-configured AV for this system.'},
-  {name:'Roblox Player',pub:'Roblox Corporation',ver:'0.617.0.6170644',size:'742 MB',legit:false,problem:'Gaming application — unauthorized software. Uses significant bandwidth and system resources.'},
-  {name:'TeamViewer',pub:'TeamViewer SE',ver:'15.51.6',size:'267 MB',legit:false,problem:'Unauthorized remote access tool — conflicts with LogMeIn and may expose the VPU to unauthorized access.'},
-  {name:'Spotify',pub:'Spotify AB',ver:'1.2.30.1135',size:'389 MB',legit:false,problem:'Media streaming application — unauthorized software. Consumes bandwidth and may interfere with streaming.'},
-  {name:'McAfee Total Protection',pub:'McAfee LLC',ver:'16.0 R52',size:'2.1 GB',legit:false,problem:'Third-party antivirus — can block Pixellot services, quarantine system files, and interfere with streaming connections.'},
-  {name:'Minecraft Launcher',pub:'Mojang Studios',ver:'1.6.28',size:'485 MB',legit:false,problem:'Gaming application — unauthorized software. Uses significant system resources and bandwidth.'},
-  {name:'Dropbox',pub:'Dropbox Inc.',ver:'196.3.5644',size:'523 MB',legit:false,problem:'Cloud sync application — unauthorized software. Constant background syncing consumes bandwidth and disk I/O.'},
-  {name:'Zoom Workplace',pub:'Zoom Video Communications',ver:'6.0.10',size:'298 MB',legit:false,problem:'Video conferencing application — unauthorized software. Can claim camera/audio resources.'}
+  {name:'Canopy Leaf',pub:'Canopy Manage LLC',ver:'2.8.5',size:'87 MB'},
+  {name:'Dropbox',pub:'Dropbox Inc.',ver:'196.3.5644',size:'523 MB'},
+  {name:'Google Chrome',pub:'Google LLC',ver:'124.0.6367.91',size:'312 MB'},
+  {name:'Intel(R) Network Connections',pub:'Intel Corporation',ver:'28.1.1',size:'76 MB'},
+  {name:'LogMeIn Remote Access',pub:'GoTo Technologies',ver:'4.1.0.14316',size:'198 MB'},
+  {name:'McAfee Total Protection',pub:'McAfee LLC',ver:'16.0 R52',size:'2.1 GB'},
+  {name:'Microsoft Visual C++ 2015-2022',pub:'Microsoft Corporation',ver:'14.38.33130.0',size:'24 MB'},
+  {name:'Minecraft Launcher',pub:'Mojang Studios',ver:'1.6.28',size:'485 MB'},
+  {name:'Norton 360 Deluxe',pub:'Gen Digital Inc.',ver:'22.24.2.16',size:'1.8 GB'},
+  {name:'NVIDIA Graphics Driver',pub:'NVIDIA Corporation',ver:'531.61',size:'645 MB'},
+  {name:'Pixellot EngineeringStation',pub:'Pixellot Ltd.',ver:'5.21.8',size:'1.2 GB'},
+  {name:'Roblox Player',pub:'Roblox Corporation',ver:'0.617.0.6170644',size:'742 MB'},
+  {name:'SportzCast Scoreconnect',pub:'SportzCast Inc.',ver:'4.7.2',size:'156 MB'},
+  {name:'Spotify',pub:'Spotify AB',ver:'1.2.30.1135',size:'389 MB'},
+  {name:'TeamViewer',pub:'TeamViewer SE',ver:'15.51.6',size:'267 MB'},
+  {name:'Windows Defender',pub:'Microsoft Corporation',ver:'4.18.23110.3',size:'N/A'},
+  {name:'Zoom Workplace',pub:'Zoom Video Communications',ver:'6.0.10',size:'298 MB'}
 ];
 let swInstalled=[];
 function initSoftware(){swInstalled=SW_PROGRAMS.map((p,i)=>({...p,id:i,installed:true}));}
@@ -201,24 +198,14 @@ function renderSoftware(){
   cnt.textContent=installed.length+' programs';
   if(!installed.length){el.innerHTML='<div class="tbl-empty">No programs installed.</div>';return;}
   el.innerHTML='<div class="sw-th"><span>Program</span><span>Publisher</span><span>Version</span><span>Size</span><span></span></div>'+
-    installed.map(p=>{
-      let nameHtml='<span class="sw-name">'+p.name+'</span>';
-      if(!p.legit)nameHtml+=' <span class="sw-flag sw-flag-warn">⚠ Unauthorized</span>';
-      else if(p.critical)nameHtml+=' <span class="sw-flag sw-flag-ok">System</span>';
-      let actionHtml='';
-      if(p.critical)actionHtml='<span style="font-size:10px;color:var(--t3);">Protected</span>';
-      else actionHtml='<button class="btn-uninstall" onclick="uninstallSw('+p.id+')">Uninstall</button>';
-      return'<div class="sw-row">'+nameHtml+'<span class="sw-pub">'+p.pub+'</span><span class="sw-ver">'+p.ver+'</span><span class="sw-size">'+p.size+'</span><div style="text-align:center;">'+actionHtml+'</div></div>';
-    }).join('');
+    installed.map(p=>'<div class="sw-row"><span class="sw-name">'+p.name+'</span><span class="sw-pub">'+p.pub+'</span><span class="sw-ver">'+p.ver+'</span><span class="sw-size">'+p.size+'</span><div style="text-align:center;"><button class="btn-uninstall" onclick="uninstallSw('+p.id+')">Uninstall</button></div></div>').join('');
 }
 function uninstallSw(id){
   const p=swInstalled.find(x=>x.id===id);
   if(!p||!p.installed)return;
-  if(p.critical){return;}
   if(!confirm('Uninstall "'+p.name+'"? This action cannot be undone.'))return;
   p.installed=false;
-  if(p.legit)log('⚠ UNINSTALL','lb-bad','Uninstalled legitimate program: <strong>'+p.name+'</strong>');
-  else log('UNINSTALL','lb-ok','Removed unauthorized software: <strong>'+p.name+'</strong>');
+  log('UNINSTALL','lb-info','Uninstalled: <strong>'+p.name+'</strong>');
   renderSoftware();persist();
 }
 
