@@ -71,7 +71,10 @@ body{font-family:'Segoe UI',sans-serif;background:#0c0c0c;color:#e2e8f0;min-heig
 
 <!-- REMOTESHIELD -->
 <div class="page" id="page-fw">
-<div class="fw-hdr"><div class="fw-logo">🔒 RemoteShield <span>FW-2000</span></div><span class="fw-build">Alpha-Build v0.18</span></div>
+<div class="fw-hdr" style="flex-direction:column;align-items:center;padding:20px;gap:8px;">
+<div class="fw-logo" style="font-size:18px;display:flex;align-items:center;gap:8px;">🔒 RemoteShield <span style="font-size:12px;color:var(--t2);font-weight:400;margin-left:4px;">FW-2000</span></div>
+<div style="display:flex;align-items:center;gap:10px;"><span class="fw-build">Alpha-Build v0.18</span><span style="font-size:10px;color:var(--t3);border-left:1px solid var(--border);padding-left:10px;">Remote Firewall & Network Management</span></div>
+</div>
 <div class="sbanner" id="fwBanner"><span style="font-size:22px;">✅</span><div><strong style="color:#4ade80;">All settings applied — VPU is ONLINE</strong><div style="font-size:12px;color:#86efac;margin-top:2px;">PlayOn High School is ready to stream.</div></div></div>
 <div class="itabs"><div class="itab active" id="itnav-dash" onclick="itab('dash',this)">Dashboard</div><div class="itab itab-locked" id="itnav-eth" onclick="itabGuard()">Ethernet Settings</div><div class="itab itab-locked" id="itnav-fw" onclick="itabGuard()">Firewall Policies</div><div class="itab itab-locked" id="itnav-cf" onclick="itabGuard()">Content Filter</div><div class="itab itab-locked" id="itnav-sw" onclick="itabGuard()">Software Manager</div><div class="itab itab-locked" id="itnav-adv" onclick="itabGuard()">Advanced Settings</div></div>
 <div class="itab-pane active" id="it-dash"><div id="vpuLookupWrap" class="vpu-lookup"><h3>RemoteShield Link</h3><p>Enter a System Name or System ID to establish a RemoteShield Link.</p><div class="lookup-row"><input class="inp mono" id="vpuInp" type="text" maxlength="60" style="flex:1;" onkeydown="if(event.key==='Enter')doLink()"/><button class="btn btn-red" onclick="doLink()">Link</button></div><div class="lookup-err" id="vpuErr"></div></div>
