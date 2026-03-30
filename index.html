@@ -1509,11 +1509,25 @@ async function persistSession(sess) {
 
 async function loadState() {
   try {
+    // Only restore if THIS browser had an active session
+    let activeName = null;
+    try { activeName = localStorage.getItem('rs_active_name'); } catch(e) {}
+    if (!activeName) return; // No active session on this browser — show splash
+
     const res = await fetch('/api/sessions'); if (!res.ok) return;
     const loaded = await res.json(); if (!Array.isArray(loaded) || !loaded.length) return;
-    sessions = loaded; activeSess = sessions[sessions.length - 1]; viewSess = activeSess;
-    if (!activeSess) return;
-    restoreSession(activeSess); startCandidatePoll();
+    sessions = loaded;
+
+    // Find the session that belongs to this browser
+    const sess = sessions.find(s => s.name === activeName && !s.submitted);
+    if (!sess) {
+      // Session was submitted or cleared — clean up localStorage
+      try { localStorage.removeItem('rs_active_name'); } catch(e) {}
+      return;
+    }
+
+    activeSess = sess; viewSess = sess;
+    restoreSession(sess); startCandidatePoll();
   } catch(e) {}
 }
 
