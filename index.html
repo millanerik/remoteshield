@@ -1892,6 +1892,9 @@ function domainMatch(d,p) { d = d.toLowerCase(); p = p.toLowerCase(); if (p.star
 function isRestricted(domain) { domain = domain.toLowerCase(); return RESTRICTED_DOMAINS.some(rd => domain === rd || domain.endsWith('.' + rd)); }
 function isWhitelisted(domain) { return cfRules.some(r => r.action === 'ALLOW' && domainMatch(domain, r.domain)); }
 function checkDomain(domain) { if (!isRestricted(domain)) return 'allow'; if (isWhitelisted(domain)) return 'allow'; return 'block'; }
+function isNoPing(domain) { domain = domain.toLowerCase(); return NO_PING_DOMAINS.some(d => domain === d || domain.endsWith('.' + d)); }
+function isNoHttp(domain) { domain = domain.toLowerCase(); return NO_HTTP_DOMAINS.some(d => domain === d || domain.endsWith('.' + d)); }
+function hasWildcard(s) { return s.includes('*'); }
 function fakeIP(s) { let h = 0; for (let i = 0; i < s.length; i++) h = ((h<<5)-h) + s.charCodeAt(i); h = Math.abs(h); return (52+(h%48)) + '.' + (((h>>8)&255)) + '.' + (((h>>16)&255)) + '.' + (((h>>24)&127)+1); }
 function isIP(s) { return /^(\d{1,3}\.){3}\d{1,3}$/.test(s); }
 function randMs(a,b) { return a + Math.floor(Math.random()*(b-a+1)); }
@@ -1940,7 +1943,7 @@ function termExec(raw) {
   }
 }
 
-function termHelp() { return ['<span class="term-h">Available Commands:</span>','','  <span class="term-cmd">ipconfig</span>            Display IP configuration','  <span class="term-cmd">ping</span> &lt;host&gt;         Test connectivity','  <span class="term-cmd">nmap</span> &lt;ip&gt;           Scan ports on target','  <span class="term-cmd">nslookup</span> &lt;domain&gt;   DNS lookup','  <span class="term-cmd">curl</span> &lt;url&gt;          Test HTTP/HTTPS connectivity','  <span class="term-cmd">tracert</span> &lt;host&gt;      Trace route','  <span class="term-cmd">netstat</span>             Active connections','  <span class="term-cmd">arp</span>                 ARP table','  <span class="term-cmd">route</span>               Routing table','  <span class="term-cmd">systeminfo</span>          System information','  <span class="term-cmd">whoami</span>              Current user','  <span class="term-cmd">hostname</span>            Hostname','  <span class="term-cmd">clear</span>               Clear terminal',''].join('\n'); }
+function termHelp() { return ['<span class="term-h">Available Commands:</span>','','  <span class="term-cmd">ipconfig</span>            Display IP configuration','  <span class="term-cmd">ping</span> &lt;host&gt;         Test ICMP connectivity','  <span class="term-cmd">nmap</span> &lt;ip&gt;           Scan ports on target','  <span class="term-cmd">nslookup</span> &lt;domain&gt;   DNS lookup (use for broadcast endpoints)','  <span class="term-cmd">curl</span> &lt;url&gt;          Test HTTP/HTTPS connectivity','  <span class="term-cmd">tracert</span> &lt;host&gt;      Trace route','  <span class="term-cmd">netstat</span>             Active connections','  <span class="term-cmd">arp</span>                 ARP table','  <span class="term-cmd">route</span>               Routing table','  <span class="term-cmd">systeminfo</span>          System information','  <span class="term-cmd">whoami</span>              Current user','  <span class="term-cmd">hostname</span>            Hostname','  <span class="term-cmd">clear</span>               Clear terminal','','<span class="term-dim">Note: Use actual hostnames, not wildcards (*.domain).</span>','<span class="term-dim">Some domains are broadcast endpoints and won\'t respond to ping/curl.</span>','<span class="term-dim">Use nslookup to verify DNS resolution for these.</span>',''].join('\n'); }
 
 function termIpconfig() {
   const n = getNet();
@@ -1989,6 +1992,7 @@ function termIpconfig() {
 function termPing(args) {
   if (!args.length) return '<span class="term-err">Usage: ping &lt;host&gt;</span>';
   const target = args[0], n = getNet(), isIp_ = isIP(target);
+  if (hasWildcard(target)) return '<span class="term-err">Ping request could not find host ' + escH(target) + '. Please check the name and try again.</span>\n<span class="term-dim">Wildcards (*.domain) are DNS/firewall notation — use an actual hostname.</span>';
   // No network config = no connectivity
   if (n.dhcp || !n.applied) return 'Pinging ' + (isIp_?target:target) + '…\n\n<span class="term-err">PING: transmit failed. General failure.</span>\n\n<span class="term-dim">' + (n.dhcp ? 'No DHCP server available. Switch to Static IP.' : 'Static IP settings not applied yet.') + '</span>';
   // Local addresses always reachable
@@ -1998,7 +2002,17 @@ function termPing(args) {
   // Camera link-local
   if (target.startsWith('169.254.')) { let l = ['Pinging '+target+' with 32 bytes of data:','']; for(let i=0;i<4;i++) l.push('Reply from '+target+': bytes=32 time='+randMs(1,2)+'ms TTL=64'); l.push(''); l.push('Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)'); return l.join('\n'); }
   let ip = isIp_?target:fakeIP(target), reachable = true;
+  // Restricted and not whitelisted = blocked
   if (!isIp_ && isRestricted(target) && !isWhitelisted(target)) reachable = false;
+  // No-ping domains (Zixi broadcast endpoints) — DNS resolves but ICMP doesn't respond
+  if (!isIp_ && isNoPing(target)) {
+    let l = ['Pinging ' + target + ' [' + ip + '] with 32 bytes of data:',''];
+    for (let i = 0; i < 4; i++) l.push('<span class="term-err">Request timed out.</span>');
+    l.push(''); l.push('Packets: Sent = 4, Received = 0, Lost = 4 (100% loss)');
+    if (isWhitelisted(target)) l.push('\n<span class="term-dim">Note: DNS resolves but host does not respond to ICMP.</span>\n<span class="term-dim">This is a broadcast endpoint — use <span class="term-cmd">nslookup</span> to verify DNS resolution instead.</span>');
+    else l.push('\n<span class="term-warn">** Restricted domain — not whitelisted in content filter.</span>');
+    return l.join('\n');
+  }
   const base = reachable ? [12,25] : [0,0];
   const mult = advState.rate ? 8 : 1;
   let l = ['Pinging '+(isIp_?target:target+' ['+ip+']')+' with 32 bytes of data:',''];
@@ -2041,11 +2055,74 @@ function termNmap(args) {
   return l.join('\n');
 }
 
-function termNslookup(args) { if (!args.length) return '<span class="term-err">Usage: nslookup &lt;domain&gt;</span>'; const domain = args[0].replace(/^https?:\/\//,'').replace(/\/.*/,''), n = getNet(), ip = fakeIP(domain), access = checkDomain(domain); let l = ['Server:  '+n.dns,'Address: '+n.dns+'#53','']; if (access==='allow') { l.push('Non-authoritative answer:'); l.push('Name:    <span class="term-info">'+escH(domain)+'</span>'); l.push('Address: '+ip); if (isRestricted(domain)) l.push('\n<span class="term-ok">✓ Domain is whitelisted in content filter.</span>'); } else { l.push('<span class="term-err">** server can\'t find '+escH(domain)+': REFUSED</span>'); l.push(''); l.push('<span class="term-warn">** Restricted domain — not whitelisted in content filter.</span>'); l.push('<span class="term-dim">Add the appropriate wildcard entry to the Content Filter.</span>'); } return l.join('\n'); }
+function termNslookup(args) {
+  if (!args.length) return '<span class="term-err">Usage: nslookup &lt;domain&gt;</span>';
+  const domain = args[0].replace(/^https?:\/\//,'').replace(/\/.*/,'');
+  if (hasWildcard(domain)) return '<span class="term-err">*** UnKnown can\'t find ' + escH(domain) + ': Non-existent domain</span>\n<span class="term-dim">Wildcards (*.domain) are DNS/firewall notation — query a specific hostname</span>\n<span class="term-dim">instead, e.g. <span class="term-cmd">nslookup stream1.pixellot.stream</span></span>';
+  const n = getNet(), ip = fakeIP(domain), access = checkDomain(domain);
+  let l = ['Server:  '+n.dns,'Address: '+n.dns+'#53',''];
+  if (access==='allow') {
+    l.push('Non-authoritative answer:');
+    l.push('Name:    <span class="term-info">'+escH(domain)+'</span>');
+    l.push('Address: '+ip);
+    if (isRestricted(domain)) l.push('\n<span class="term-ok">✓ Domain is whitelisted in content filter.</span>');
+    if (isNoPing(domain)) l.push('<span class="term-dim">Note: This is a broadcast endpoint — DNS resolves but ICMP/HTTP will not respond.</span>');
+  } else {
+    l.push('<span class="term-err">** server can\'t find '+escH(domain)+': REFUSED</span>');
+    l.push('');
+    l.push('<span class="term-warn">** Restricted domain — not whitelisted in content filter.</span>');
+    l.push('<span class="term-dim">Add the appropriate wildcard entry to the Content Filter.</span>');
+  }
+  return l.join('\n');
+}
 
-function termCurl(args) { if (!args.length) return '<span class="term-err">Usage: curl &lt;url&gt;</span>'; let url = args[0]; if (!url.startsWith('http')) url = 'https://'+url; const isHttps = url.startsWith('https'), domain = url.replace(/^https?:\/\//,'').split('/')[0], access = checkDomain(domain); if (access!=='allow') return '<span class="term-err">curl: (7) Failed to connect to '+escH(domain)+'</span>\n\n<span class="term-warn">** Restricted domain — not whitelisted.</span>'; if (isHttps&&advState.ssl) return '<span class="term-err">curl: (60) SSL certificate problem</span>\n\n<span class="term-warn">⚠ SSL/TLS DPI is intercepting this connection.</span>\n<span class="term-dim">Disable SSL/TLS DPI in Advanced Settings.</span>'; if (isHttps&&advState.certpin) return '<span class="term-err">curl: (60) Certificate subject mismatch</span>\n\n<span class="term-warn">⚠ Certificate Pinning is rejecting this connection.</span>'; let l = ['<span class="term-ok">HTTP/1.1 200 OK</span>','<span class="term-ok">✓ Connection successful</span>']; if (isRestricted(domain)) l.push('<span class="term-ok">✓ Domain whitelisted</span>'); if (advState.rate) l.push('<span class="term-warn">⚠ Rate limited (5 Mbps cap)</span>'); return l.join('\n'); }
+function termCurl(args) {
+  if (!args.length) return '<span class="term-err">Usage: curl &lt;url&gt;</span>';
+  let url = args[0]; if (!url.startsWith('http')) url = 'https://'+url;
+  const isHttps = url.startsWith('https'), domain = url.replace(/^https?:\/\//,'').split('/')[0];
+  if (hasWildcard(domain)) return '<span class="term-err">curl: (6) Could not resolve host: ' + escH(domain) + '</span>\n<span class="term-dim">Wildcards are not valid hostnames. Use a specific subdomain.</span>';
+  const access = checkDomain(domain);
+  if (access!=='allow') return '<span class="term-err">curl: (7) Failed to connect to '+escH(domain)+'</span>\n\n<span class="term-warn">** Restricted domain — not whitelisted.</span>';
+  if (isNoHttp(domain)) return '<span class="term-err">curl: (7) Failed to connect to '+escH(domain)+' port '+(isHttps?'443':'80')+': Connection refused</span>\n\n<span class="term-dim">This host is a broadcast endpoint (Zixi) — it does not serve HTTP/HTTPS.</span>\n<span class="term-dim">DNS resolves, but there is no web server. Use <span class="term-cmd">nslookup</span> to verify DNS.</span>';
+  if (isHttps&&advState.ssl) return '<span class="term-err">curl: (60) SSL certificate problem</span>\n\n<span class="term-warn">⚠ SSL/TLS DPI is intercepting this connection.</span>\n<span class="term-dim">Disable SSL/TLS DPI in Advanced Settings.</span>';
+  if (isHttps&&advState.certpin) return '<span class="term-err">curl: (60) Certificate subject mismatch</span>\n\n<span class="term-warn">⚠ Certificate Pinning is rejecting this connection.</span>';
+  let l = ['<span class="term-ok">HTTP/1.1 200 OK</span>','<span class="term-ok">✓ Connection successful</span>'];
+  if (isRestricted(domain)) l.push('<span class="term-ok">✓ Domain whitelisted</span>');
+  if (advState.rate) l.push('<span class="term-warn">⚠ Rate limited (5 Mbps cap)</span>');
+  return l.join('\n');
+}
 
-function termTracert(args) { if (!args.length) return '<span class="term-err">Usage: tracert &lt;host&gt;</span>'; const target = args[0], isIp_ = isIP(target), ip = isIp_?target:fakeIP(target), n = getNet(), reachable = isIp_||!isRestricted(target)||isWhitelisted(target); let l = ['Tracing route to '+(isIp_?target:target+' ['+ip+']'),'over a maximum of 30 hops:','']; if (reachable) { l.push('  1    <1 ms    <1 ms    <1 ms  '+n.gw); l.push('  2     2 ms     1 ms     2 ms  192.168.1.1'); l.push('  3     8 ms     7 ms     8 ms  10.128.0.1'); l.push('  4    '+randMs(11,14)+' ms    '+randMs(11,14)+' ms    '+randMs(11,14)+' ms  '+ip); l.push(''); l.push('<span class="term-ok">Trace complete.</span>'); } else { l.push('  1    <1 ms    <1 ms    <1 ms  '+n.gw); l.push('  2     *        *        *     Request timed out.'); l.push('  3     *        *        *     Request timed out.'); l.push(''); l.push('<span class="term-err">** Destination unreachable.</span>'); l.push('<span class="term-warn">** Restricted domain — not whitelisted.</span>'); } return l.join('\n'); }
+function termTracert(args) {
+  if (!args.length) return '<span class="term-err">Usage: tracert &lt;host&gt;</span>';
+  const target = args[0];
+  if (hasWildcard(target)) return '<span class="term-err">Unable to resolve target system name ' + escH(target) + '.</span>\n<span class="term-dim">Wildcards are not valid hostnames.</span>';
+  const isIp_ = isIP(target), ip = isIp_?target:fakeIP(target), n = getNet();
+  const reachable = isIp_ || (!isRestricted(target) || isWhitelisted(target));
+  const noPing = !isIp_ && isNoPing(target);
+  let l = ['Tracing route to '+(isIp_?target:target+' ['+ip+']'),'over a maximum of 30 hops:',''];
+  if (reachable && !noPing) {
+    l.push('  1    <1 ms    <1 ms    <1 ms  '+n.gw);
+    l.push('  2     2 ms     1 ms     2 ms  192.168.1.1');
+    l.push('  3     8 ms     7 ms     8 ms  10.128.0.1');
+    l.push('  4    '+randMs(11,14)+' ms    '+randMs(11,14)+' ms    '+randMs(11,14)+' ms  '+ip);
+    l.push(''); l.push('<span class="term-ok">Trace complete.</span>');
+  } else if (reachable && noPing) {
+    l.push('  1    <1 ms    <1 ms    <1 ms  '+n.gw);
+    l.push('  2     2 ms     1 ms     2 ms  192.168.1.1');
+    l.push('  3     8 ms     7 ms     8 ms  10.128.0.1');
+    l.push('  4     *        *        *     Request timed out.');
+    l.push('  5     *        *        *     Request timed out.');
+    l.push(''); l.push('<span class="term-dim">Trace reached upstream network but destination does not respond to ICMP.</span>');
+    l.push('<span class="term-dim">This is a broadcast endpoint — use <span class="term-cmd">nslookup</span> to verify connectivity.</span>');
+  } else {
+    l.push('  1    <1 ms    <1 ms    <1 ms  '+n.gw);
+    l.push('  2     *        *        *     Request timed out.');
+    l.push('  3     *        *        *     Request timed out.');
+    l.push(''); l.push('<span class="term-err">** Destination unreachable.</span>');
+    l.push('<span class="term-warn">** Restricted domain — not whitelisted.</span>');
+  }
+  return l.join('\n');
+}
 
 function termNetstat() {
   const n = getNet(); let l = ['<span class="term-h">Active Connections</span>','','  Proto  Local Address              Foreign Address            State'];
