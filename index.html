@@ -819,6 +819,29 @@ async function launchCandidate(name) {
       const loaded = await res.json();
       if (Array.isArray(loaded)) {
         sessions = loaded;
+
+        // Check for completed session first
+        const completed = sessions.find(s => s.name === name && s.submitted);
+        if (completed) {
+          // Show completed notification on splash
+          showSplash(true);
+          const err = document.getElementById('spErr');
+          err.innerHTML = '';
+          const notice = document.createElement('div');
+          notice.style.cssText = 'margin-top:14px;background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;text-align:center;';
+          const pct = completed.grade ? completed.grade.pct : 0;
+          const pts = completed.grade ? completed.grade.total : 0;
+          const mx = completed.grade ? completed.grade.max : 0;
+          notice.innerHTML = '<div style="font-size:13px;color:var(--t2);margin-bottom:10px;">A completed session for <strong style="color:var(--t1);">' + escH(name) + '</strong> already exists.</div>' +
+            '<div style="font-size:28px;font-weight:700;color:' + (pct>=80?'#4ade80':pct>=60?'#fbbf24':'#f87171') + ';margin-bottom:4px;">' + pct + '%</div>' +
+            '<div style="font-size:11px;color:var(--t3);margin-bottom:12px;">' + pts + ' / ' + mx + ' points — Submitted at ' + (completed.submittedAt||'—') + '</div>' +
+            '<button onclick="showCompletedScorecard(\'' + name.replace(/'/g,"\\'") + '\')" style="background:var(--red);color:#fff;border:none;padding:8px 20px;border-radius:var(--r-md);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-right:8px;">View Grade Report</button>' +
+            '<button onclick="this.parentElement.remove();document.getElementById(\'spErr\').textContent=\'\';" style="background:var(--bg-raised);border:1px solid var(--border-md);color:var(--t2);padding:8px 20px;border-radius:var(--r-md);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Dismiss</button>';
+          err.appendChild(notice);
+          return;
+        }
+
+        // Check for in-progress session
         const existing = sessions.find(s => s.name === name && !s.submitted);
         if (existing) {
           activeSess = existing; viewSess = existing;
@@ -901,6 +924,46 @@ function doComplete() {
     document.getElementById('spErr').textContent = '';
     showSplash(true);
   }, 3000);
+}
+
+function returnToSplash() {
+  S = {...DS}; ethMode = 'dhcp'; staticApplied = false; fwIPLocked = false; fwRules = []; cfIPLocked = false; cfRules = []; vpuLinked = false;
+  resetAdvState(); initSoftware(); activeSess = null; pendingCandAtt = [];
+  document.getElementById('completeWrap').style.display = 'block';
+  document.getElementById('completeDone').style.display = 'none';
+  document.getElementById('sbCand').style.display = 'none';
+  document.getElementById('sbName').textContent = '—';
+  document.getElementById('sbAdmin').style.display = 'none';
+  document.getElementById('csCandLabel').textContent = '';
+  document.getElementById('emailThread').innerHTML = '';
+  document.getElementById('emailReply').value = '';
+  document.getElementById('emailAttachBar').innerHTML = '';
+  document.getElementById('ebadge').style.display = 'none';
+  resetFwState(); renderAdv(); renderSoftware(); refresh(); resetTerminal();
+  nav('case', document.getElementById('nav-case'));
+  document.getElementById('spName').value = '';
+  document.getElementById('spPw').value = '';
+  document.getElementById('spPwWrap').style.display = 'none';
+  document.getElementById('spErr').textContent = '';
+  showSplash(true);
+}
+
+function showCompletedScorecard(name) {
+  const sess = sessions.find(s => s.name === name && s.submitted);
+  if (!sess || !sess.grade) return;
+  showSplash(false);
+  document.getElementById('sbName').textContent = name;
+  document.getElementById('sbCand').style.display = 'block';
+  document.getElementById('sbAdmin').style.display = 'none';
+  document.getElementById('csCandLabel').textContent = 'Candidate: ' + name + ' (Completed)';
+  // Show score on the case study page
+  document.getElementById('completeWrap').style.display = 'none';
+  document.getElementById('completeDone').innerHTML =
+    '<div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:16px;">Grade Report — ' + escH(name) + '</div>' +
+    renderGradeReport(sess.grade) +
+    '<div style="margin-top:20px;"><button onclick="returnToSplash()" style="background:var(--bg-raised);border:1px solid var(--border-md);color:var(--t2);padding:10px 28px;border-radius:var(--r-md);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Return to Start</button></div>';
+  document.getElementById('completeDone').style.display = 'block';
+  nav('case', document.getElementById('nav-case'));
 }
 
 function switchUser() {
