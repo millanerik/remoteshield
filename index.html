@@ -749,6 +749,7 @@ let S = {...DS};
 let ethMode = 'dhcp', fwIPLocked = false, fwRules = [], cfIPLocked = false, cfRules = [], vpuLinked = false;
 let sessions = [], activeSess = null, viewSess = null, adminUnlocked = false;
 let pendingCandAtt = [], pendingAdminAtt = [], adminPollTimer = null, candidatePollTimer = null;
+let staticApplied = false;
 
 // ══════════════════════════════════════
 // HELPERS
@@ -841,7 +842,7 @@ async function launchCandidate(name) {
   document.getElementById('sbCand').style.display = 'block';
   document.getElementById('sbAdmin').style.display = 'none';
   document.getElementById('csCandLabel').textContent = 'Candidate: ' + name;
-  resetFwState(); renderAdv(); renderSoftware(); refresh(); renderEmailThread();
+  resetFwState(); renderAdv(); renderSoftware(); refresh(); renderEmailThread(); resetTerminal();
   activeSess.totalActions++;
   activeSess.log.push({ t: ts(activeSess), badge:'START', cls:'lb-start', msg:'Candidate <strong>' + name + '</strong> started the exercise.' });
   try { localStorage.setItem('rs_active_name', name); } catch(e) {}
@@ -892,7 +893,7 @@ function doComplete() {
     document.getElementById('emailReply').value = '';
     document.getElementById('emailAttachBar').innerHTML = '';
     document.getElementById('ebadge').style.display = 'none';
-    resetFwState(); renderAdv(); renderSoftware(); refresh();
+    resetFwState(); renderAdv(); renderSoftware(); refresh(); resetTerminal();
     nav('case', document.getElementById('nav-case'));
     document.getElementById('spName').value = '';
     document.getElementById('spPw').value = '';
@@ -917,7 +918,7 @@ function switchUser() {
   document.getElementById('ebadge').style.display = 'none';
   document.getElementById('completeWrap').style.display = 'block';
   document.getElementById('completeDone').style.display = 'none';
-  resetFwState(); renderAdv(); renderSoftware(); refresh();
+  resetFwState(); renderAdv(); renderSoftware(); refresh(); resetTerminal();
   document.getElementById('spName').value = '';
   document.getElementById('spPw').value = '';
   document.getElementById('spPwWrap').style.display = 'none';
@@ -1033,6 +1034,7 @@ function renderHardware() {
 // ══════════════════════════════════════
 function setEthMode(mode) {
   ethMode = mode;
+  staticApplied = false;
   document.getElementById('ethDhcpBtn').classList.toggle('active', mode === 'dhcp');
   document.getElementById('ethStaticBtn').classList.toggle('active', mode === 'static');
   document.getElementById('ethDhcpInfo').style.display = mode === 'dhcp' ? 'block' : 'none';
@@ -1051,6 +1053,7 @@ function saveStatic() {
   st.className = 'eth-status ok';
   const [ip,mask,gw,dns,alt] = vals.map(f => f.val);
   st.textContent = `✓ Saved — IP: ${ip}, Mask: ${mask}, GW: ${gw}, DNS: ${dns}, Alt: ${alt}`;
+  staticApplied = true;
   log('APPLIED','lb-eth',`Static IP — IP: ${ip} Mask: ${mask} GW: ${gw} DNS: ${dns} Alt: ${alt}`); persist();
 }
 
@@ -1202,7 +1205,7 @@ ADV.forEach(s => { advState[s.id] = s.startOn; });
 function resetAdvState() { ADV.forEach(s => { advState[s.id] = s.startOn; }); }
 
 function resetFwState() {
-  S = {...DS}; ethMode = 'dhcp'; fwIPLocked = false; fwRules = []; cfIPLocked = false; cfRules = []; vpuLinked = false;
+  S = {...DS}; ethMode = 'dhcp'; staticApplied = false; fwIPLocked = false; fwRules = []; cfIPLocked = false; cfRules = []; vpuLinked = false;
   resetAdvState(); initSoftware();
   document.getElementById('fwIPCard').style.display = 'block'; document.getElementById('fwBuilder').style.display = 'none'; if (document.getElementById('fwIPInp')) document.getElementById('fwIPInp').value = '';
   document.getElementById('cfIPCard').style.display = 'block'; document.getElementById('cfBuilder').style.display = 'none'; if (document.getElementById('cfIPInp')) document.getElementById('cfIPInp').value = '';
@@ -1494,6 +1497,7 @@ async function persist() {
   activeSess.savedVpuLinked = vpuLinked; activeSess.savedFwIPLocked = fwIPLocked; activeSess.savedFwIP = v('fwIPInp');
   activeSess.savedCfIPLocked = cfIPLocked; activeSess.savedCfIP = v('cfIPInp');
   activeSess.savedStaticFields = { ip:v('ethIP'), mask:v('ethMask'), gw:v('ethGW'), dns:v('ethDNS'), altdns:v('ethAltDNS') };
+  activeSess.savedStaticApplied = staticApplied;
   activeSess.savedSwInstalled = swInstalled.map(p => ({id:p.id, installed:p.installed}));
   const san = JSON.parse(JSON.stringify(activeSess));
   if (san.emails) san.emails = san.emails.map(m => ({...m, attachments: (m.attachments||[]).map(a => ({name:a.name,type:a.type,id:a.id,size:a.size}))}));
@@ -1550,6 +1554,7 @@ function restoreSession(sess) {
   if (sess.savedFwIPLocked) { fwIPLocked = true; document.getElementById('fwIPCard').style.display = 'none'; document.getElementById('fwBuilder').style.display = 'block'; document.getElementById('fwIPDisp').textContent = sess.savedFwIP||''; if (document.getElementById('fwIPInp')) document.getElementById('fwIPInp').value = sess.savedFwIP||''; renderFwRules(); }
   if (sess.savedCfIPLocked) { cfIPLocked = true; document.getElementById('cfIPCard').style.display = 'none'; document.getElementById('cfBuilder').style.display = 'block'; document.getElementById('cfIPDisp').textContent = sess.savedCfIP||''; if (document.getElementById('cfIPInp')) document.getElementById('cfIPInp').value = sess.savedCfIP||''; renderCfRules(); }
   if (sess.savedEthMode) setEthMode(sess.savedEthMode);
+  if (sess.savedStaticApplied) staticApplied = true;
   if (sess.savedStaticFields && sess.savedEthMode === 'static') { const f = sess.savedStaticFields; ['ethIP','ethMask','ethGW','ethDNS','ethAltDNS'].forEach((id,i) => { const el = document.getElementById(id); if (el) el.value = [f.ip,f.mask,f.gw,f.dns,f.altdns][i]||''; }); }
   renderAdv(); renderSoftware(); refresh(); renderEmailThread(); updateBadge();
 }
@@ -1598,7 +1603,23 @@ let termHistory = [], termHistIdx = -1;
 const DHCP_NET = { ip:'10.0.1.50', mask:'255.255.255.0', gw:'10.0.1.1', dns:'10.0.1.1', altdns:'8.8.8.8' };
 const RESTRICTED_DOMAINS = ['nfhsnetwork.com','pixellot.stream','pixellot.tv','sportzcast.net','app.singular.live','balena-cloud.com','logmein.com','gocanopy.io','s3.amazonaws.com'];
 
-function getNet() { if (ethMode === 'static') return { ip:v('ethIP')||DHCP_NET.ip, mask:v('ethMask')||DHCP_NET.mask, gw:v('ethGW')||DHCP_NET.gw, dns:v('ethDNS')||DHCP_NET.dns, altdns:v('ethAltDNS')||DHCP_NET.altdns, dhcp:false }; return {...DHCP_NET, dhcp:true}; }
+function resetTerminal() {
+  termHistory = []; termHistIdx = -1;
+  const el = document.getElementById('termOutput');
+  if (el) el.innerHTML = '<span class="term-dim">RemoteShield Terminal v0.18</span>\n<span class="term-dim">Type <span class="term-cmd">help</span> for a list of available commands.</span>\n<span class="term-dim">────────────────────────────────────────────────────</span>\n';
+  const inp = document.getElementById('termInput');
+  if (inp) inp.value = '';
+}
+
+function getNet() {
+  if (ethMode === 'static' && staticApplied) {
+    return { ip: v('ethIP')||'', mask: v('ethMask')||'', gw: v('ethGW')||'', dns: v('ethDNS')||'', altdns: v('ethAltDNS')||'', dhcp: false, applied: true };
+  }
+  if (ethMode === 'static' && !staticApplied) {
+    return { ip:'', mask:'', gw:'', dns:'', altdns:'', dhcp: false, applied: false };
+  }
+  return { ...DHCP_NET, dhcp: true, applied: false };
+}
 function domainMatch(d,p) { d = d.toLowerCase(); p = p.toLowerCase(); if (p.startsWith('*.')) return d === p.slice(2) || d.endsWith(p.slice(1)); return d === p; }
 function isRestricted(domain) { domain = domain.toLowerCase(); return RESTRICTED_DOMAINS.some(rd => domain === rd || domain.endsWith('.' + rd)); }
 function isWhitelisted(domain) { return cfRules.some(r => r.action === 'ALLOW' && domainMatch(domain, r.domain)); }
@@ -1627,6 +1648,12 @@ function handleTermKey(e) {
 function termExec(raw) {
   const parts = raw.split(/\s+/), cmd = parts[0].toLowerCase(), args = parts.slice(1);
   if (!vpuLinked && !['help','clear','cls'].includes(cmd)) return '<span class="term-err">Error: No RemoteShield connection established.</span>\n<span class="term-dim">Link a VPU from the Dashboard first.</span>';
+  const netCmds = ['nslookup','dig','curl','wget','tracert','traceroute','netstat','nmap'];
+  if (netCmds.includes(cmd)) {
+    const n = getNet();
+    if (n.dhcp) return '<span class="term-err">Error: No network connectivity.</span>\n<span class="term-dim">No DHCP server available on this VLAN. Switch to Static IP and apply settings.</span>';
+    if (!n.applied && ethMode === 'static') return '<span class="term-err">Error: No network connectivity.</span>\n<span class="term-dim">Static IP mode is selected but settings have not been applied yet.</span>';
+  }
   switch(cmd) {
     case 'help': return termHelp();
     case 'ipconfig': case 'ifconfig': return termIpconfig();
@@ -1647,9 +1674,74 @@ function termExec(raw) {
 
 function termHelp() { return ['<span class="term-h">Available Commands:</span>','','  <span class="term-cmd">ipconfig</span>            Display IP configuration','  <span class="term-cmd">ping</span> &lt;host&gt;         Test connectivity','  <span class="term-cmd">nmap</span> &lt;ip&gt;           Scan ports on target','  <span class="term-cmd">nslookup</span> &lt;domain&gt;   DNS lookup','  <span class="term-cmd">curl</span> &lt;url&gt;          Test HTTP/HTTPS connectivity','  <span class="term-cmd">tracert</span> &lt;host&gt;      Trace route','  <span class="term-cmd">netstat</span>             Active connections','  <span class="term-cmd">arp</span>                 ARP table','  <span class="term-cmd">route</span>               Routing table','  <span class="term-cmd">systeminfo</span>          System information','  <span class="term-cmd">whoami</span>              Current user','  <span class="term-cmd">hostname</span>            Hostname','  <span class="term-cmd">clear</span>               Clear terminal',''].join('\n'); }
 
-function termIpconfig() { const n = getNet(); const l = ['<span class="term-h">Windows IP Configuration</span>','','   Host Name . . . . . . . . . . . . : PXLS2_5215','   Primary DNS Suffix  . . . . . . . : playon.local','','<span class="term-h">Ethernet adapter Ethernet0:</span>','','   DHCP Enabled . . . . . . . . . . . : '+(n.dhcp?'<span class="term-ok">Yes</span>':'<span class="term-warn">No</span>'),'   IPv4 Address . . . . . . . . . . . : <span class="term-info">'+n.ip+'</span>','   Subnet Mask  . . . . . . . . . . . : '+n.mask,'   Default Gateway  . . . . . . . . . : '+n.gw,'   DNS Servers  . . . . . . . . . . . : '+n.dns]; if (n.altdns&&n.altdns!==n.dns) l.push('                                       '+n.altdns); l.push('   Physical Address . . . . . . . . . : 9C-7B-EF-4D-96-9D'); if (advState.rate) l.push('\n<span class="term-warn">⚠ Rate Limiting ACTIVE (5 Mbps cap)</span>'); if (advState.sleep) l.push('<span class="term-warn">⚠ Internet Sleep Schedule ACTIVE (10PM–6AM)</span>'); if (advState.ssl) l.push('<span class="term-warn">⚠ SSL/TLS Deep Packet Inspection ACTIVE</span>'); return l.join('\n'); }
+function termIpconfig() {
+  const n = getNet();
+  let l = ['<span class="term-h">Windows IP Configuration</span>','','   Host Name . . . . . . . . . . . . : PXLS2_5215','   Primary DNS Suffix  . . . . . . . : playon.local','','<span class="term-h">Ethernet adapter Ethernet0:</span>',''];
 
-function termPing(args) { if (!args.length) return '<span class="term-err">Usage: ping &lt;host&gt;</span>'; const target = args[0], n = getNet(), isIp_ = isIP(target); let ip = isIp_?target:fakeIP(target), reachable = true; if (!isIp_&&isRestricted(target)&&!isWhitelisted(target)) reachable = false; if (target===n.ip||target===n.gw||target==='127.0.0.1'||target==='localhost'||target.startsWith('169.254.')) reachable = true; const base = reachable?(isIp_||target===n.gw||target.startsWith('169.254.')?[1,3]:[12,25]):[0,0]; const mult = advState.rate?8:1; let l = ['Pinging '+(isIp_?target:target+' ['+ip+']')+' with 32 bytes of data:','']; let sent = 4, recv = 0; for (let i = 0; i < 4; i++) { if (reachable) { const ms = randMs(base[0],base[1])*mult; l.push('Reply from '+ip+': bytes=32 time'+(ms<1?'<1':('='+ms))+'ms TTL=64'); recv++; } else l.push('<span class="term-err">Request timed out.</span>'); } l.push(''); l.push('Ping statistics for '+ip+':'); l.push('    Packets: Sent = '+sent+', Received = '+recv+', Lost = '+(sent-recv)+' ('+Math.round((sent-recv)/sent*100)+'% loss)'); if (recv>0) { const ms = randMs(base[0],base[1])*mult; l.push('    Min = '+Math.max(0,ms-1)+'ms, Max = '+(ms+2)+'ms, Avg = '+ms+'ms'); } if (!reachable&&!isIp_) l.push('\n<span class="term-warn">** Restricted domain — not whitelisted in content filter.</span>'); if (advState.rate&&reachable&&!target.startsWith('169.254.')) l.push('\n<span class="term-warn">⚠ High latency — Rate Limiting active.</span>'); return l.join('\n'); }
+  if (n.dhcp) {
+    // DHCP mode — no server on this VLAN
+    l.push('   DHCP Enabled . . . . . . . . . . . : <span class="term-ok">Yes</span>');
+    l.push('   <span class="term-warn">Autoconfiguration IPv4 Address  . : 169.254.'+Math.floor(Math.random()*254+1)+'.'+Math.floor(Math.random()*254+1)+'</span>');
+    l.push('   Subnet Mask  . . . . . . . . . . . : 255.255.0.0');
+    l.push('   Default Gateway  . . . . . . . . . : ');
+    l.push('   DNS Servers  . . . . . . . . . . . : ');
+    l.push('');
+    l.push('<span class="term-err">⚠ No DHCP server found. Adapter has auto-configured a link-local address.</span>');
+    l.push('<span class="term-dim">The system cannot reach the network in this state.</span>');
+    l.push('<span class="term-dim">Consider switching to Static IP mode and applying valid settings.</span>');
+  } else if (!n.applied) {
+    // Static mode selected but not yet applied
+    l.push('   DHCP Enabled . . . . . . . . . . . : <span class="term-warn">No</span>');
+    l.push('   IPv4 Address . . . . . . . . . . . : <span class="term-err">Not configured</span>');
+    l.push('   Subnet Mask  . . . . . . . . . . . : <span class="term-err">Not configured</span>');
+    l.push('   Default Gateway  . . . . . . . . . : <span class="term-err">Not configured</span>');
+    l.push('   DNS Servers  . . . . . . . . . . . : <span class="term-err">Not configured</span>');
+    l.push('');
+    l.push('<span class="term-err">⚠ Static IP mode is selected but no settings have been applied.</span>');
+    l.push('<span class="term-dim">Enter IP settings in Ethernet Settings and click Apply.</span>');
+  } else {
+    // Static mode with applied settings
+    l.push('   DHCP Enabled . . . . . . . . . . . : <span class="term-warn">No</span>');
+    l.push('   IPv4 Address . . . . . . . . . . . : <span class="term-info">' + n.ip + '</span>');
+    l.push('   Subnet Mask  . . . . . . . . . . . : ' + n.mask);
+    l.push('   Default Gateway  . . . . . . . . . : ' + n.gw);
+    l.push('   DNS Servers  . . . . . . . . . . . : ' + n.dns);
+    if (n.altdns && n.altdns !== n.dns) l.push('                                       ' + n.altdns);
+  }
+
+  l.push('   Physical Address . . . . . . . . . : 9C-7B-EF-4D-96-9D');
+
+  if (advState.rate) l.push('\n<span class="term-warn">⚠ Rate Limiting ACTIVE (5 Mbps cap)</span>');
+  if (advState.sleep) l.push('<span class="term-warn">⚠ Internet Sleep Schedule ACTIVE (10PM–6AM)</span>');
+  if (advState.ssl) l.push('<span class="term-warn">⚠ SSL/TLS Deep Packet Inspection ACTIVE</span>');
+
+  return l.join('\n');
+}
+
+function termPing(args) {
+  if (!args.length) return '<span class="term-err">Usage: ping &lt;host&gt;</span>';
+  const target = args[0], n = getNet(), isIp_ = isIP(target);
+  // No network config = no connectivity
+  if (n.dhcp || !n.applied) return 'Pinging ' + (isIp_?target:target) + '…\n\n<span class="term-err">PING: transmit failed. General failure.</span>\n\n<span class="term-dim">' + (n.dhcp ? 'No DHCP server available. Switch to Static IP.' : 'Static IP settings not applied yet.') + '</span>';
+  // Local addresses always reachable
+  if (target===n.ip||target==='127.0.0.1'||target==='localhost') { let l = ['Pinging '+target+' with 32 bytes of data:','']; for(let i=0;i<4;i++) l.push('Reply from '+target+': bytes=32 time<1ms TTL=128'); l.push(''); l.push('Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)'); return l.join('\n'); }
+  // Gateway ping
+  if (target===n.gw) { let l = ['Pinging '+target+' with 32 bytes of data:','']; for(let i=0;i<4;i++) l.push('Reply from '+target+': bytes=32 time='+randMs(1,3)+'ms TTL=64'); l.push(''); l.push('Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)'); return l.join('\n'); }
+  // Camera link-local
+  if (target.startsWith('169.254.')) { let l = ['Pinging '+target+' with 32 bytes of data:','']; for(let i=0;i<4;i++) l.push('Reply from '+target+': bytes=32 time='+randMs(1,2)+'ms TTL=64'); l.push(''); l.push('Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)'); return l.join('\n'); }
+  let ip = isIp_?target:fakeIP(target), reachable = true;
+  if (!isIp_ && isRestricted(target) && !isWhitelisted(target)) reachable = false;
+  const base = reachable ? [12,25] : [0,0];
+  const mult = advState.rate ? 8 : 1;
+  let l = ['Pinging '+(isIp_?target:target+' ['+ip+']')+' with 32 bytes of data:',''];
+  let sent = 4, recv = 0;
+  for (let i = 0; i < 4; i++) { if (reachable) { const ms = randMs(base[0],base[1])*mult; l.push('Reply from '+ip+': bytes=32 time='+ms+'ms TTL=64'); recv++; } else l.push('<span class="term-err">Request timed out.</span>'); }
+  l.push(''); l.push('Packets: Sent = '+sent+', Received = '+recv+', Lost = '+(sent-recv)+' ('+ Math.round((sent-recv)/sent*100)+'% loss)');
+  if (recv > 0) { const ms = randMs(base[0],base[1])*mult; l.push('    Min = '+Math.max(0,ms-1)+'ms, Max = '+(ms+2)+'ms, Avg = '+ms+'ms'); }
+  if (!reachable && !isIp_) l.push('\n<span class="term-warn">** Restricted domain — not whitelisted in content filter.</span>');
+  if (advState.rate && reachable) l.push('\n<span class="term-warn">⚠ High latency — Rate Limiting active.</span>');
+  return l.join('\n');
+}
 
 function termNmap(args) { if (!args.length) return '<span class="term-err">Usage: nmap &lt;target IP&gt;</span>'; const target = args[0]; if (!isIP(target)) return '<span class="term-err">Invalid target. Specify an IP.</span>'; const fwTarget = v('fwIPInp'), isTarget = target===fwTarget||target===getNet().ip; let l = ['<span class="term-dim">Starting Nmap 7.94</span>','Nmap scan report for '+target,'','PORT         STATE      SERVICE']; const defaults = [{p:'22',pr:'tcp',svc:'ssh'},{p:'80',pr:'tcp',svc:'http'},{p:'443',pr:'tcp',svc:'https'},{p:'443',pr:'udp',svc:'https'},{p:'2088',pr:'udp',svc:'zixi-transport'},{p:'8080',pr:'tcp',svc:'http-proxy'},{p:'554',pr:'tcp',svc:'rtsp'}]; const shown = new Set(); if (isTarget) { fwRules.forEach(r => { const protos = r.proto==='TCP+UDP'?['tcp','udp']:[r.proto.toLowerCase()]; protos.forEach(p => { const k = r.port+'/'+p; if (!shown.has(k)) { shown.add(k); const state = r.action==='ALLOW'?'<span class="term-ok">open</span>    ':'<span class="term-err">filtered</span>'; const svc = r.purpose||defaults.find(d=>d.p===r.port&&d.pr===p)?.svc||'unknown'; const pad = ' '.repeat(Math.max(1,13-r.port.length-p.length-1)); l.push('  '+r.port+'/'+p+pad+state+'  '+svc); } }); }); } defaults.forEach(d => { const k = d.p+'/'+d.pr; if (!shown.has(k)) { shown.add(k); const pad = ' '.repeat(Math.max(1,13-d.p.length-d.pr.length-1)); l.push('  '+d.p+'/'+d.pr+pad+'<span class="term-dim">closed</span>   '+d.svc); } }); l.push(''); l.push('<span class="term-dim">Nmap done: 1 IP address (1 host up)</span>'); return l.join('\n'); }
 
@@ -1661,11 +1753,31 @@ function termTracert(args) { if (!args.length) return '<span class="term-err">Us
 
 function termNetstat() { const n = getNet(); let l = ['<span class="term-h">Active Connections</span>','','  Proto  Local Address              Foreign Address            State']; l.push('  TCP    '+n.ip+':49152          169.254.16.51:554          ESTABLISHED'); l.push('  TCP    '+n.ip+':49153          169.254.16.50:554          ESTABLISHED'); const has443 = fwRules.some(r=>r.port==='443'&&r.action==='ALLOW'), has2088 = fwRules.some(r=>r.port==='2088'&&r.action==='ALLOW'), hasPx = cfRules.some(r=>r.action==='ALLOW'&&r.domain.toLowerCase().includes('pixellot')), hasBal = cfRules.some(r=>r.action==='ALLOW'&&r.domain.toLowerCase().includes('balena')); if (has443&&hasPx&&!advState.ssl) l.push('  UDP    '+n.ip+':443             52.84.125.42:443           ESTABLISHED'); if (has2088&&hasPx&&!advState.ssl) l.push('  UDP    '+n.ip+':2088            52.84.125.42:2088          ESTABLISHED'); if (hasBal) l.push('  TCP    '+n.ip+':49200          13.52.87.140:443           ESTABLISHED'); if (advState.ssl) l.push('  TCP    '+n.ip+':8443           '+n.gw+':3129              ESTABLISHED  <span class="term-dim">[DPI Proxy]</span>'); return l.join('\n'); }
 
-function termArp() { const n = getNet(); return ['Interface: '+n.ip+' --- 0x3','  Internet Address      Physical Address       Type','  '+n.gw+'              00-1a-2b-3c-4d-5e     dynamic','  169.254.16.50         00-d0-89-1b-9b-99     dynamic','  169.254.16.51         00-d0-89-1b-9a-27     dynamic','  '+n.ip.replace(/\.\d+$/,'.255')+'            ff-ff-ff-ff-ff-ff     static'].join('\n'); }
+function termArp() {
+  const n = getNet(), hasNet = !n.dhcp && n.applied;
+  let l = ['Interface: '+(hasNet?n.ip:'0.0.0.0')+' --- 0x3','  Internet Address      Physical Address       Type'];
+  if (hasNet) {
+    l.push('  '+n.gw+'              00-1a-2b-3c-4d-5e     dynamic');
+  }
+  l.push('  169.254.16.50         00-d0-89-1b-9b-99     dynamic');
+  l.push('  169.254.16.51         00-d0-89-1b-9a-27     dynamic');
+  if (hasNet) l.push('  '+n.ip.replace(/\.\d+$/,'.255')+'            ff-ff-ff-ff-ff-ff     static');
+  if (!hasNet) l.push('\n<span class="term-dim">Limited entries — no network configuration applied.</span>');
+  return l.join('\n');
+}
 
-function termRoute() { const n = getNet(), net = n.ip.replace(/\.\d+$/,'.0'); return ['<span class="term-h">IPv4 Route Table</span>','===========================================================================','Network Destination    Netmask          Gateway       Interface    Metric','          0.0.0.0      0.0.0.0        '+n.gw+'     '+n.ip+'       25','       '+net+'    '+n.mask+'     On-link       '+n.ip+'      281','      169.254.0.0    255.255.0.0      On-link     169.254.16.1     281','==========================================================================='].join('\n'); }
+function termRoute() {
+  const n = getNet(), hasNet = !n.dhcp && n.applied;
+  if (!hasNet) return '<span class="term-h">IPv4 Route Table</span>\n===========================================================================\nActive Routes:\nNetwork Destination    Netmask          Gateway       Interface    Metric\n      169.254.0.0    255.255.0.0      On-link     169.254.16.1     281\n===========================================================================\n\n<span class="term-dim">No default route — network not configured.</span>';
+  const net = n.ip.replace(/\.\d+$/,'.0');
+  return ['<span class="term-h">IPv4 Route Table</span>','===========================================================================','Active Routes:','Network Destination    Netmask          Gateway       Interface    Metric','          0.0.0.0      0.0.0.0        '+n.gw+'     '+n.ip+'       25','       '+net+'    '+n.mask+'     On-link       '+n.ip+'      281','      169.254.0.0    255.255.0.0      On-link     169.254.16.1     281','==========================================================================='].join('\n');
+}
 
-function termSysinfo() { const n = getNet(); return ['<span class="term-h">System Information</span>','','Host Name:                 PXLS2_5215','System ID:                 5cbd98b0118884077f6cc921','OS Name:                   Microsoft Windows 10 IoT Enterprise','Processor:                 Intel(R) Core(TM) i5-10500 @ 3.10GHz','Total Physical Memory:     32,768 MB','','<span class="term-h">Network Configuration</span>','DHCP Enabled:              '+(n.dhcp?'Yes':'No'),'IP Address:                '+n.ip,'Subnet Mask:               '+n.mask,'Default Gateway:           '+n.gw,'DNS Server:                '+n.dns,'MAC Address:               9C-7B-EF-4D-96-9D'].join('\n'); }
+function termSysinfo() {
+  const n = getNet();
+  const hasNet = !n.dhcp && n.applied;
+  return ['<span class="term-h">System Information</span>','','Host Name:                 PXLS2_5215','System ID:                 5cbd98b0118884077f6cc921','OS Name:                   Microsoft Windows 10 IoT Enterprise','Processor:                 Intel(R) Core(TM) i5-10500 @ 3.10GHz','Total Physical Memory:     32,768 MB','','<span class="term-h">Network Configuration</span>','DHCP Enabled:              '+(n.dhcp?'Yes':'No'),'IP Address:                '+(hasNet?n.ip:'<span class="term-err">Not configured</span>'),'Subnet Mask:               '+(hasNet?n.mask:'—'),'Default Gateway:           '+(hasNet?n.gw:'—'),'DNS Server:                '+(hasNet?n.dns:'—'),'MAC Address:               9C-7B-EF-4D-96-9D'].join('\n');
+}
 
 // ══════════════════════════════════════
 // INIT
