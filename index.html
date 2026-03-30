@@ -1451,14 +1451,23 @@ function idbPut(k,b) { return openIDB().then(db => new Promise((res,rej) => { co
 function idbGet(k) { return openIDB().then(db => new Promise((res,rej) => { const r = db.transaction(IDB_STORE).objectStore(IDB_STORE).get(k); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); }
 function idbDel(k) { return openIDB().then(db => new Promise((res,rej) => { const tx = db.transaction(IDB_STORE,'readwrite'); tx.objectStore(IDB_STORE).delete(k); tx.oncomplete = res; tx.onerror = () => rej(tx.error); })); }
 function genID() { return 'a' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+function blobToDataUrl(blob) { return new Promise((res,rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); }); }
 const MAX_ATT = 10 * 1024 * 1024;
 
 async function handleCandidateAttach(e) { const w = document.getElementById('emailAttachWarn'); w.textContent = ''; for (const f of e.target.files) { if (f.size > MAX_ATT) { w.textContent = '"' + f.name + '" exceeds 10MB.'; continue; } const id = genID(); await idbPut(id,f); pendingCandAtt.push({name:f.name,type:f.type,id,size:f.size}); } e.target.value = ''; renderPendingAtt('emailAttachBar',pendingCandAtt,'cand'); }
 async function handleAdminAttach(e) { const w = document.getElementById('adminAttachWarn'); w.textContent = ''; for (const f of e.target.files) { if (f.size > MAX_ATT) { w.textContent = '"' + f.name + '" exceeds 10MB.'; continue; } const id = genID(); await idbPut(id,f); pendingAdminAtt.push({name:f.name,type:f.type,id,size:f.size}); } e.target.value = ''; renderPendingAtt('adminAttachBar',pendingAdminAtt,'admin'); }
 function renderPendingAtt(barId,list,who) { const el = document.getElementById(barId); if (!el) return; el.innerHTML = list.map((f,i) => `<div class="attach-chip"><span>${f.type.startsWith('image/')?'🖼':'📄'} ${f.name}</span><button onclick="removePendingAtt(${i},'${who}')">✕</button></div>`).join(''); }
 function removePendingAtt(idx,who) { if (who === 'cand') { idbDel(pendingCandAtt[idx].id); pendingCandAtt.splice(idx,1); renderPendingAtt('emailAttachBar',pendingCandAtt,'cand'); } else { idbDel(pendingAdminAtt[idx].id); pendingAdminAtt.splice(idx,1); renderPendingAtt('adminAttachBar',pendingAdminAtt,'admin'); } }
-function loadAttsInto(pid,atts) { if (!atts||!atts.length) return; const el = document.getElementById(pid); if (!el) return; Promise.all(atts.map(a => { if (!a.id) return Promise.resolve('<span style="font-size:11px;color:var(--t3);">📎 '+a.name+'</span>'); return idbGet(a.id).then(blob => { if (!blob) return '<span style="font-size:11px;color:var(--t3);">📎 '+a.name+'</span>'; const url = URL.createObjectURL(blob); if (a.type&&a.type.startsWith('image/')) return '<img class="msg-attach-img" src="'+url+'" onclick="openLightbox(\''+url+'\')" />'; return '<a class="msg-attach-file" href="'+url+'" download="'+a.name+'">📄 '+a.name+'</a>'; }).catch(() => '<span style="font-size:11px;color:var(--t3);">📎 '+a.name+'</span>'); })).then(parts => { if (el) el.innerHTML = parts.join(''); }).catch(() => {}); }
 function openLightbox(src) { const lb = document.createElement('div'); lb.className = 'lightbox'; lb.innerHTML = '<img src="'+src+'"/>'; lb.onclick = () => lb.remove(); document.body.appendChild(lb); }
+
+function renderAttachments(atts) {
+  if (!atts || !atts.length) return '';
+  return '<div class="msg-attachments">' + atts.map(a => {
+    if (a.dataUrl && a.type && a.type.startsWith('image/')) return '<img class="msg-attach-img" src="' + a.dataUrl + '" onclick="openLightbox(\'' + a.dataUrl.replace(/'/g,"\\'") + '\')" />';
+    if (a.dataUrl) return '<a class="msg-attach-file" href="' + a.dataUrl + '" download="' + escH(a.name) + '">📄 ' + escH(a.name) + '</a>';
+    return '<span style="font-size:11px;color:var(--t3);">📎 ' + escH(a.name) + '</span>';
+  }).join('') + '</div>';
+}
 
 // ══════════════════════════════════════
 // EMAIL
@@ -1467,9 +1476,8 @@ function renderEmailThread() {
   const el = document.getElementById('emailThread'); if (!el) return;
   const emails = activeSess ? activeSess.emails : [];
   if (!emails.length) { el.innerHTML = '<div style="padding:20px;font-size:13px;color:var(--t3);">No messages yet.</div>'; return; }
-  el.innerHTML = emails.map((m,i) => `<div class="bubble ${m.dir==='inbound'?'in':'out'}"><div class="bubble-meta">${m.dir==='inbound'?'Erik Millan · '+m.t:'You · '+m.t}</div><div class="bubble-body">${m.body.replace(/\n/g,'<br>')}${m.attachments&&m.attachments.length?'<div class="msg-attachments" id="att-'+i+'"></div>':''}</div></div>`).join('');
+  el.innerHTML = emails.map(m => `<div class="bubble ${m.dir==='inbound'?'in':'out'}"><div class="bubble-meta">${m.dir==='inbound'?'Erik Millan · '+m.t:'You · '+m.t}</div><div class="bubble-body">${m.body.replace(/\n/g,'<br>')}${renderAttachments(m.attachments)}</div></div>`).join('');
   el.scrollTop = el.scrollHeight;
-  emails.forEach((m,i) => { if (m.attachments && m.attachments.length) loadAttsInto('att-' + i, m.attachments); });
 }
 
 function renderAdminThread() {
@@ -1477,19 +1485,27 @@ function renderAdminThread() {
   const el = document.getElementById('adminThread'); if (!el) return;
   const emails = viewSess.emails || [];
   if (!emails.length) { el.innerHTML = '<div class="no-log">No messages yet.</div>'; return; }
-  el.innerHTML = emails.map((m,i) => `<div class="admin-bubble ${m.dir==='inbound'?'out':'in'}"><div class="ab-meta">${m.dir==='inbound'?'Erik Millan':'Candidate'} · ${m.t}</div><div class="ab-body">${m.body.replace(/\n/g,'<br>')}${m.attachments&&m.attachments.length?'<div class="msg-attachments" id="aatt-'+i+'"></div>':''}</div></div>`).join('');
+  el.innerHTML = emails.map(m => `<div class="admin-bubble ${m.dir==='inbound'?'out':'in'}"><div class="ab-meta">${m.dir==='inbound'?'Erik Millan':'Candidate'} · ${m.t}</div><div class="ab-body">${m.body.replace(/\n/g,'<br>')}${renderAttachments(m.attachments)}</div></div>`).join('');
   el.scrollTop = el.scrollHeight;
-  emails.forEach((m,i) => { if (m.attachments && m.attachments.length) loadAttsInto('aatt-' + i, m.attachments); });
 }
 
 function updateCharCount() { const val = document.getElementById('emailReply').value; document.getElementById('emailCharCount').textContent = val.length + ' character' + (val.length !== 1 ? 's' : ''); }
 function updateBadge() { const b = document.getElementById('ebadge'); if (!activeSess) { b.style.display = 'none'; return; } const u = activeSess.emails.filter(m => !m.read && m.dir === 'inbound').length; b.style.display = u > 0 ? 'inline' : 'none'; b.textContent = u; }
 
-function sendEmail() {
+async function sendEmail() {
   if (!activeSess) return;
   const body = document.getElementById('emailReply').value.trim();
   if (!body && !pendingCandAtt.length) return;
-  const atts = [...pendingCandAtt];
+  // Convert pending attachments to data URLs for cross-browser persistence
+  const atts = [];
+  for (const a of pendingCandAtt) {
+    try {
+      const blob = await idbGet(a.id);
+      if (blob) { const dataUrl = await blobToDataUrl(blob); atts.push({name:a.name, type:a.type, size:a.size, dataUrl}); }
+      else atts.push({name:a.name, type:a.type, size:a.size});
+      idbDel(a.id);
+    } catch(e) { atts.push({name:a.name, type:a.type, size:a.size}); }
+  }
   activeSess.emails.push({ dir:'outbound', body, t: ts(activeSess), read: true, attachments: atts });
   log('EMAIL SENT','lb-info','Reply to Erik — "' + body.substring(0,80) + (body.length > 80 ? '…' : '') + '"');
   document.getElementById('emailReply').value = ''; pendingCandAtt = [];
@@ -1498,10 +1514,20 @@ function sendEmail() {
   updateCharCount(); renderEmailThread(); refreshAdmin();
 }
 
-function sendAdminReply() {
+async function sendAdminReply() {
   if (!viewSess) return;
   const body = document.getElementById('adminReplyInp').value.trim();
-  const atts = [...pendingAdminAtt]; if (!body && !atts.length) return;
+  if (!body && !pendingAdminAtt.length) return;
+  // Convert pending attachments to data URLs
+  const atts = [];
+  for (const a of pendingAdminAtt) {
+    try {
+      const blob = await idbGet(a.id);
+      if (blob) { const dataUrl = await blobToDataUrl(blob); atts.push({name:a.name, type:a.type, size:a.size, dataUrl}); }
+      else atts.push({name:a.name, type:a.type, size:a.size});
+      idbDel(a.id);
+    } catch(e) { atts.push({name:a.name, type:a.type, size:a.size}); }
+  }
   viewSess.emails.push({ dir:'inbound', body, t: ts(viewSess), read: false, attachments: atts });
   document.getElementById('adminReplyInp').value = ''; pendingAdminAtt = [];
   renderPendingAtt('adminAttachBar', pendingAdminAtt, 'admin');
@@ -1563,14 +1589,14 @@ async function persist() {
   activeSess.savedStaticApplied = staticApplied;
   activeSess.savedSwInstalled = swInstalled.map(p => ({id:p.id, installed:p.installed}));
   const san = JSON.parse(JSON.stringify(activeSess));
-  if (san.emails) san.emails = san.emails.map(m => ({...m, attachments: (m.attachments||[]).map(a => ({name:a.name,type:a.type,id:a.id,size:a.size}))}));
+  if (san.emails) san.emails = san.emails.map(m => ({...m, attachments: (m.attachments||[]).map(a => ({name:a.name, type:a.type, size:a.size, dataUrl:a.dataUrl||null}))}));
   try { await fetch('/api/sessions', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(san) }); } catch(e) {}
 }
 
 async function persistSession(sess) {
   if (!sess) return;
   const san = JSON.parse(JSON.stringify(sess));
-  if (san.emails) san.emails = san.emails.map(m => ({...m, attachments: (m.attachments||[]).map(a => ({name:a.name,type:a.type,id:a.id,size:a.size}))}));
+  if (san.emails) san.emails = san.emails.map(m => ({...m, attachments: (m.attachments||[]).map(a => ({name:a.name, type:a.type, size:a.size, dataUrl:a.dataUrl||null}))}));
   try { await fetch('/api/sessions', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(san) }); } catch(e) {}
 }
 
