@@ -127,8 +127,12 @@ input:checked+.tslider:before{transform:translateX(22px);}
 .tbl-hdr .lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
 .tbl-cnt{background:var(--bg-raised);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--t3);}
 .tbl-empty{padding:20px 16px;font-size:13px;color:var(--t3);font-style:italic;}
-.fw-th{display:grid;grid-template-columns:80px 80px 90px 1fr 80px 36px;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
-.fw-row{display:grid;grid-template-columns:80px 80px 90px 1fr 80px 36px;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}.fw-row:last-child{border-bottom:none;}.fw-row:hover{background:rgba(255,255,255,.02);}
+.fw-th{display:grid;grid-template-columns:44px 80px 80px 90px 1fr 80px 36px;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
+.fw-row{display:grid;grid-template-columns:44px 80px 80px 90px 1fr 80px 36px;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}.fw-row:last-child{border-bottom:none;}.fw-row:hover{background:rgba(255,255,255,.02);}
+.fw-pri{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.fw-pri button{background:none;border:none;color:var(--t3);cursor:pointer;font-size:10px;line-height:1;padding:1px 4px;border-radius:3px;font-family:inherit;}.fw-pri button:hover{color:var(--t1);background:var(--bg-raised);}
+.fw-pri-num{font-size:11px;color:var(--t2);font-weight:700;min-width:16px;text-align:center;}
+.fw-existing{opacity:.7;}.fw-existing:hover{opacity:1;}
 .cf-th{display:grid;grid-template-columns:1fr 180px 80px 36px;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
 .cf-row{display:grid;grid-template-columns:1fr 180px 80px 36px;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}.cf-row:last-child{border-bottom:none;}.cf-row:hover{background:rgba(255,255,255,.02);}
 .ip-bar{display:flex;align-items:center;gap:8px;background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--r-md);padding:6px 14px;font-size:12px;}
@@ -550,7 +554,13 @@ input:checked+.tslider:before{transform:translateX(22px);}
             <div id="fwRuleErr" style="font-size:11px;color:var(--red);margin-top:8px;min-height:14px;"></div>
           </div>
           <div class="card" style="padding:0;overflow:hidden;">
-            <div class="tbl-hdr"><span class="lbl">Configured Port Rules</span><span class="tbl-cnt" id="fwRuleCnt">0 rules</span></div>
+            <div class="tbl-hdr">
+              <span class="lbl">Configured Port Rules</span>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:10px;color:var(--t3);font-style:italic;">Rules processed top-to-bottom — first match wins</span>
+                <span class="tbl-cnt" id="fwRuleCnt">0 rules</span>
+              </div>
+            </div>
             <div id="fwRuleTbl"><div class="tbl-empty">No rules added yet.</div></div>
           </div>
           <div style="margin-top:12px;">
@@ -1146,7 +1156,67 @@ function testConnectivity() {
 // ══════════════════════════════════════
 // FIREWALL
 // ══════════════════════════════════════
-function lockFwIP() { const val = v('fwIPInp'), err = document.getElementById('fwIPErr'); if (!val) { err.textContent = 'IP address required.'; return; } if (!isValidIP(val)) { err.textContent = 'Invalid IP address.'; return; } err.textContent = ''; fwIPLocked = true; document.getElementById('fwIPCard').style.display = 'none'; document.getElementById('fwBuilder').style.display = 'block'; document.getElementById('fwIPDisp').textContent = val; log('IP SET','lb-eth','Firewall target IP: <strong>' + val + '</strong>.'); persist(); }
+const PRELOADED_FW_RULES = [
+  {port:'80',proto:'TCP',dir:'Outbound',purpose:'HTTP web traffic',action:'ALLOW'},
+  {port:'443',proto:'TCP',dir:'Outbound',purpose:'HTTPS web traffic',action:'ALLOW'},
+  {port:'443',proto:'UDP',dir:'Outbound',purpose:'',action:'DENY'},
+  {port:'2088',proto:'TCP',dir:'Inbound',purpose:'Zixi',action:'DENY'},
+  {port:'3389',proto:'TCP',dir:'Inbound',purpose:'Remote Desktop (RDP)',action:'ALLOW'},
+  {port:'1935',proto:'UDP',dir:'Outbound',purpose:'SportzCast RTMP',action:'ALLOW'},
+  {port:'22',proto:'TCP',dir:'Inbound',purpose:'SSH',action:'ALLOW'}
+];
+
+function loadPresetFwRules() {
+  PRELOADED_FW_RULES.forEach(r => {
+    fwRules.push({...r, id: Date.now() + Math.random()});
+  });
+}
+
+function lockFwIP() {
+  const val = v('fwIPInp'), err = document.getElementById('fwIPErr');
+  if (!val) { err.textContent = 'IP address required.'; return; }
+  if (!isValidIP(val)) { err.textContent = 'Invalid IP address.'; return; }
+  err.textContent = ''; fwIPLocked = true;
+  log('IP SET','lb-eth','Firewall target IP: <strong>' + val + '</strong>.');
+
+  if (val === '10.1.5.80') {
+    // Show loading animation then fetch pre-existing config
+    document.getElementById('fwIPCard').style.display = 'none';
+    document.getElementById('fwBuilder').style.display = 'block';
+    document.getElementById('fwIPDisp').textContent = val;
+
+    const tbl = document.getElementById('fwRuleTbl');
+    tbl.innerHTML = '<div style="padding:30px;text-align:center;"><div style="font-size:14px;color:var(--t2);margin-bottom:12px;">Fetching Firewall Configuration…</div><div id="fwFetchChecklist" style="max-width:340px;margin:0 auto;text-align:left;"></div></div>';
+
+    const steps = ['Connecting to device…','Reading firewall policy table…','Configuration loaded.'];
+    const cl = document.getElementById('fwFetchChecklist');
+    steps.forEach((s, i) => {
+      setTimeout(() => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);font-size:12px;color:var(--t2);opacity:0;transition:opacity .3s;';
+        row.innerHTML = '<div style="width:16px;height:16px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="color:#4ade80;font-size:10px;">✓</span></div><span>' + s + '</span>';
+        cl.appendChild(row);
+        requestAnimationFrame(() => { row.style.opacity = '1'; });
+        if (i === steps.length - 1) {
+          setTimeout(() => {
+            // Only load presets if rules haven't already been loaded (e.g. on resume)
+            if (fwRules.length === 0) loadPresetFwRules();
+            renderFwRules();
+            log('FW FETCHED','lb-info','Fetched existing firewall configuration — <strong>' + fwRules.length + '</strong> rules loaded.');
+            persist();
+          }, 600);
+        }
+      }, 700 * (i + 1));
+    });
+  } else {
+    // Wrong IP — show builder but no pre-loaded rules
+    document.getElementById('fwIPCard').style.display = 'none';
+    document.getElementById('fwBuilder').style.display = 'block';
+    document.getElementById('fwIPDisp').textContent = val;
+    renderFwRules();
+    persist();
+  }
+}
 function unlockFwIP() { fwIPLocked = false; document.getElementById('fwIPCard').style.display = 'block'; document.getElementById('fwBuilder').style.display = 'none'; log('IP EDIT','lb-info','Firewall IP edit triggered.'); persist(); }
 
 function addFwRule(action) {
@@ -1155,8 +1225,8 @@ function addFwRule(action) {
   if (!proto) { err.textContent = 'Select protocol.'; return; }
   if (!dir) { err.textContent = 'Select direction.'; return; }
   err.textContent = '';
-  fwRules.push({ port, proto, dir, purpose, action, id: Date.now() });
-  log(action, action === 'ALLOW' ? 'lb-ok' : 'lb-bad', 'Port rule — <strong>' + port + '</strong> ' + proto + ' ' + dir + ': <strong>' + action + '</strong>' + (purpose ? ' (' + purpose + ')' : ''));
+  fwRules.push({ port, proto, dir, purpose, action });
+  log(action, action === 'ALLOW' ? 'lb-ok' : 'lb-bad', 'Port rule — <strong>' + port + '</strong> ' + proto + ' ' + dir + ': <strong>' + action + '</strong>' + (purpose ? ' (' + purpose + ')' : '') + ' — Priority #' + fwRules.length);
   checkPortProgress(); renderFwRules();
   document.getElementById('fwPort').value = ''; document.getElementById('fwProto').value = ''; document.getElementById('fwDir').value = ''; document.getElementById('fwPurpose').value = '';
 }
@@ -1172,8 +1242,16 @@ function renderFwRules() {
 }
 
 function checkPortProgress() {
-  S.port443udp = fwRules.some(r => r.port === '443' && r.proto === 'UDP' && r.dir === 'Outbound' && r.action === 'ALLOW');
-  S.port2088udp = fwRules.some(r => r.port === '2088' && r.proto === 'UDP' && r.dir === 'Outbound' && r.action === 'ALLOW');
+  // Rule priority matters — first matching rule wins
+  function firstMatch(port, proto, dir) {
+    for (const r of fwRules) {
+      const protoMatch = r.proto === proto || r.proto === 'TCP+UDP' || (proto === 'TCP+UDP' && r.proto === proto);
+      if (r.port === port && protoMatch && r.dir === dir) return r.action;
+    }
+    return null;
+  }
+  S.port443udp = firstMatch('443', 'UDP', 'Outbound') === 'ALLOW';
+  S.port2088udp = firstMatch('2088', 'UDP', 'Outbound') === 'ALLOW';
   refresh();
 }
 
@@ -1182,7 +1260,65 @@ function saveFwRules() { log('SAVED','lb-ok','Firewall policies saved — ' + fw
 // ══════════════════════════════════════
 // CONTENT FILTER
 // ══════════════════════════════════════
-function lockCfIP() { const val = v('cfIPInp'), err = document.getElementById('cfIPErr'); if (!val) { err.textContent = 'IP address required.'; return; } if (!isValidIP(val)) { err.textContent = 'Invalid IP address.'; return; } err.textContent = ''; cfIPLocked = true; document.getElementById('cfIPCard').style.display = 'none'; document.getElementById('cfBuilder').style.display = 'block'; document.getElementById('cfIPDisp').textContent = val; log('IP SET','lb-eth','Content filter target IP: <strong>' + val + '</strong>.'); persist(); }
+const PRELOADED_CF_RULES = [
+  {domain:'*.google.com',note:'Search engine',action:'ALLOW'},
+  {domain:'*.microsoft.com',note:'Windows updates',action:'ALLOW'},
+  {domain:'*.youtube.com',note:'Video streaming',action:'ALLOW'},
+  {domain:'*.pixelot.stream',note:'Pixellot streaming',action:'ALLOW'},
+  {domain:'*.balena-cloud.net',note:'Balena OS mgmt',action:'ALLOW'},
+  {domain:'*.facebook.com',note:'Social media',action:'BLOCK'},
+  {domain:'*.tiktok.com',note:'Social media',action:'BLOCK'},
+  {domain:'*.instagram.com',note:'Social media',action:'BLOCK'}
+];
+
+function loadPresetCfRules() {
+  PRELOADED_CF_RULES.forEach(r => {
+    cfRules.push({...r, id: Date.now() + Math.random()});
+  });
+}
+
+function lockCfIP() {
+  const val = v('cfIPInp'), err = document.getElementById('cfIPErr');
+  if (!val) { err.textContent = 'IP address required.'; return; }
+  if (!isValidIP(val)) { err.textContent = 'Invalid IP address.'; return; }
+  err.textContent = ''; cfIPLocked = true;
+  log('IP SET','lb-eth','Content filter target IP: <strong>' + val + '</strong>.');
+
+  if (val === '10.1.5.80') {
+    document.getElementById('cfIPCard').style.display = 'none';
+    document.getElementById('cfBuilder').style.display = 'block';
+    document.getElementById('cfIPDisp').textContent = val;
+
+    const tbl = document.getElementById('cfRuleTbl');
+    tbl.innerHTML = '<div style="padding:30px;text-align:center;"><div style="font-size:14px;color:var(--t2);margin-bottom:12px;">Fetching Content Filter Configuration…</div><div id="cfFetchChecklist" style="max-width:340px;margin:0 auto;text-align:left;"></div></div>';
+
+    const steps = ['Connecting to device…','Reading whitelist table…','Configuration loaded.'];
+    const cl = document.getElementById('cfFetchChecklist');
+    steps.forEach((s, i) => {
+      setTimeout(() => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);font-size:12px;color:var(--t2);opacity:0;transition:opacity .3s;';
+        row.innerHTML = '<div style="width:16px;height:16px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="color:#4ade80;font-size:10px;">✓</span></div><span>' + s + '</span>';
+        cl.appendChild(row);
+        requestAnimationFrame(() => { row.style.opacity = '1'; });
+        if (i === steps.length - 1) {
+          setTimeout(() => {
+            if (cfRules.length === 0) loadPresetCfRules();
+            renderCfRules();
+            log('CF FETCHED','lb-info','Fetched existing content filter — <strong>' + cfRules.length + '</strong> entries loaded.');
+            persist();
+          }, 600);
+        }
+      }, 700 * (i + 1));
+    });
+  } else {
+    document.getElementById('cfIPCard').style.display = 'none';
+    document.getElementById('cfBuilder').style.display = 'block';
+    document.getElementById('cfIPDisp').textContent = val;
+    renderCfRules();
+    persist();
+  }
+}
 function unlockCfIP() { cfIPLocked = false; document.getElementById('cfIPCard').style.display = 'block'; document.getElementById('cfBuilder').style.display = 'none'; log('IP EDIT','lb-info','CF IP edit triggered.'); persist(); }
 
 function addCfRule(action) {
@@ -1348,19 +1484,29 @@ function calcGrade(snap, sess) {
   }
   g.sections.push({name:'Ethernet Settings',pts:Math.max(0,ethPts),max:ethMax,details:ethD});
 
-  // 3. Firewall (20 pts)
+  // 3. Firewall (20 pts) — priority-aware
   let fwPts = 0, fwMax = 20, fwD = [];
   if (snap.fwIP === '10.1.5.80') { fwPts += 2; fwD.push({t:'Target IP correct',p:2,ok:true}); }
   else if (snap.fwIP) { fwPts -= 2; fwD.push({t:'Target IP incorrect: '+snap.fwIP,p:-2,ok:false}); }
   else fwD.push({t:'No target IP set',p:0,ok:false});
   const rules = snap.fwRules || [];
+  // First matching rule per port/proto/dir wins (priority order)
+  function gradeFirstMatch(port, proto, dir) {
+    for (const r of rules) {
+      const pm = r.proto === proto || r.proto === 'TCP+UDP' || (proto === 'TCP+UDP' && r.proto === proto);
+      if (r.port === port && pm && r.dir === dir) return r.action;
+    }
+    return null;
+  }
   REQ_FW_RULES.forEach(req => {
-    const found = rules.some(r => r.port === req.port && r.action === 'ALLOW' && r.dir === 'Outbound' && (req.proto === 'TCP+UDP' ? r.proto === 'TCP+UDP' : (r.proto === req.proto || r.proto === 'TCP+UDP')));
-    if (found) { fwPts += 3; fwD.push({t:'Port '+req.port+' '+req.proto+' ALLOW ('+req.label+')',p:3,ok:true}); }
+    const result = gradeFirstMatch(req.port, req.proto, req.dir);
+    if (result === 'ALLOW') { fwPts += 3; fwD.push({t:'Port '+req.port+' '+req.proto+' '+req.dir+' ALLOW ('+req.label+')',p:3,ok:true}); }
+    else if (result === 'DENY') { fwPts -= 2; fwD.push({t:'Port '+req.port+' '+req.proto+' blocked by higher-priority DENY rule',p:-2,ok:false}); }
     else fwD.push({t:'Missing: Port '+req.port+' '+req.proto+' ('+req.label+')',p:0,ok:false});
   });
-  const denyOnReq = rules.filter(r => r.action === 'DENY' && REQ_FW_RULES.some(rq => rq.port === r.port)).length;
-  if (denyOnReq > 0) { const pen = denyOnReq * -3; fwPts += pen; fwD.push({t:denyOnReq+' DENY on required ports',p:pen,ok:false}); }
+  // Penalty for leaving insecure inbound rules
+  const insecureInbound = rules.filter(r => r.action === 'ALLOW' && r.dir === 'Inbound' && ['22','3389'].includes(r.port));
+  if (insecureInbound.length > 0) { const pen = insecureInbound.length * -1; fwPts += pen; fwD.push({t:insecureInbound.length+' insecure inbound rule(s) left open (SSH/RDP)',p:pen,ok:false}); }
   g.sections.push({name:'Firewall Policies',pts:Math.max(0,fwPts),max:fwMax,details:fwD});
 
   // 4. Content Filter (20 pts)
@@ -1374,6 +1520,9 @@ function calcGrade(snap, sess) {
     if (found) { cfPts += perDom; cfD.push({t:'Whitelisted: '+req,p:perDom,ok:true}); }
     else cfD.push({t:'Missing: '+req,p:0,ok:false});
   });
+  // Penalty for misspelled entries that look like they were meant to be correct
+  const misspelled = cfs.filter(r => r.action === 'ALLOW' && (r.domain === '*.pixelot.stream' || r.domain === '*.balena-cloud.net'));
+  if (misspelled.length > 0) { const pen = misspelled.length * -1; cfPts += pen; cfD.push({t:misspelled.length+' misspelled/incorrect domain(s) left in whitelist',p:pen,ok:false}); }
   g.sections.push({name:'Content Filter',pts:Math.max(0,cfPts),max:cfMax,details:cfD});
 
   // 5. Software (15 pts)
@@ -1832,7 +1981,35 @@ function termPing(args) {
   return l.join('\n');
 }
 
-function termNmap(args) { if (!args.length) return '<span class="term-err">Usage: nmap &lt;target IP&gt;</span>'; const target = args[0]; if (!isIP(target)) return '<span class="term-err">Invalid target. Specify an IP.</span>'; const fwTarget = v('fwIPInp'), isTarget = target===fwTarget||target===getNet().ip; let l = ['<span class="term-dim">Starting Nmap 7.94</span>','Nmap scan report for '+target,'','PORT         STATE      SERVICE']; const defaults = [{p:'22',pr:'tcp',svc:'ssh'},{p:'80',pr:'tcp',svc:'http'},{p:'443',pr:'tcp',svc:'https'},{p:'443',pr:'udp',svc:'https'},{p:'2088',pr:'udp',svc:'zixi-transport'},{p:'8080',pr:'tcp',svc:'http-proxy'},{p:'554',pr:'tcp',svc:'rtsp'}]; const shown = new Set(); if (isTarget) { fwRules.forEach(r => { const protos = r.proto==='TCP+UDP'?['tcp','udp']:[r.proto.toLowerCase()]; protos.forEach(p => { const k = r.port+'/'+p; if (!shown.has(k)) { shown.add(k); const state = r.action==='ALLOW'?'<span class="term-ok">open</span>    ':'<span class="term-err">filtered</span>'; const svc = r.purpose||defaults.find(d=>d.p===r.port&&d.pr===p)?.svc||'unknown'; const pad = ' '.repeat(Math.max(1,13-r.port.length-p.length-1)); l.push('  '+r.port+'/'+p+pad+state+'  '+svc); } }); }); } defaults.forEach(d => { const k = d.p+'/'+d.pr; if (!shown.has(k)) { shown.add(k); const pad = ' '.repeat(Math.max(1,13-d.p.length-d.pr.length-1)); l.push('  '+d.p+'/'+d.pr+pad+'<span class="term-dim">closed</span>   '+d.svc); } }); l.push(''); l.push('<span class="term-dim">Nmap done: 1 IP address (1 host up)</span>'); return l.join('\n'); }
+function termNmap(args) {
+  if (!args.length) return '<span class="term-err">Usage: nmap &lt;target IP&gt;</span>';
+  const target = args[0]; if (!isIP(target)) return '<span class="term-err">Invalid target. Specify an IP.</span>';
+  const fwTarget = v('fwIPInp'), isTarget = target===fwTarget||target===getNet().ip;
+  let l = ['<span class="term-dim">Starting Nmap 7.94</span>','Nmap scan report for '+target,'','PORT         STATE      SERVICE'];
+  const defaults = [{p:'22',pr:'tcp',svc:'ssh'},{p:'80',pr:'tcp',svc:'http'},{p:'443',pr:'tcp',svc:'https'},{p:'443',pr:'udp',svc:'https'},{p:'2088',pr:'udp',svc:'zixi-transport'},{p:'8080',pr:'tcp',svc:'http-proxy'},{p:'554',pr:'tcp',svc:'rtsp'}];
+  const shown = new Set();
+  if (isTarget) {
+    // Process rules in priority order — first match wins per port/proto
+    const resolved = {};
+    fwRules.forEach(r => {
+      const protos = r.proto==='TCP+UDP'?['tcp','udp']:[r.proto.toLowerCase()];
+      protos.forEach(p => {
+        const k = r.port+'/'+p;
+        if (!resolved[k]) resolved[k] = { port:r.port, proto:p, action:r.action, purpose:r.purpose };
+      });
+    });
+    Object.values(resolved).forEach(r => {
+      const k = r.port+'/'+r.proto; shown.add(k);
+      const state = r.action==='ALLOW'?'<span class="term-ok">open</span>    ':'<span class="term-err">filtered</span>';
+      const svc = r.purpose||defaults.find(d=>d.p===r.port&&d.pr===r.proto)?.svc||'unknown';
+      const pad = ' '.repeat(Math.max(1,13-r.port.length-r.proto.length-1));
+      l.push('  '+r.port+'/'+r.proto+pad+state+'  '+svc);
+    });
+  }
+  defaults.forEach(d => { const k = d.p+'/'+d.pr; if (!shown.has(k)) { shown.add(k); const pad = ' '.repeat(Math.max(1,13-d.p.length-d.pr.length-1)); l.push('  '+d.p+'/'+d.pr+pad+'<span class="term-dim">closed</span>   '+d.svc); } });
+  l.push(''); l.push('<span class="term-dim">Nmap done: 1 IP address (1 host up)</span>');
+  return l.join('\n');
+}
 
 function termNslookup(args) { if (!args.length) return '<span class="term-err">Usage: nslookup &lt;domain&gt;</span>'; const domain = args[0].replace(/^https?:\/\//,'').replace(/\/.*/,''), n = getNet(), ip = fakeIP(domain), access = checkDomain(domain); let l = ['Server:  '+n.dns,'Address: '+n.dns+'#53','']; if (access==='allow') { l.push('Non-authoritative answer:'); l.push('Name:    <span class="term-info">'+escH(domain)+'</span>'); l.push('Address: '+ip); if (isRestricted(domain)) l.push('\n<span class="term-ok">✓ Domain is whitelisted in content filter.</span>'); } else { l.push('<span class="term-err">** server can\'t find '+escH(domain)+': REFUSED</span>'); l.push(''); l.push('<span class="term-warn">** Restricted domain — not whitelisted in content filter.</span>'); l.push('<span class="term-dim">Add the appropriate wildcard entry to the Content Filter.</span>'); } return l.join('\n'); }
 
@@ -1840,7 +2017,27 @@ function termCurl(args) { if (!args.length) return '<span class="term-err">Usage
 
 function termTracert(args) { if (!args.length) return '<span class="term-err">Usage: tracert &lt;host&gt;</span>'; const target = args[0], isIp_ = isIP(target), ip = isIp_?target:fakeIP(target), n = getNet(), reachable = isIp_||!isRestricted(target)||isWhitelisted(target); let l = ['Tracing route to '+(isIp_?target:target+' ['+ip+']'),'over a maximum of 30 hops:','']; if (reachable) { l.push('  1    <1 ms    <1 ms    <1 ms  '+n.gw); l.push('  2     2 ms     1 ms     2 ms  192.168.1.1'); l.push('  3     8 ms     7 ms     8 ms  10.128.0.1'); l.push('  4    '+randMs(11,14)+' ms    '+randMs(11,14)+' ms    '+randMs(11,14)+' ms  '+ip); l.push(''); l.push('<span class="term-ok">Trace complete.</span>'); } else { l.push('  1    <1 ms    <1 ms    <1 ms  '+n.gw); l.push('  2     *        *        *     Request timed out.'); l.push('  3     *        *        *     Request timed out.'); l.push(''); l.push('<span class="term-err">** Destination unreachable.</span>'); l.push('<span class="term-warn">** Restricted domain — not whitelisted.</span>'); } return l.join('\n'); }
 
-function termNetstat() { const n = getNet(); let l = ['<span class="term-h">Active Connections</span>','','  Proto  Local Address              Foreign Address            State']; l.push('  TCP    '+n.ip+':49152          169.254.16.51:554          ESTABLISHED'); l.push('  TCP    '+n.ip+':49153          169.254.16.50:554          ESTABLISHED'); const has443 = fwRules.some(r=>r.port==='443'&&r.action==='ALLOW'), has2088 = fwRules.some(r=>r.port==='2088'&&r.action==='ALLOW'), hasPx = cfRules.some(r=>r.action==='ALLOW'&&r.domain.toLowerCase().includes('pixellot')), hasBal = cfRules.some(r=>r.action==='ALLOW'&&r.domain.toLowerCase().includes('balena')); if (has443&&hasPx&&!advState.ssl) l.push('  UDP    '+n.ip+':443             52.84.125.42:443           ESTABLISHED'); if (has2088&&hasPx&&!advState.ssl) l.push('  UDP    '+n.ip+':2088            52.84.125.42:2088          ESTABLISHED'); if (hasBal) l.push('  TCP    '+n.ip+':49200          13.52.87.140:443           ESTABLISHED'); if (advState.ssl) l.push('  TCP    '+n.ip+':8443           '+n.gw+':3129              ESTABLISHED  <span class="term-dim">[DPI Proxy]</span>'); return l.join('\n'); }
+function termNetstat() {
+  const n = getNet(); let l = ['<span class="term-h">Active Connections</span>','','  Proto  Local Address              Foreign Address            State'];
+  l.push('  TCP    '+n.ip+':49152          169.254.16.51:554          ESTABLISHED');
+  l.push('  TCP    '+n.ip+':49153          169.254.16.50:554          ESTABLISHED');
+  // Check effective rules (first match wins per port)
+  function effectiveAllow(port, proto) {
+    for (const r of fwRules) {
+      const pm = r.proto === proto || r.proto === 'TCP+UDP';
+      if (r.port === port && pm && r.dir === 'Outbound') return r.action === 'ALLOW';
+    }
+    return false;
+  }
+  const has443 = effectiveAllow('443','UDP'), has2088 = effectiveAllow('2088','UDP');
+  const hasPx = cfRules.some(r => r.action==='ALLOW' && r.domain.toLowerCase().includes('pixellot'));
+  const hasBal = cfRules.some(r => r.action==='ALLOW' && r.domain.toLowerCase().includes('balena'));
+  if (has443 && hasPx && !advState.ssl) l.push('  UDP    '+n.ip+':443             52.84.125.42:443           ESTABLISHED');
+  if (has2088 && hasPx && !advState.ssl) l.push('  UDP    '+n.ip+':2088            52.84.125.42:2088          ESTABLISHED');
+  if (hasBal) l.push('  TCP    '+n.ip+':49200          13.52.87.140:443           ESTABLISHED');
+  if (advState.ssl) l.push('  TCP    '+n.ip+':8443           '+n.gw+':3129              ESTABLISHED  <span class="term-dim">[DPI Proxy]</span>');
+  return l.join('\n');
+}
 
 function termArp() {
   const n = getNet(), hasNet = !n.dhcp && n.applied;
