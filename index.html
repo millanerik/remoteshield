@@ -84,6 +84,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0c0c0c;color:#e2e8f0;min-heig
 .btn-deny{background:var(--red-dim);color:var(--red-soft);}.btn-deny:hover{background:#991b1b;}
 .btn-ghost{background:var(--bg-raised);border:1px solid var(--border-md);color:var(--t2);}.btn-ghost:hover{color:var(--t1);background:#2a2a2a;}
 .btn-del{background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px;padding:2px 6px;border-radius:4px;font-family:inherit;}.btn-del:hover{color:var(--red);}
+.btn-edit{background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 6px;border-radius:4px;font-family:inherit;}.btn-edit:hover{color:#93c5fd;}
 .btn-link{background:none;border:none;color:var(--t3);cursor:pointer;font-size:11px;font-family:inherit;}.btn-link:hover{color:var(--t1);}
 
 /* ═══ TOGGLE ═══ */
@@ -128,14 +129,10 @@ input:checked+.tslider:before{transform:translateX(22px);}
 .tbl-hdr .lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
 .tbl-cnt{background:var(--bg-raised);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--t3);}
 .tbl-empty{padding:20px 16px;font-size:13px;color:var(--t3);font-style:italic;}
-.fw-th{display:grid;grid-template-columns:44px 80px 80px 90px 1fr 80px 36px;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
-.fw-row{display:grid;grid-template-columns:44px 80px 80px 90px 1fr 80px 36px;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}.fw-row:last-child{border-bottom:none;}.fw-row:hover{background:rgba(255,255,255,.02);}
-.fw-pri{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.fw-pri button{background:none;border:none;color:var(--t3);cursor:pointer;font-size:10px;line-height:1;padding:1px 4px;border-radius:3px;font-family:inherit;}.fw-pri button:hover{color:var(--t1);background:var(--bg-raised);}
-.fw-pri-num{font-size:11px;color:var(--t2);font-weight:700;min-width:16px;text-align:center;}
-.fw-existing{opacity:.7;}.fw-existing:hover{opacity:1;}
-.cf-th{display:grid;grid-template-columns:1fr 180px 80px 36px;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
-.cf-row{display:grid;grid-template-columns:1fr 180px 80px 36px;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}.cf-row:last-child{border-bottom:none;}.cf-row:hover{background:rgba(255,255,255,.02);}
+.fw-th{display:grid;grid-template-columns:80px 80px 90px 1fr 80px 36px 36px;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
+.fw-row{display:grid;grid-template-columns:80px 80px 90px 1fr 80px 36px 36px;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}.fw-row:last-child{border-bottom:none;}.fw-row:hover{background:rgba(255,255,255,.02);}
+.cf-th{display:grid;grid-template-columns:1fr 180px 80px 36px 36px;gap:12px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;background:var(--bg-inset);}
+.cf-row{display:grid;grid-template-columns:1fr 180px 80px 36px 36px;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;}.cf-row:last-child{border-bottom:none;}.cf-row:hover{background:rgba(255,255,255,.02);}
 .ip-bar{display:flex;align-items:center;gap:8px;background:var(--bg-inset);border:1px solid var(--border);border-radius:var(--r-md);padding:6px 14px;font-size:12px;}
 .ip-bar .lbl{color:var(--t3);}.ip-bar .val{font-family:'Courier New',monospace;color:var(--red);font-weight:700;}
 
@@ -586,10 +583,7 @@ input:checked+.tslider:before{transform:translateX(22px);}
           <div class="card" style="padding:0;overflow:hidden;">
             <div class="tbl-hdr">
               <span class="lbl">Configured Port Rules</span>
-              <div style="display:flex;align-items:center;gap:10px;">
-                <span style="font-size:10px;color:var(--t3);font-style:italic;">Rules processed top-to-bottom — first match wins</span>
-                <span class="tbl-cnt" id="fwRuleCnt">0 rules</span>
-              </div>
+              <span class="tbl-cnt" id="fwRuleCnt">0 rules</span>
             </div>
             <div id="fwRuleTbl"><div class="tbl-empty">No rules added yet.</div></div>
           </div>
@@ -925,8 +919,8 @@ function doComplete() {
   activeSess.snapshot = {
     ethMode,
     ethFields: ethMode === 'static' ? { ip:v('ethIP'), mask:v('ethMask'), gw:v('ethGW'), dns:v('ethDNS'), altdns:v('ethAltDNS') } : null,
-    fwIP: v('fwIPInp'), fwRules: [...fwRules],
-    cfIP: v('cfIPInp'), cfRules: [...cfRules],
+    fwIP: v('fwIPInp'), fwRules: fwRules.map(r => ({port:r.port,proto:r.proto,dir:r.dir,purpose:r.purpose,action:r.action})),
+    cfIP: v('cfIPInp'), cfRules: cfRules.map(r => ({domain:r.domain,note:r.note,action:r.action})),
     advState: {...advState}, fixedCount: activeSess.fixedCount, vpuLooked: vpuLinked,
     swRemoved: swInstalled.filter(p => !p.installed).map(p => p.name),
     swRemaining: swInstalled.filter(p => p.installed).map(p => p.name)
@@ -1198,7 +1192,7 @@ const PRELOADED_FW_RULES = [
 
 function loadPresetFwRules() {
   PRELOADED_FW_RULES.forEach(r => {
-    fwRules.push({...r, id: Date.now() + Math.random()});
+    fwRules.push({port:r.port, proto:r.proto, dir:r.dir, purpose:r.purpose, action:r.action});
   });
 }
 
@@ -1272,16 +1266,8 @@ function renderFwRules() {
 }
 
 function checkPortProgress() {
-  // Rule priority matters — first matching rule wins
-  function firstMatch(port, proto, dir) {
-    for (const r of fwRules) {
-      const protoMatch = r.proto === proto || r.proto === 'TCP+UDP' || (proto === 'TCP+UDP' && r.proto === proto);
-      if (r.port === port && protoMatch && r.dir === dir) return r.action;
-    }
-    return null;
-  }
-  S.port443udp = firstMatch('443', 'UDP', 'Outbound') === 'ALLOW';
-  S.port2088udp = firstMatch('2088', 'UDP', 'Outbound') === 'ALLOW';
+  S.port443udp = fwRules.some(r => r.port === '443' && (r.proto === 'UDP' || r.proto === 'TCP+UDP') && r.dir === 'Outbound' && r.action === 'ALLOW');
+  S.port2088udp = fwRules.some(r => r.port === '2088' && (r.proto === 'UDP' || r.proto === 'TCP+UDP') && r.dir === 'Outbound' && r.action === 'ALLOW');
   refresh();
 }
 
@@ -1303,7 +1289,7 @@ const PRELOADED_CF_RULES = [
 
 function loadPresetCfRules() {
   PRELOADED_CF_RULES.forEach(r => {
-    cfRules.push({...r, id: Date.now() + Math.random()});
+    cfRules.push({domain:r.domain, note:r.note, action:r.action});
   });
 }
 
@@ -1354,20 +1340,55 @@ function unlockCfIP() { cfIPLocked = false; document.getElementById('cfIPCard').
 function addCfRule(action) {
   const domain = v('cfDomain'), note = v('cfNote'), err = document.getElementById('cfRuleErr');
   if (!domain) { err.textContent = 'Domain required.'; return; } err.textContent = '';
-  cfRules.push({ domain, note, action, id: Date.now() });
+  cfRules.push({ domain, note, action });
   log(action, 'lb-ok', 'CF entry — <strong>' + domain + '</strong>: <strong>' + action + '</strong>' + (note ? ' (' + note + ')' : ''));
   checkCfProgress(); renderCfRules();
   document.getElementById('cfDomain').value = ''; document.getElementById('cfNote').value = '';
 }
 
-function removeCfRule(id) { const r = cfRules.find(x => x.id === id); cfRules = cfRules.filter(x => x.id !== id); if (r) log('REMOVED','lb-bad','CF entry removed — ' + r.domain); checkCfProgress(); renderCfRules(); }
+function removeCfRule(idx) {
+  const r = cfRules[idx];
+  cfRules.splice(idx, 1);
+  if (r) log('REMOVED','lb-bad','CF entry removed — ' + r.domain);
+  checkCfProgress(); renderCfRules(); persist();
+}
 
 function renderCfRules() {
   const el = document.getElementById('cfRuleTbl');
   document.getElementById('cfRuleCnt').textContent = cfRules.length + ' entr' + (cfRules.length !== 1 ? 'ies' : 'y');
   if (!cfRules.length) { el.innerHTML = '<div class="tbl-empty">No entries yet.</div>'; return; }
-  el.innerHTML = '<div class="cf-th"><span>Domain</span><span>Category / Notes</span><span>Action</span><span></span></div>' +
-    cfRules.map(r => `<div class="cf-row"><span style="font-family:'Courier New',monospace;color:#93c5fd;">${r.domain}</span><span style="color:var(--t3);font-size:12px;">${r.note||'—'}</span><span class="pill ${r.action==='ALLOW'?'pill-g':'pill-r'}">${r.action}</span><button class="btn-del" onclick="removeCfRule(${r.id})">✕</button></div>`).join('');
+  el.innerHTML = '<div class="cf-th"><span>Domain</span><span>Category / Notes</span><span>Action</span><span></span><span></span></div>' +
+    cfRules.map((r, i) => {
+      if (r._editing) {
+        return `<div class="cf-row" style="background:var(--bg-inset);"><input class="inp mono" id="cfEdit_domain_${i}" value="${escH(r.domain)}" style="padding:6px 8px;font-size:12px;"/><input class="inp" id="cfEdit_note_${i}" value="${escH(r.note||'')}" style="padding:6px 8px;font-size:12px;"/><select class="sel" id="cfEdit_action_${i}" style="padding:6px 8px;font-size:12px;"><option ${r.action==='ALLOW'?'selected':''}>ALLOW</option><option ${r.action==='BLOCK'?'selected':''}>BLOCK</option></select><button class="btn-edit" onclick="saveEditCfRule(${i})" title="Save" style="color:#4ade80;">✓</button><button class="btn-del" onclick="cancelEditCfRule(${i})" title="Cancel">✕</button></div>`;
+      }
+      return `<div class="cf-row"><span style="font-family:'Courier New',monospace;color:#93c5fd;">${r.domain}</span><span style="color:var(--t3);font-size:12px;">${r.note||'—'}</span><span class="pill ${r.action==='ALLOW'?'pill-g':'pill-r'}">${r.action}</span><button class="btn-edit" onclick="editCfRule(${i})" title="Edit">✎</button><button class="btn-del" onclick="removeCfRule(${i})" title="Delete">✕</button></div>`;
+    }).join('');
+}
+
+function editCfRule(idx) {
+  cfRules.forEach((r, i) => { r._editing = i === idx; });
+  renderCfRules();
+}
+
+function cancelEditCfRule(idx) {
+  cfRules[idx]._editing = false;
+  renderCfRules();
+}
+
+function saveEditCfRule(idx) {
+  const domain = document.getElementById('cfEdit_domain_' + idx).value.trim();
+  const note = document.getElementById('cfEdit_note_' + idx).value.trim();
+  const action = document.getElementById('cfEdit_action_' + idx).value;
+  if (!domain) return;
+  const old = cfRules[idx];
+  const changes = [];
+  if (old.domain !== domain) changes.push('domain: ' + old.domain + ' → ' + domain);
+  if (old.action !== action) changes.push('action: ' + old.action + ' → ' + action);
+  if ((old.note||'') !== note) changes.push('notes updated');
+  cfRules[idx] = { domain, note, action };
+  if (changes.length) log('EDITED','lb-info','CF entry edited — <strong>' + domain + '</strong>: ' + changes.join(', '));
+  checkCfProgress(); renderCfRules(); persist();
 }
 
 const REQ_CF = ['*.pixellot.stream','*.balena-cloud.com'];
@@ -1514,27 +1535,19 @@ function calcGrade(snap, sess) {
   }
   g.sections.push({name:'Ethernet Settings',pts:Math.max(0,ethPts),max:ethMax,details:ethD});
 
-  // 3. Firewall (20 pts) — priority-aware
+  // 3. Firewall (20 pts)
   let fwPts = 0, fwMax = 20, fwD = [];
   if (snap.fwIP === '10.1.5.80') { fwPts += 2; fwD.push({t:'Target IP correct',p:2,ok:true}); }
   else if (snap.fwIP) { fwPts -= 2; fwD.push({t:'Target IP incorrect: '+snap.fwIP,p:-2,ok:false}); }
   else fwD.push({t:'No target IP set',p:0,ok:false});
   const rules = snap.fwRules || [];
-  // First matching rule per port/proto/dir wins (priority order)
-  function gradeFirstMatch(port, proto, dir) {
-    for (const r of rules) {
-      const pm = r.proto === proto || r.proto === 'TCP+UDP' || (proto === 'TCP+UDP' && r.proto === proto);
-      if (r.port === port && pm && r.dir === dir) return r.action;
-    }
-    return null;
-  }
   REQ_FW_RULES.forEach(req => {
-    const result = gradeFirstMatch(req.port, req.proto, req.dir);
-    if (result === 'ALLOW') { fwPts += 3; fwD.push({t:'Port '+req.port+' '+req.proto+' '+req.dir+' ALLOW ('+req.label+')',p:3,ok:true}); }
-    else if (result === 'DENY') { fwPts -= 2; fwD.push({t:'Port '+req.port+' '+req.proto+' blocked by higher-priority DENY rule',p:-2,ok:false}); }
+    const found = rules.some(r => r.port === req.port && r.action === 'ALLOW' && r.dir === 'Outbound' && (req.proto === 'TCP+UDP' ? r.proto === 'TCP+UDP' : (r.proto === req.proto || r.proto === 'TCP+UDP')));
+    if (found) { fwPts += 3; fwD.push({t:'Port '+req.port+' '+req.proto+' '+req.dir+' ALLOW ('+req.label+')',p:3,ok:true}); }
     else fwD.push({t:'Missing: Port '+req.port+' '+req.proto+' ('+req.label+')',p:0,ok:false});
   });
-  // Penalty for leaving insecure inbound rules
+  const denyOnReq = rules.filter(r => r.action === 'DENY' && REQ_FW_RULES.some(rq => rq.port === r.port)).length;
+  if (denyOnReq > 0) { const pen = denyOnReq * -2; fwPts += pen; fwD.push({t:denyOnReq+' DENY rule(s) on required ports',p:pen,ok:false}); }
   const insecureInbound = rules.filter(r => r.action === 'ALLOW' && r.dir === 'Inbound' && ['22','3389'].includes(r.port));
   if (insecureInbound.length > 0) { const pen = insecureInbound.length * -1; fwPts += pen; fwD.push({t:insecureInbound.length+' insecure inbound rule(s) left open (SSH/RDP)',p:pen,ok:false}); }
   g.sections.push({name:'Firewall Policies',pts:Math.max(0,fwPts),max:fwMax,details:fwD});
@@ -1777,7 +1790,8 @@ async function clearSession(idx) {
 async function persist() {
   if (!activeSess) return;
   activeSess.savedAdvState = {...advState}; activeSess.savedEthMode = ethMode;
-  activeSess.savedFwRules = [...fwRules]; activeSess.savedCfRules = [...cfRules];
+  activeSess.savedFwRules = fwRules.map(r => ({port:r.port,proto:r.proto,dir:r.dir,purpose:r.purpose,action:r.action}));
+  activeSess.savedCfRules = cfRules.map(r => ({domain:r.domain,note:r.note,action:r.action}));
   activeSess.savedVpuLinked = vpuLinked; activeSess.savedFwIPLocked = fwIPLocked; activeSess.savedFwIP = v('fwIPInp');
   activeSess.savedCfIPLocked = cfIPLocked; activeSess.savedCfIP = v('cfIPInp');
   activeSess.savedStaticFields = { ip:v('ethIP'), mask:v('ethMask'), gw:v('ethGW'), dns:v('ethDNS'), altdns:v('ethAltDNS') };
@@ -2049,21 +2063,18 @@ function termNmap(args) {
   const defaults = [{p:'22',pr:'tcp',svc:'ssh'},{p:'80',pr:'tcp',svc:'http'},{p:'443',pr:'tcp',svc:'https'},{p:'443',pr:'udp',svc:'https'},{p:'2088',pr:'udp',svc:'zixi-transport'},{p:'8080',pr:'tcp',svc:'http-proxy'},{p:'554',pr:'tcp',svc:'rtsp'}];
   const shown = new Set();
   if (isTarget) {
-    // Process rules in priority order — first match wins per port/proto
-    const resolved = {};
     fwRules.forEach(r => {
       const protos = r.proto==='TCP+UDP'?['tcp','udp']:[r.proto.toLowerCase()];
       protos.forEach(p => {
         const k = r.port+'/'+p;
-        if (!resolved[k]) resolved[k] = { port:r.port, proto:p, action:r.action, purpose:r.purpose };
+        if (!shown.has(k)) {
+          shown.add(k);
+          const state = r.action==='ALLOW'?'<span class="term-ok">open</span>    ':'<span class="term-err">filtered</span>';
+          const svc = r.purpose||defaults.find(d=>d.p===r.port&&d.pr===p)?.svc||'unknown';
+          const pad = ' '.repeat(Math.max(1,13-r.port.length-p.length-1));
+          l.push('  '+r.port+'/'+p+pad+state+'  '+svc);
+        }
       });
-    });
-    Object.values(resolved).forEach(r => {
-      const k = r.port+'/'+r.proto; shown.add(k);
-      const state = r.action==='ALLOW'?'<span class="term-ok">open</span>    ':'<span class="term-err">filtered</span>';
-      const svc = r.purpose||defaults.find(d=>d.p===r.port&&d.pr===r.proto)?.svc||'unknown';
-      const pad = ' '.repeat(Math.max(1,13-r.port.length-r.proto.length-1));
-      l.push('  '+r.port+'/'+r.proto+pad+state+'  '+svc);
     });
   }
   defaults.forEach(d => { const k = d.p+'/'+d.pr; if (!shown.has(k)) { shown.add(k); const pad = ' '.repeat(Math.max(1,13-d.p.length-d.pr.length-1)); l.push('  '+d.p+'/'+d.pr+pad+'<span class="term-dim">closed</span>   '+d.svc); } });
@@ -2144,15 +2155,8 @@ function termNetstat() {
   const n = getNet(); let l = ['<span class="term-h">Active Connections</span>','','  Proto  Local Address              Foreign Address            State'];
   l.push('  TCP    '+n.ip+':49152          169.254.16.51:554          ESTABLISHED');
   l.push('  TCP    '+n.ip+':49153          169.254.16.50:554          ESTABLISHED');
-  // Check effective rules (first match wins per port)
-  function effectiveAllow(port, proto) {
-    for (const r of fwRules) {
-      const pm = r.proto === proto || r.proto === 'TCP+UDP';
-      if (r.port === port && pm && r.dir === 'Outbound') return r.action === 'ALLOW';
-    }
-    return false;
-  }
-  const has443 = effectiveAllow('443','UDP'), has2088 = effectiveAllow('2088','UDP');
+  const has443 = fwRules.some(r => r.port==='443' && (r.proto==='UDP'||r.proto==='TCP+UDP') && r.action==='ALLOW');
+  const has2088 = fwRules.some(r => r.port==='2088' && (r.proto==='UDP'||r.proto==='TCP+UDP') && r.action==='ALLOW');
   const hasPx = cfRules.some(r => r.action==='ALLOW' && r.domain.toLowerCase().includes('pixellot'));
   const hasBal = cfRules.some(r => r.action==='ALLOW' && r.domain.toLowerCase().includes('balena'));
   if (has443 && hasPx && !advState.ssl) l.push('  UDP    '+n.ip+':443             52.84.125.42:443           ESTABLISHED');
