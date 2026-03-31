@@ -1730,7 +1730,7 @@ function renderSessions() {
   if (!adminUnlocked) return;
   const bar = document.getElementById('sessBar');
   if (!sessions.length) { bar.innerHTML = '<div class="no-sess">No sessions yet.</div>'; document.getElementById('sessView').style.display = 'none'; return; }
-  bar.innerHTML = sessions.map((s,i) => `<button class="sess-btn ${viewSess===s?'active':''}" onclick="selectSess(${i})">${s.name}${s.submitted?' ✅':''}</button>`).join('');
+  bar.innerHTML = sessions.map((s,i) => `<div style="display:inline-flex;align-items:center;margin-right:6px;margin-bottom:6px;"><button class="sess-btn ${viewSess===s?'active':''}" onclick="selectSess(${i})" style="margin:0;border-radius:var(--r-md) 0 0 var(--r-md);">${s.name}${s.submitted?' ✅':''}</button><button onclick="clearSession(${i})" title="Delete ${escH(s.name)}" style="background:${viewSess===s?'var(--red-h)':'var(--bg-card)'};border:1px solid ${viewSess===s?'var(--red)':'var(--border)'};border-left:none;border-radius:0 var(--r-md) var(--r-md) 0;color:${viewSess===s?'#fff':'var(--t3)'};padding:7px 8px;font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s;" onmouseover="this.style.color='var(--red-soft)';this.style.background='var(--red-dim)'" onmouseout="this.style.color='${viewSess===s?'#fff':'var(--t3)'}';this.style.background='${viewSess===s?'var(--red-h)':'var(--bg-card)'}'"">✕</button></div>`).join('');
   document.getElementById('sessView').style.display = 'block';
 }
 function selectSess(i) { viewSess = sessions[i]; renderSessions(); refreshAdmin(); }
@@ -1754,6 +1754,22 @@ function refreshAdmin() {
 }
 
 function clearSessions() { if (!confirm('Clear all saved sessions?')) return; fetch('/api/sessions',{method:'DELETE'}).catch(() => {}); sessions = []; activeSess = null; viewSess = null; renderSessions(); document.getElementById('sessView').style.display = 'none'; }
+
+async function clearSession(idx) {
+  const s = sessions[idx];
+  if (!s) return;
+  if (!confirm('Delete session for "' + s.name + '"?')) return;
+  // Remove from Supabase by re-saving without this session
+  sessions.splice(idx, 1);
+  if (viewSess === s) viewSess = sessions.length ? sessions[0] : null;
+  if (activeSess === s) activeSess = null;
+  // Delete from server — post all remaining sessions after clearing
+  try {
+    await fetch('/api/sessions', { method: 'DELETE' });
+    for (const sess of sessions) { await persistSession(sess); }
+  } catch(e) {}
+  renderSessions(); refreshAdmin();
+}
 
 // ══════════════════════════════════════
 // PERSISTENCE
