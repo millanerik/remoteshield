@@ -1967,7 +1967,7 @@ function termExec(raw) {
     case 'arp': return termArp();
     case 'route': return termRoute();
     case 'whoami': return 'playon\\support-tech';
-    case 'hostname': return 'PXLS2_5215';
+    case 'hostname': return 'VPU';
     case 'systeminfo': return termSysinfo();
     default: return '<span class="term-err">\'' + escH(cmd) + '\' is not recognized.</span>\nType <span class="term-cmd">help</span> for available commands.';
   }
@@ -1977,7 +1977,7 @@ function termHelp() { return ['<span class="term-h">Available Commands:</span>',
 
 function termIpconfig() {
   const n = getNet();
-  let l = ['<span class="term-h">Windows IP Configuration</span>','','   Host Name . . . . . . . . . . . . : PXLS2_5215','   Primary DNS Suffix  . . . . . . . : playon.local','','<span class="term-h">Ethernet adapter Ethernet0:</span>',''];
+  let l = ['<span class="term-h">Windows IP Configuration</span>','','   Host Name . . . . . . . . . . . . : VPU','   Primary DNS Suffix  . . . . . . . : playon.local','','<span class="term-h">Ethernet adapter Ethernet0:</span>',''];
 
   if (n.dhcp) {
     // DHCP mode — no server on this VLAN
@@ -2189,7 +2189,7 @@ function termRoute() {
 function termSysinfo() {
   const n = getNet();
   const hasNet = !n.dhcp && n.applied;
-  return ['<span class="term-h">System Information</span>','','Host Name:                 PXLS2_5215','System ID:                 5cbd98b0118884077f6cc921','OS Name:                   Microsoft Windows 10 IoT Enterprise','Processor:                 Intel(R) Core(TM) i5-10500 @ 3.10GHz','Total Physical Memory:     32,768 MB','','<span class="term-h">Network Configuration</span>','DHCP Enabled:              '+(n.dhcp?'Yes':'No'),'IP Address:                '+(hasNet?n.ip:'<span class="term-err">Not configured</span>'),'Subnet Mask:               '+(hasNet?n.mask:'—'),'Default Gateway:           '+(hasNet?n.gw:'—'),'DNS Server:                '+(hasNet?n.dns:'—'),'MAC Address:               9C-7B-EF-4D-96-9D'].join('\n');
+  return ['<span class="term-h">System Information</span>','','Host Name:                 VPU','System ID:                 5cbd98b0118884077f6cc921','OS Name:                   Microsoft Windows 10 IoT Enterprise','Processor:                 Intel(R) Core(TM) i5-10500 @ 3.10GHz','Total Physical Memory:     32,768 MB','','<span class="term-h">Network Configuration</span>','DHCP Enabled:              '+(n.dhcp?'Yes':'No'),'IP Address:                '+(hasNet?n.ip:'<span class="term-err">Not configured</span>'),'Subnet Mask:               '+(hasNet?n.mask:'—'),'Default Gateway:           '+(hasNet?n.gw:'—'),'DNS Server:                '+(hasNet?n.dns:'—'),'MAC Address:               9C-7B-EF-4D-96-9D'].join('\n');
 }
 
 // ══════════════════════════════════════
